@@ -210,15 +210,17 @@
                 month: "long", day: "numeric", hour: "2-digit", minute: "2-digit"
             });
         }
+	    
+    	timer_delay = 0;
 
         for(let i = 0; event_date_divs.length > i; i++) {
-            let timed_id = setInterval(function () {
+            let timer_id = setInterval(function () {
                 let event_date = Date.parse(event_date_divs[i].getAttribute("data-start-event-date"));
                 let current_time = Date.now();
 
                 if (current_time >= event_date) {
                     countdown_divs[i].innerHTML = "0 д. 0 ч. 0 м. 0 с.";
-                    clearInterval(timed_id);
+                    clearInterval(timer_id);
                     return;
                 }
 
@@ -257,7 +259,11 @@
                 }
 
                 countdown_divs[i].innerHTML = buf;
-            }, 1000);
+				
+                if(timer_delay === 0){
+                    timer_delay = 1000;
+                }
+            }, timer_delay);
         }
     </script>
 </body>
