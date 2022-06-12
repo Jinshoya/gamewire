@@ -57,6 +57,7 @@ font-weight:bold;
     position: relative;
     height: auto;
     width: 100%;
+	min-width:238px;
 }
 .events {
     display: flex;
