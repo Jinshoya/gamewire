@@ -85,6 +85,15 @@ background-color: #107C10;
 
 }
 
+.event_playstation {
+color:#fff;
+font-size: 13px;
+padding:10px;
+font-weight:bold;
+text-align:center;
+background-color: #00439C;
+}
+
 .event_title {
 color:#fff;
 font-size: 24px;
