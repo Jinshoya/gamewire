@@ -2,7 +2,7 @@
         let countdown_divs = document.getElementsByClassName("countdown");
 
         for(let i = 0; event_date_divs.length > i; i++){
-            event_date_divs[i].innerHTML = new Date(Date.parse(event_date_divs[i].getAttribute("data-start-event-date"))).toLocaleString(window.navigator.language, {
+            event_date_divs[i].innerHTML = new Date(Date.parse(event_date_divs[i].getAttribute("data-start-event-date"))).toLocaleString(navigator.language, {
                 month: "long", day: "numeric", hour: "2-digit", minute: "2-digit"
             });
         }
@@ -20,7 +20,7 @@
                     return;
                 }
 
-                let language = window.navigator.language;
+                let language = navigator.language;
                 let buf = "";
                 let days = Math.floor((event_date - current_time) / 86400000);
                 let hours = Math.floor(((event_date - current_time) / 3600000) % 24);
@@ -29,7 +29,7 @@
 
 
                 switch(language) {
-                    case 'ru':
+                    case 'ru-RU':
                         if (days > 0) {
                             buf = days + " д. ";
                         }
