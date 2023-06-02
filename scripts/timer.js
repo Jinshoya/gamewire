@@ -58,6 +58,35 @@
                             }
                         }
                         break
+                    case 'ru':
+                        if (days > 0) {
+                            buf = days + " д. ";
+                        }
+        
+                        if (hours > 0 || buf !== "") {
+                            if (buf !== "") {
+                                buf += "" + String(hours) + " ч. ";
+                            } else {
+                                buf = String(hours) + " ч. ";
+                            }
+                        }
+        
+                        if (minutes > 0 || buf !== "") {
+                            if (buf !== "") {
+                                buf += "" + String(minutes) + " м. ";
+                            } else {
+                                buf = String(minutes) + " м. ";
+                            }
+                        }
+        
+                        if (seconds > 0 || buf !== "") {
+                            if (buf !== "") {
+                                buf += "" + String(seconds) + " с.";
+                            } else {
+                                buf = String(seconds) + " с.";
+                            }
+                        }
+                        break
                     default :
                     if (days > 0) {
                         buf = days + " d. ";
