@@ -20,7 +20,7 @@
                     return;
                 }
 
-                let language = navigator.language;
+                let language = window.navigator.language || window.navigator.browserLanguage || window.navigator.userLanguage;
                 let buf = "";
                 let days = Math.floor((event_date - current_time) / 86400000);
                 let hours = Math.floor(((event_date - current_time) / 3600000) % 24);
