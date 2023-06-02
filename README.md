@@ -1,3 +1,3 @@
-# gamewire
+# gamelink
 
 ## Website is live @ http://gamelink.pro/
