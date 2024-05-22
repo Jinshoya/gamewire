@@ -1,3 +1,3 @@
-# gamelink
+# ggpause
 
-## Website is live @ http://gamelink.pro/
+## Website is live @ http://ggpause.com/
