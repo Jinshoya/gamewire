@@ -15,7 +15,7 @@
                 let current_time = Date.now();
 
                 if (current_time >= event_date) {
-                    countdown_divs[i].innerHTML = "0 д. 0 ч. 0 м. 0 с.";
+                    countdown_divs[i].innerHTML = "Event Has Already Started";
                     clearInterval(timer_id);
                     return;
                 }
