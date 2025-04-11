@@ -51,9 +51,6 @@
       border-bottom: none;
       border-top: none;
     }
-    .event_logo:hover #live_event_label {
-      display: flex;
-    }
     #past-events {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -159,9 +156,11 @@
               el.textContent = 'Started';
               if (!isSteam && parent.parentElement.id !== 'live-events') {
                 document.getElementById('live-events').appendChild(parent);
+                parent.querySelector('#live_event_label').style.display = 'flex'; // Display 'NOW LIVE'
               }
             } else if (!isSteam && parent.parentElement.id !== 'past-events') {
               document.getElementById('past-events').appendChild(parent);
+              parent.querySelector('#live_event_label').style.display = 'none'; // Hide 'NOW LIVE' once it's in the past
             }
             return;
           }
@@ -197,7 +196,7 @@
             <div class="event_head">
               <div class="event_logo">
                 <img src="${data.image}" alt="${data.title}">
-                <div id="live_event_label">NOW LIVE</div>
+                <div id="live_event_label" style="display: none;">NOW LIVE</div> <!-- Hidden until event starts -->
               </div>
               <div class="event_flex">
                 <div class="col-sm">
