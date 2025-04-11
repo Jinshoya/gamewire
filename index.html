@@ -16,28 +16,32 @@
   <meta name="description" content="Countdown to events with links to the streams">
   <meta name="keywords" content="XBOX,Playstation,State of Play,Countdown,2022,2023,2024,2025,2026,2027,gaming,gamelink,game,wire,game countdown,conference countdown,timer,steam,steam sale">
   <style>
-    #live_event_label {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      background-color: #f28e8e;
-      padding: 5px 15px;
-      border-radius: 30px;
-      color: white;
-      font-weight: bold;
-      font-size: 1.25rem;
-    }
-    #live_event_label::before {
-      content: "";
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      background-color: white;
-      margin-right: 10px;
-    }
+#live_event_label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  background-color: #f28e8e;
+  padding: 5px 15px;
+  border-radius: 30px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.25rem;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Add text shadow */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Add shadow to the red circle */
+}
+
+#live_event_label::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: white;
+  margin-right: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Shadow on the circle */
+}
     .event_logo {
       position: relative;
     }
