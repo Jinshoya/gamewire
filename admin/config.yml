@@ -16,4 +16,9 @@ collections:
       - { label: "Date", name: "date", widget: "datetime" }
       - { label: "Image", name: "image", widget: "image" }
       - { label: "Link", name: "link", widget: "string" }
-      - { label: "Status", name: "status", widget: "select", options: ["upcoming", "past"] }
+      - label: "Type"
+        name: "type"
+        widget: "select"
+        options:
+          - { label: "Upcoming Event", value: "event" }
+          - { label: "Steam Sale", value: "steam_sale" }

@@ -2,418 +2,104 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=0.8">
- <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
- 	<link rel="stylesheet" type="text/css" href="./styles/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="./styles/main.css" />
-    <title>Event schedule - ggPause.com</title>
-<meta property="og:url" content="https://ggpause.com/">
-<meta property="og:image" content="https://ggpause.com/images/gamewire.jpg">
-<meta property="og:title" content="ggPause Event Countdown">
-<meta property="og:description" content="Your #1 source for upcoming gaming event schedule.">
-<meta property="og:type" content="website">
-<meta name="description" content="Countdown to events with links to the streams">
-<meta name="keywords" content="XBOX,Playstation,State of Play,Countdown,2022,2023,2024,2025,2026,2027,gaming,gamelink,game,wire,game countdown,conference countdown,timer,steam,steam sale">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.8">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" type="text/css" href="./styles/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="./styles/main.css" />
+  <title>Event schedule - ggPause.com</title>
+  <meta property="og:url" content="https://ggpause.com/">
+  <meta property="og:image" content="https://ggpause.com/images/gamewire.jpg">
+  <meta property="og:title" content="ggPause Event Countdown">
+  <meta property="og:description" content="Your #1 source for upcoming gaming event schedule.">
+  <meta property="og:type" content="website">
+  <meta name="description" content="Countdown to events with links to the streams">
+  <meta name="keywords" content="XBOX,Playstation,State of Play,Countdown,2022,2023,2024,2025,2026,2027,gaming,gamelink,game,wire,game countdown,conference countdown,timer,steam,steam sale">
 </head>
 
 <body>
-
-<div class="content" style="margin-left: auto;margin-right: auto;max-width:960px;"> 
-<div class="container">
-
- <!--  
-<div class= "events_upnext" id="next_event_name">Next Event</div>
-               
-<div class="events_grouped">
-<div class="events">
-
-    <div class="event_headliner">
-        <div class="event_head">
-            <div class="event_logo">	
-                <img src="./images/events/ninteno_direct@2x.png" alt="Nintendo Direct">     
-
-               </div>
-               <div class="event_flex">
-                <div class="col-sm">
-                <div class="event_upc_title">Nintendo Direct</div></div>
-                <div class="col-sm">
-                    <div class="event_date" data-start-event-date="2024-06-18T13:00:00.000-01:00">LIVE</div>	
-                            </div>
-                <div class="col-sm">
-                    <div class="countdown" data-start-event-date="2024-06-18T13:00:00.000-01:00">LIVE</div>	
-                </div>
-                            <div class="col-sm">
-                                <div class="event_links">
-                                    <a href="https://www.twitch.tv/nintendo" target="_blank"><img src="./images/links/twitch_link.png" alt="Twitch" class="links_image"></a>
-                                    <a href="https://www.youtube.com/live/kX3BkD5PVUM" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                            
-                            </div></div>	
-                        </div>
-            </div>	
-        </div>
-
-        
-</div>
-    </div>
-
-
-	</div>
--->
+  <div class="content" style="margin-left: auto;margin-right: auto;max-width:960px;">
     <div class="container">
-        <div class= "events_upnext" id="next_steam_sale">Next Steam Sale</div>
-        <div class="events_grouped">
-        <div class="events">
-        
-        
-                
-        <div class="event_headliner">
-                <div class="event_head">
-                    <div class="event_logo">	
-        <img srcset="./images/events/steam.png, ./images/banners/steam@2x.png 1.5x, ./images/events/steam@2x.png 2x" src="./images/events/steam.png" alt="Steam Summer Sale">
-        
-                       </div>
-                       <div class="event_flex">
-                        <div class="col-sm">
-                        <div class="event_upc_title">Steam Summer Sale</div></div>
-                        <div class="col-sm">
-                            <div class="event_date" data-start-event-date="2024-06-27T13:00:00.000-04:00">LIVE</div>	
-                                    </div>
-                        <div class="col-sm">
-                            <div class="countdown" data-start-event-date="2024-06-27T13:00:00.000-04:00">LIVE</div>	
-                        </div>
-                                    <div class="col-sm">
-                                        <div class="event_links">
-                                            <a href="https://store.steampowered.com/" target="_blank"><img src="./images/links/steam_link.png" alt="Steam" class="links_image"></a>
-                                    
-                                    </div></div>	
-                                </div>
-                    </div>	
-                </div>
+      <div class="events_upnext" id="next_steam_sale">Next Steam Sale</div>
+      <div class="events_grouped">
+        <div class="events" id="steam-sale-event">
+          <!-- Steam sale event inserted here -->
         </div>
-            </div>
-        
-        
-            </div>
+      </div>
 
-  <!--
-            <div class="container">
-                <div class= "events_upnext" id="upcoming_events_name">Upcoming Events</div>
-                <div class="events_grouped">
-                <div class="events">
-                
+      <div class="events_upnext" id="next_event_name">Upcoming Events</div>
+      <div class="events_grouped">
+        <div class="events" id="upcoming-events">
+          <!-- Upcoming events from CMS go here -->
+        </div>
+      </div>
 
-                </div>
-                    </div>             
-
-
-
-
-                                            <div class="event_headliner">
-                                                <div class="event_head">
-                                                    <div class="event_logo">	
-                                                        <img src="./images/events/ninteno_direct@2x.png" alt="Nintendo Direct">     
-                                        
-                                                       </div>
-                                                       <div class="event_flex">
-                                                        <div class="col-sm">
-                                                        <div class="event_upc_title">Nintendo Direct</div></div>
-                                                        <div class="col-sm">
-                                                            <div >June ???</div>	
-                                                                    </div>
-                                                        <div class="col-sm">
-                                                            <div class="countdown">???</div>	
-                                                        </div>
-                                                                    <div class="col-sm">
-                                                                        <div class="event_links">
-                                                                            <a href="https://www.twitch.tv/nintendo" target="_blank"><img src="./images/links/twitch_link.png" alt="Twitch" class="links_image"></a>
-                                                                            <a href="https://www.youtube.com/nintendo/streams" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                                                    
-                                                                    </div></div>	
-                                                                </div>
-                                                    </div>	
-                                                </div>
-
-
-                </div>
-                
-                
-
-            -->
-                
-                    <div class="container"> 
-<div class= "events_upcoming" id="old_events_name">Old Events</div>
-<div class="events_grouped">
-    <div class="events">
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/ninteno_direct@2x.png" alt="Nintendo Direct">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Nintendo Direct</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/live/kX3BkD5PVUM" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/ubisoft@2x.png" alt="Ubisoft Forward">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Ubisoft Forward</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=zPoJUPrCkkg" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/pcgaming@2x.png" alt="PC Gaming Show">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">PC Gaming Show</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=AaZCdMPqT44" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/xbox@2x.png" alt="Xbox Games Showcase">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Xbox Games Showcase</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=Z8DALyUq4gc" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/fgs@2x.png" alt="Future Games Show">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Future Games Show</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=1jXmyz452hs" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/wlg@2x.png" alt="Women-led Games Summer Games Fest">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Women-led Games Summer Games Fest</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=cnMnMb_ZNSY" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/lag@2x.png" alt="Latin America Games Showcase">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Latin America Games</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=agU97QU0Z4c" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>   
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/whd@2x.png" alt="Wholesome Direct">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Wholesome Direct</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=FCWH-vWw1gg" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/future_of_play@2x.png" alt="Future of Play Direct">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Future of Play Direct</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=9Wov9caAN0I" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/devolver_digital@2x.png" alt="Devolver Direct">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Devolver Direct</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=fY4fzpd2T28" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-            
-    
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/sgf@2x.png" alt="Summer Game Fest">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Summer Game Fest</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=pZzia5NrMuU" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/guerilla@2x.png" alt="Guerrilla Collective">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">Guerrilla Collective</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=ojWMAfiSurA" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a> 
-                                
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/otk@2x.png" alt="OTK Games Expo">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">OTK Games Expo</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.youtube.com/watch?v=Ds3POuU_cDk" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a>                            
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-        <div class="events_old">
-            <div class="event_head">
-                <div class="event_logo">	
-                    <img src="./images/events/playstation@2x.png" alt="Sony State Of Play">     
-    
-                   </div>
-                   <div class="event_flex">
-                    <div class="col-sm">
-                    <div class="event_upc_title">PlayStation State of Play</div></div>
-                                <div class="col-sm">
-                                    <div class="event_links">
-                                        <a href="https://www.twitch.tv/videos/2159490663" target="_blank"><img src="./images/links/twitch_link.png" alt="Twitch" class="links_image"></a>
-                                        <a href="https://www.youtube.com/watch?v=m-4ZM3jxhdE" target="_blank"><img src="./images/links/youtube_link.png" alt="YouTube" class="links_image"></a>                            
-                                </div></div>	
-                            </div>
-                </div>	
-            </div>
-
-
-
-	</div>
+      <div class="events_upcoming" id="old_events_name">Old Events</div>
+      <div class="events_grouped">
+        <div class="events" id="past-events">
+          <!-- Past events from CMS go here -->
+        </div>
+      </div>
     </div>
-	</div>
-    </div>
+  </div>
 
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./scripts/timer.js"></script>
-    <script src="./scripts/translations.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gray-matter@4.0.3/index.min.js"></script>
+  <script src="./scripts/timer.js"></script>
+  <script src="./scripts/translations.js"></script>
+  <script>
+    async function loadEvents() {
+      const files = ["tomorrow.md"];
+      const now = new Date();
+
+      for (const file of files) {
+        const res = await fetch(`/events/${file}`);
+        const raw = await res.text();
+        const parsed = window.matter(raw);
+        const data = parsed.data;
+
+        const eventDate = new Date(data.date);
+        const isPast = eventDate < now;
+        const isSteam = data.type === 'steam_sale';
+
+        const html = `
+          <div class="event_headliner">
+            <div class="event_head">
+              <div class="event_logo">
+                <img src="${data.image}" alt="${data.title}">
+              </div>
+              <div class="event_flex">
+                <div class="col-sm">
+                  <div class="event_upc_title">${data.title}</div>
+                </div>
+                <div class="col-sm">
+                  <div class="event_date" data-start-event-date="${data.date}">${new Date(data.date).toLocaleString()}</div>
+                </div>
+                <div class="col-sm">
+                  <div class="countdown" data-start-event-date="${data.date}">...</div>
+                </div>
+                <div class="col-sm">
+                  <div class="event_links">
+                    <a href="${data.link}" target="_blank"><img src="./images/links/youtube_link.png" alt="Link" class="links_image"></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+
+        const targetId = isPast
+          ? "past-events"
+          : isSteam
+            ? "steam-sale-event"
+            : "upcoming-events";
+
+        document.getElementById(targetId).insertAdjacentHTML("beforeend", html);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", loadEvents);
+  </script>
 </body>
 
 </html>
