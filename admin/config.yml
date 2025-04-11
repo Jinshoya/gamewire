@@ -2,9 +2,6 @@ backend:
   name: github
   repo: Jinshoya/gamewire
   branch: main
-  auth_scope: repo
-  base_url: https://auth.netlify.com
-  auth_endpoint: auth
 
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
