@@ -15,6 +15,25 @@
   <meta property="og:type" content="website">
   <meta name="description" content="Countdown to events with links to the streams">
   <meta name="keywords" content="XBOX,Playstation,State of Play,Countdown,2022,2023,2024,2025,2026,2027,gaming,gamelink,game,wire,game countdown,conference countdown,timer,steam,steam sale">
+  <style>
+    #live_event_label {
+      background-color: #ff0033;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.25rem;
+      border-radius: 8px;
+      margin-top: 20px;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.7); }
+      50% { box-shadow: 0 0 20px rgba(255, 0, 0, 1); }
+      100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.7); }
+    }
+  </style>
 </head>
 
 <body>
@@ -25,14 +44,14 @@
         <div class="events" id="steam-sale-event"></div>
       </div>
 
-      <div class="events_upnext" id="next_event_name">Upcoming Events</div>
-      <div class="events_grouped">
-        <div class="events" id="upcoming-events"></div>
-      </div>
-
       <div class="events_upnext" id="live_event_label">NOW LIVE</div>
       <div class="events_grouped">
         <div class="events" id="live-events"></div>
+      </div>
+
+      <div class="events_upnext" id="next_event_name">Upcoming Events</div>
+      <div class="events_grouped">
+        <div class="events" id="upcoming-events"></div>
       </div>
 
       <div class="events_upcoming" id="old_events_name">Old Events</div>
@@ -111,10 +130,12 @@
             return;
           }
 
-          const hours = Math.floor(diff / 1000 / 60 / 60);
-          const mins = Math.floor((diff / 1000 / 60) % 60);
-          const secs = Math.floor((diff / 1000) % 60);
-          el.textContent = `${hours}h ${mins}m ${secs}s`;
+          const totalSeconds = Math.floor(diff / 1000);
+          const days = Math.floor(totalSeconds / (3600 * 24));
+          const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+          const mins = Math.floor((totalSeconds % 3600) / 60);
+
+          el.textContent = `${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m`;
         });
       }, 1000);
     }
@@ -133,9 +154,10 @@
         const eventDate = new Date(data.date);
         const isPast = eventDate < now;
         const isSteam = data.type === 'steam_sale';
+        const borderColor = data.borderColor || '#ff6600';
 
         const html = `
-          <div class="event_headliner">
+          <div class="event_headliner" style="border-left: 6px solid ${borderColor}; border-right: 6px solid ${borderColor};">
             <div class="event_head">
               <div class="event_logo">
                 <img src="${data.image}" alt="${data.title}">

@@ -16,6 +16,7 @@ collections:
       - { label: "Date", name: "date", widget: "datetime" }
       - { label: "End Date (only for Steam Sale)", name: "end", widget: "datetime", required: false }
       - { label: "Image", name: "image", widget: "image" }
+      - { label: "Border Color", name: "borderColor", widget: "color", required: false, default: "#ff6600" }
       - label: "Event Type"
         name: "type"
         widget: "select"
@@ -25,30 +26,35 @@ collections:
           - { label: "Old Event", value: "old_event" }
       - label: "YouTube Link"
         name: "youtube"
+        required: false
         widget: "object"
         fields:
-          - { label: "URL", name: "url", widget: "string" }
+          - { label: "URL", name: "url", widget: "string", required: false }
           - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/youtube_link.png" }
       - label: "Twitch Link"
         name: "twitch"
+        required: false
         widget: "object"
         fields:
-          - { label: "URL", name: "url", widget: "string" }
+          - { label: "URL", name: "url", widget: "string", required: false }
           - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/twitch_link.png" }
       - label: "Website Link"
         name: "website"
+        required: false
         widget: "object"
         fields:
-          - { label: "URL", name: "url", widget: "string" }
+          - { label: "URL", name: "url", widget: "string", required: false }
           - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/web_link.png" }
       - label: "Steam Link"
         name: "steam"
+        required: false
         widget: "object"
         fields:
-          - { label: "URL", name: "url", widget: "string" }
+          - { label: "URL", name: "url", widget: "string", required: false }
           - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/steam_link.png" }
       - label: "Custom Links"
         name: "links"
+        required: false
         widget: "list"
         summary: "{{fields.label}} - {{fields.url}}"
         fields:
