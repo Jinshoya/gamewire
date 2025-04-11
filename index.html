@@ -15,6 +15,58 @@
   <meta property="og:type" content="website">
   <meta name="description" content="Countdown to events with links to the streams">
   <meta name="keywords" content="XBOX,Playstation,State of Play,Countdown,2022,2023,2024,2025,2026,2027,gaming,gamelink,game,wire,game countdown,conference countdown,timer,steam,steam sale">
+  <style>
+    #live_event_label {
+      background-color: transparent;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.25rem;
+      position: relative;
+      margin-top: 20px;
+    }
+    #live_event_label::before {
+      content: "NOW LIVE";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+      color: white;
+      font-size: 2rem;
+      padding: 10px 20px;
+    }
+    #live_event_label .event_logo {
+      position: relative;
+    }
+    #live_event_label .event_logo img {
+      display: block;
+      line-height: 0;
+      height: auto;
+      width: 100%;
+      border-radius: 8px;
+      border: 3px solid var(--event-border-color, #d9a62d);
+      border-bottom: none;
+      border-top: none;
+    }
+    #past-events {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    @media (min-width: 600px) and (max-width: 1023px) {
+      #past-events {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (min-width: 1024px) {
+      #past-events {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -178,4 +230,5 @@
     window.addEventListener("DOMContentLoaded", loadEvents);
   </script>
 </body>
+
 </html>
