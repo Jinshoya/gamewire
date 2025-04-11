@@ -22,33 +22,43 @@
     <div class="container">
       <div class="events_upnext" id="next_steam_sale">Next Steam Sale</div>
       <div class="events_grouped">
-        <div class="events" id="steam-sale-event">
-          <!-- Steam sale event inserted here -->
-        </div>
+        <div class="events" id="steam-sale-event"></div>
       </div>
 
       <div class="events_upnext" id="next_event_name">Upcoming Events</div>
       <div class="events_grouped">
-        <div class="events" id="upcoming-events">
-          <!-- Upcoming events from CMS go here -->
-        </div>
+        <div class="events" id="upcoming-events"></div>
       </div>
 
       <div class="events_upcoming" id="old_events_name">Old Events</div>
       <div class="events_grouped">
-        <div class="events" id="past-events">
-          <!-- Past events from CMS go here -->
-        </div>
+        <div class="events" id="past-events"></div>
       </div>
     </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/front-matter@4.0.2/dist/front-matter.min.js"></script>
   <script src="./scripts/timer.js"></script>
   <script src="./scripts/translations.js"></script>
   <script>
+    function parseFrontmatter(md) {
+      const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/m.exec(md);
+      if (!match) return { attributes: {}, body: md };
+
+      const yamlText = match[1];
+      const body = match[2];
+      const lines = yamlText.split('\n');
+
+      const attributes = {};
+      for (const line of lines) {
+        const [key, ...rest] = line.split(':');
+        attributes[key.trim()] = rest.join(':').trim();
+      }
+
+      return { attributes, body };
+    }
+
     async function loadEvents() {
       const res = await fetch('/events/index.json');
       const files = await res.json();
@@ -57,7 +67,7 @@
       for (const file of files) {
         const response = await fetch(`/events/${file}`);
         const raw = await response.text();
-        const parsed = window.frontMatter(raw);
+        const parsed = parseFrontmatter(raw);
         const data = parsed.attributes;
 
         const eventDate = new Date(data.date);
