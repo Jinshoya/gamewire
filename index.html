@@ -17,26 +17,26 @@
   <meta name="keywords" content="XBOX,Playstation,State of Play,Countdown,2022,2023,2024,2025,2026,2027,gaming,gamelink,game,wire,game countdown,conference countdown,timer,steam,steam sale">
   <style>
     #live_event_label {
-      background-color: transparent;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      background-color: red;
+      padding: 5px 10px;
+      border-radius: 50px;
       color: white;
-      padding: 10px;
-      text-align: center;
       font-weight: bold;
       font-size: 1.25rem;
-      position: relative;
-      margin-top: 20px;
     }
     #live_event_label::before {
-      content: "NOW LIVE";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: rgba(0, 0, 0, 0.7);
+      content: "";
+      width: 15px;
+      height: 15px;
       border-radius: 50%;
-      color: white;
-      font-size: 2rem;
-      padding: 10px 20px;
+      background-color: red;
+      margin-right: 8px;
     }
     #live_event_label .event_logo {
       position: relative;
