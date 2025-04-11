@@ -15,54 +15,8 @@
   <meta property="og:type" content="website">
   <meta name="description" content="Countdown to events with links to the streams">
   <meta name="keywords" content="XBOX,Playstation,State of Play,Countdown,2022,2023,2024,2025,2026,2027,gaming,gamelink,game,wire,game countdown,conference countdown,timer,steam,steam sale">
-  <style>
-    #live_event_label {
-      background-color: #f28e8e;
-      color: white;
-      padding: 10px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.25rem;
-      border-radius: 8px;
-      margin-top: 20px;
-      box-shadow: 0 0 15px rgba(242, 142, 142, 0.5);
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 10px rgba(242, 142, 142, 0.4); }
-      50% { box-shadow: 0 0 20px rgba(242, 142, 142, 0.7); }
-      100% { box-shadow: 0 0 10px rgba(242, 142, 142, 0.4); }
-    }
-    #past-events {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-    @media (min-width: 600px) and (max-width: 1023px) {
-      #past-events {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    @media (min-width: 1024px) {
-      #past-events {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-    .event_logo img {
-      display: block;
-      line-height: 0;
-      height: auto;
-      width: 100%;
-      border-radius: 8px;
-      border: 3px solid var(--event-border-color, #d9a62d);
-      border-bottom: none;
-      border-top: none;
-    }
-    .event_headliner {
-      border: none !important;
-    }
-  </style>
 </head>
+
 <body>
   <div class="content" style="margin-left: auto;margin-right: auto;max-width:960px;">
     <div class="container">
@@ -181,10 +135,10 @@
         const eventDate = new Date(data.date);
         const isPast = eventDate < now;
         const isSteam = data.type === 'steam_sale';
-        const borderColor = data.borderColor || '#ff6600';
+        const borderColor = data.borderColor || '#d9a62d';
 
         const html = `
-          <div class="event_headliner" style="border-left: 6px solid ${borderColor}; border-right: 6px solid ${borderColor};">
+          <div class="event_headliner" style="--event-border-color: ${borderColor};">
             <div class="event_head">
               <div class="event_logo">
                 <img src="${data.image}" alt="${data.title}">
