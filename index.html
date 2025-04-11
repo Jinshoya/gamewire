@@ -30,6 +30,11 @@
         <div class="events" id="upcoming-events"></div>
       </div>
 
+      <div class="events_upnext" id="live_event_label">NOW LIVE</div>
+      <div class="events_grouped">
+        <div class="events" id="live-events"></div>
+      </div>
+
       <div class="events_upcoming" id="old_events_name">Old Events</div>
       <div class="events_grouped">
         <div class="events" id="past-events"></div>
@@ -59,10 +64,26 @@
       return { attributes, body };
     }
 
+    function renderLinks(data) {
+      const links = [];
+      if (data.youtube && data.youtube.url) links.push(data.youtube);
+      if (data.twitch && data.twitch.url) links.push(data.twitch);
+      if (data.website && data.website.url) links.push(data.website);
+      if (data.steam && data.steam.url) links.push(data.steam);
+      if (Array.isArray(data.links)) links.push(...data.links);
+
+      return links.map(link => `
+        <a href="${link.url}" target="_blank">
+          <img src="${link.icon}" alt="${link.label}" class="links_image">
+        </a>
+      `).join('');
+    }
+
     function startCountdowns() {
       setInterval(() => {
         document.querySelectorAll('.countdown').forEach((el) => {
           const dateStr = el.getAttribute('data-start-event-date');
+          const endStr = el.getAttribute('data-end-event-date');
           const parent = el.closest('.event_headliner');
           const eventDate = new Date(dateStr);
           const now = new Date();
@@ -70,12 +91,21 @@
           const diffFromStart = now - eventDate;
           const isSteam = parent.closest('#steam-sale-event');
 
+          if (isSteam && endStr) {
+            const endDate = new Date(endStr);
+            if (now >= endDate) {
+              parent.remove();
+              return;
+            }
+          }
+
           if (diff <= 0) {
-            // Ongoing event (less than 1 hour past start)
             if (diffFromStart < 3600000) {
               el.textContent = 'Started';
-            } else if (!isSteam && parent.parentElement.id === 'upcoming-events') {
-              // Move to past events after 1 hour
+              if (!isSteam && parent.parentElement.id !== 'live-events') {
+                document.getElementById('live-events').appendChild(parent);
+              }
+            } else if (!isSteam && parent.parentElement.id !== 'past-events') {
               document.getElementById('past-events').appendChild(parent);
             }
             return;
@@ -115,14 +145,16 @@
                   <div class="event_upc_title">${data.title}</div>
                 </div>
                 <div class="col-sm">
-                  <div class="event_date" data-start-event-date="${data.date}">${new Date(data.date).toLocaleString()}</div>
+                  <div class="event_date">
+                    ${isSteam ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : new Date(data.date).toLocaleString()}
+                  </div>
                 </div>
                 <div class="col-sm">
-                  <div class="countdown" data-start-event-date="${data.date}">...</div>
+                  <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div>
                 </div>
                 <div class="col-sm">
                   <div class="event_links">
-                    <a href="${data.link}" target="_blank"><img src="./images/links/youtube_link.png" alt="Link" class="links_image"></a>
+                    ${renderLinks(data)}
                   </div>
                 </div>
               </div>
