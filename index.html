@@ -16,58 +16,64 @@
   <meta name="description" content="Countdown to events with links to the streams">
   <meta name="keywords" content="XBOX,Playstation,State of Play,Countdown,2022,2023,2024,2025,2026,2027,gaming,gamelink,game,wire,game countdown,conference countdown,timer,steam,steam sale">
   <style>
-    #live_event_label {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      background-color: #f28e8e;
-      padding: 5px 15px;
-      border-radius: 30px;
-      color: white;
-      font-weight: bold;
-      font-size: 1.25rem;
-      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Add text shadow */
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Add shadow to the red circle */
-    }
-    #live_event_label::before {
-      content: "";
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      background-color: white;
-      margin-right: 10px;
-    }
-    .event_logo {
-      position: relative;
-    }
-    .event_logo img {
-      display: block;
-      line-height: 0;
-      height: auto;
-      width: 100%;
-      border-radius: 8px;
-      border: 3px solid var(--event-border-color, #d9a62d);
-      border-bottom: none;
-      border-top: none;
-    }
-    #past-events {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-    @media (min-width: 600px) and (max-width: 1023px) {
-      #past-events {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    @media (min-width: 1024px) {
-      #past-events {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
+.event_logo {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.event_logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  border-top: none;
+  border-bottom: none;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.event_logo img:hover {
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+  transform: scale(1.01);
+}
+
+.event_headliner {
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.live_badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  background-color: #f28e8e;
+  color: white;
+  font-weight: bold;
+  font-size: 0.85rem;
+  padding: 4px 10px 4px 8px;
+  border-radius: 16px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+  opacity: 0.95;
+}
+
+.live_badge::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  background-color: white;
+  border-radius: 50%;
+}
   </style>
 </head>
 
@@ -161,7 +167,7 @@
               el.textContent = 'Started';
               if (!isSteam && parent.parentElement.id !== 'live-events') {
                 document.getElementById('live-events').appendChild(parent);
-                parent.querySelector('#live_event_label').style.display = 'flex'; // Display 'NOW LIVE'
+                const liveLabel = parent.querySelector('.live_badge');if (liveLabel) liveLabel.style.display = 'flex';
               }
             } else if (!isSteam && parent.parentElement.id !== 'past-events') {
               document.getElementById('past-events').appendChild(parent);
@@ -197,12 +203,40 @@
         const borderColor = data.borderColor || '#d9a62d';
 
         const html = `
+  <div class="event_headliner" style="--event-border-color: ${borderColor};">
+    <div class="event_head">
+      <div class="event_logo">
+        <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
+        <div class="live_badge" style="display: none;">NOW LIVE</div>
+      </div>
+      <div class="event_flex">
+        <div class="col-sm">
+          <div class="event_upc_title">${data.title}</div>
+        </div>
+        <div class="col-sm">
+          <div class="event_date">
+            ${isSteam ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : new Date(data.date).toLocaleString()}
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div>
+        </div>
+        <div class="col-sm">
+          <div class="event_links">
+            ${renderLinks(data)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
           <div class="event_headliner" style="--event-border-color: ${borderColor};">
             <div class="event_head">
-              <div class="event_logo">
-                <img src="${data.image}" alt="${data.title}">
-                <div id="live_event_label" style="display: none;">NOW LIVE</div> <!-- Hidden until event starts -->
-              </div>
+<div class="event_logo" data-border-color="${borderColor}">
+  <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
+  <div class="live_badge" style="display: none;">NOW LIVE</div>
+</div>
+
               <div class="event_flex">
                 <div class="col-sm">
                   <div class="event_upc_title">${data.title}</div>
