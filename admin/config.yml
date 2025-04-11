@@ -1,0 +1,23 @@
+backend:
+  name: github
+  repo: Jinshoya/gamewire
+  branch: main
+  auth_scope: repo
+  base_url: https://auth.netlify.com
+  auth_endpoint: auth
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "events"
+    label: "Events"
+    folder: "events"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Link", name: "link", widget: "string" }
+      - { label: "Status", name: "status", widget: "select", options: ["upcoming", "past"] }
