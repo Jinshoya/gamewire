@@ -50,15 +50,15 @@
   <script src="./scripts/translations.js"></script>
   <script>
     async function loadEvents() {
-        const res = await fetch('/events/index.json');
-        const files = await res.json();
+      const res = await fetch('/events/index.json');
+      const files = await res.json();
       const now = new Date();
 
       for (const file of files) {
-        const res = await fetch(`/events/${file}`);
+        const response = await fetch(`/events/${file}`);
+        const raw = await response.text();
         const parsed = window.frontMatter(raw);
         const data = parsed.attributes;
-
 
         const eventDate = new Date(data.date);
         const isPast = eventDate < now;
@@ -102,5 +102,4 @@
     window.addEventListener("DOMContentLoaded", loadEvents);
   </script>
 </body>
-
 </html>
