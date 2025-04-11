@@ -4,9 +4,16 @@
     <meta charset="utf-8" />
     <title>GGPause Admin</title>
     <link rel="cms-config-url" href="/admin/config.yml" />
-    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+    <script src="https://unpkg.com/netlify-cms-app@2.15.72/dist/netlify-cms.js" defer></script>
   </head>
   <body>
     <div id="nc-root"></div>
+    <script>
+      window.addEventListener('load', function () {
+        if (window.CMS) {
+          window.CMS.init();
+        }
+      });
+    </script>
   </body>
 </html>
