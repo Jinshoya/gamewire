@@ -1,6 +1,5 @@
 backend:
-  name: github
-  repo: Jinshoya/gamewire
+  name: git-gateway
   branch: main
 
 media_folder: "images/uploads"
