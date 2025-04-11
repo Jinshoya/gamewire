@@ -50,7 +50,8 @@
   <script src="./scripts/translations.js"></script>
   <script>
     async function loadEvents() {
-      const files = ["tomorrow.md"];
+        const res = await fetch('/events/index.json');
+        const files = await res.json();
       const now = new Date();
 
       for (const file of files) {
