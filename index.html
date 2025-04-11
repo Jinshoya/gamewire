@@ -51,6 +51,9 @@
       border-bottom: none;
       border-top: none;
     }
+    .event_logo:hover #live_event_label {
+      display: flex;
+    }
     #past-events {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -194,6 +197,7 @@
             <div class="event_head">
               <div class="event_logo">
                 <img src="${data.image}" alt="${data.title}">
+                <div id="live_event_label">NOW LIVE</div>
               </div>
               <div class="event_flex">
                 <div class="col-sm">
