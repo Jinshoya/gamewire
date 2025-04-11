@@ -229,32 +229,7 @@
       </div>
     </div>
   </div>`;
-  <div class="event_headliner" style="--event-border-color: ${borderColor};">
-    <div class="event_head">
-      <div class="event_logo">
-        <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-        <div class="live_badge" style="display: none;">NOW LIVE</div>
-      </div>
-      <div class="event_flex">
-        <div class="col-sm">
-          <div class="event_upc_title">${data.title}</div>
-        </div>
-        <div class="col-sm">
-          <div class="event_date">
-            ${isSteam ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : new Date(data.date).toLocaleString()}
-          </div>
-        </div>
-        <div class="col-sm">
-          <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div>
-        </div>
-        <div class="col-sm">
-          <div class="event_links">
-            ${renderLinks(data)}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>`;
+
 
           <div class="event_headliner" style="--event-border-color: ${borderColor};">
             <div class="event_head">
