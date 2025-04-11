@@ -56,9 +56,9 @@
 
       for (const file of files) {
         const res = await fetch(`/events/${file}`);
-        const raw = await res.text();
-        const parsed = window.matter(raw);
-        const data = parsed.data;
+        const parsed = window.frontMatter(raw);
+        const data = parsed.attributes;
+
 
         const eventDate = new Date(data.date);
         const isPast = eventDate < now;
