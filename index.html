@@ -59,6 +59,36 @@
       return { attributes, body };
     }
 
+    function startCountdowns() {
+      setInterval(() => {
+        document.querySelectorAll('.countdown').forEach((el) => {
+          const dateStr = el.getAttribute('data-start-event-date');
+          const parent = el.closest('.event_headliner');
+          const eventDate = new Date(dateStr);
+          const now = new Date();
+          const diff = eventDate - now;
+          const diffFromStart = now - eventDate;
+          const isSteam = parent.closest('#steam-sale-event');
+
+          if (diff <= 0) {
+            // Ongoing event (less than 1 hour past start)
+            if (diffFromStart < 3600000) {
+              el.textContent = 'Started';
+            } else if (!isSteam && parent.parentElement.id === 'upcoming-events') {
+              // Move to past events after 1 hour
+              document.getElementById('past-events').appendChild(parent);
+            }
+            return;
+          }
+
+          const hours = Math.floor(diff / 1000 / 60 / 60);
+          const mins = Math.floor((diff / 1000 / 60) % 60);
+          const secs = Math.floor((diff / 1000) % 60);
+          el.textContent = `${hours}h ${mins}m ${secs}s`;
+        });
+      }, 1000);
+    }
+
     async function loadEvents() {
       const res = await fetch('/events/index.json');
       const files = await res.json();
@@ -107,6 +137,7 @@
 
         document.getElementById(targetId).insertAdjacentHTML("beforeend", html);
       }
+      startCountdowns();
     }
 
     window.addEventListener("DOMContentLoaded", loadEvents);
