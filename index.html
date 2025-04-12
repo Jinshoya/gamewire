@@ -209,7 +209,7 @@
   const storageKey = `reaction_${eventId}`;
   const current = localStorage.getItem(storageKey);
 
-  // Undo if clicking same emoji again
+  // If clicking same reaction again → undo
   if (current === emoji) {
     try {
       await supabase
@@ -221,12 +221,13 @@
       localStorage.removeItem(storageKey);
       wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
     } catch (err) {
-      console.error('Failed to undo reaction:', err.message);
+      console.error('Undo failed:', err.message);
     }
+    await refreshReactionCounts(eventId, wrapper);
     return;
   }
 
-  // Remove previous reaction if it exists
+  // Remove previous reaction if different
   if (current) {
     try {
       await supabase
@@ -235,41 +236,50 @@
         .eq('event_id', eventId)
         .eq('emoji', current);
     } catch (err) {
-      console.error('Failed to remove previous reaction:', err.message);
+      console.error('Failed to remove old reaction:', err.message);
     }
   }
 
-  // Insert new reaction
+  // Insert or update the selected emoji
   try {
     await supabase
       .from('reactions')
       .upsert({ event_id: eventId, emoji });
 
     localStorage.setItem(storageKey, emoji);
-
-    // Set highlight
     wrapper.querySelectorAll('button').forEach(btn => {
       const e = btn.textContent.trim().split(' ')[0];
       btn.classList.toggle('reacted', e === emoji);
     });
-
-    // Refresh counts
-    const { data: counts, error } = await supabase
-      .from('reactions')
-      .select('event_id, emoji, count')
-      .eq('event_id', eventId);
-
-    if (error) return console.error('Count refresh failed:', error.message);
-
-    wrapper.querySelectorAll('button').forEach(btn => {
-      const e = btn.textContent.trim().split(' ')[0];
-      const found = counts.find(r => r.emoji === e);
-      btn.querySelector('span').textContent = found ? found.count : '0';
-    });
-
   } catch (err) {
     console.error('Failed to insert reaction:', err.message);
   }
+
+  await refreshReactionCounts(eventId, wrapper);
+}
+
+// Helper: Refresh reaction numbers and highlight
+async function refreshReactionCounts(eventId, wrapper) {
+  const { data, error } = await supabase
+    .from('reactions')
+    .select('emoji, count')
+    .eq('event_id', eventId);
+
+  if (error) {
+    console.error('Failed to refresh counts:', error.message);
+    return;
+  }
+
+  const storageKey = `reaction_${eventId}`;
+  const selected = localStorage.getItem(storageKey);
+
+  wrapper.querySelectorAll('button').forEach(btn => {
+    const emoji = btn.textContent.trim().split(' ')[0];
+    const match = data.find(r => r.emoji === emoji);
+    const count = match?.count || 0;
+    btn.querySelector('span').textContent = count;
+    btn.classList.toggle('reacted', emoji === selected);
+  });
 }
 
 async function refreshReactionCounts(wrapper, eventId) {
