@@ -209,42 +209,41 @@
   const storageKey = `reaction_${eventId}`;
   const current = localStorage.getItem(storageKey);
 
+  // Undo if clicking the same emoji
   if (current === emoji) {
-    // Insert or update the selected emoji
     try {
-  const { data } = await supabase
-    .from('reactions')
-    .select('count')
-    .eq('event_id', eventId)
-    .eq('emoji', emoji)
-    .single();
+      const { data } = await supabase
+        .from('reactions')
+        .select('count')
+        .eq('event_id', eventId)
+        .eq('emoji', emoji)
+        .single();
 
-  const currentCount = data?.count ?? 0; // fallback if null or undefined
+      if (data?.count > 1) {
+        await supabase
+          .from('reactions')
+          .update({ count: data.count - 1 })
+          .eq('event_id', eventId)
+          .eq('emoji', emoji);
+      } else {
+        await supabase
+          .from('reactions')
+          .delete()
+          .eq('event_id', eventId)
+          .eq('emoji', emoji);
+      }
 
-  if (data) {
-    await supabase
-      .from('reactions')
-      .update({ count: currentCount + 1 })
-      .eq('event_id', eventId)
-      .eq('emoji', emoji);
-  } else {
-    await supabase
-      .from('reactions')
-      .insert({ event_id: eventId, emoji, count: 1 });
+      localStorage.removeItem(storageKey);
+      wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
+    } catch (err) {
+      console.error('Undo failed:', err.message);
+    }
+
+    await refreshReactionCounts(eventId, wrapper);
+    return;
   }
 
-  localStorage.setItem(storageKey, emoji);
-  wrapper.querySelectorAll('button').forEach(btn => {
-    const e = btn.textContent.trim().split(' ')[0];
-    btn.classList.toggle('reacted', e === emoji);
-  });
-} catch (err) {
-  console.error('Failed to insert/update reaction:', err.message);
-}
-
-
-
-  // Remove previous reaction
+  // Remove previous reaction if different
   if (current) {
     try {
       const { data } = await supabase
@@ -272,7 +271,7 @@
     }
   }
 
-  // Add new reaction or increase count
+  // Add new reaction or increment
   try {
     const { data } = await supabase
       .from('reactions')
@@ -281,10 +280,12 @@
       .eq('emoji', emoji)
       .single();
 
+    const count = data?.count ?? 0;
+
     if (data) {
       await supabase
         .from('reactions')
-        .update({ count: data.count + 1 })
+        .update({ count: count + 1 })
         .eq('event_id', eventId)
         .eq('emoji', emoji);
     } else {
@@ -299,11 +300,12 @@
       btn.classList.toggle('reacted', e === emoji);
     });
   } catch (err) {
-    console.error('Failed to insert reaction:', err.message);
+    console.error('Insert reaction failed:', err.message);
   }
 
   await refreshReactionCounts(eventId, wrapper);
 }
+
 
 // Helper: Refresh reaction numbers and highlight
 async function refreshReactionCounts(eventId, wrapper) {
