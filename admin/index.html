@@ -3,47 +3,42 @@
   <head>
     <meta charset="utf-8" />
     <title>GGPause Admin</title>
-
-    <!-- CMS config -->
     <link rel="cms-config-url" href="/admin/config.yml" />
-
-    <!-- Dark mode & custom styles -->
-    <link rel="stylesheet" href="/admin/admin-dark.css" />
     <link rel="stylesheet" href="/admin/custom.css" />
-
-    <!-- Netlify Identity + CMS -->
+    <link rel="stylesheet" href="/admin/admin-dark.css" />
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+    <script src="https://unpkg.com/netlify-cms@2.10.192/dist/netlify-cms.js" defer></script>
   </head>
-
   <body>
     <div id="nc-root"></div>
 
     <script>
-      // Wait for Netlify CMS to fully load before using CMS global
-      const waitForCMS = setInterval(() => {
+      window.addEventListener("load", function () {
         if (window.CMS) {
-          clearInterval(waitForCMS);
+          // ✅ Register preview first
+          function EventPreview({ entry }) {
+            const data = entry.getIn(["data"]).toJS();
+            const wrapper = document.createElement("div");
+            wrapper.innerHTML = `
+              <div style="background: #121212; color: #fff; padding: 20px; font-family: sans-serif; border-radius: 10px; max-width: 600px;">
+                <h2 style="margin-top: 0;">${data.title || 'Untitled Event'}</h2>
+                <p><strong>Date:</strong> ${data.date || 'TBD'}</p>
+                ${data.end ? `<p><strong>Ends:</strong> ${data.end}</p>` : ''}
+                <img src="${data.image || ''}" alt="${data.title || ''}" style="max-width: 100%; border-radius: 8px; margin-top: 10px;" />
+                <div style="margin-top: 15px;">
+                  ${(data.links || []).map(link =>
+                    `<a href="${link.url}" target="_blank" style="color: #90caf9; display: inline-block; margin-right: 10px;">${link.label}</a>`
+                  ).join('')}
+                </div>
+              </div>
+            `;
+            return wrapper;
+          }
+
           CMS.init();
-
-          // Preview template
-          CMS.registerPreviewTemplate("events", ({ entry }) => {
-  const data = entry.getIn(["data"]).toJS();
-
-  const div = document.createElement("div");
-  div.innerHTML = `
-    <div style="background:#1e1e1e;padding:20px;border-radius:10px;color:white;">
-      <h2>${data.title || 'Untitled Event'}</h2>
-      <p><strong>Date:</strong> ${data.date || 'TBD'}</p>
-      ${data.end ? `<p><strong>Ends:</strong> ${data.end}</p>` : ''}
-      <img src="${data.image || ''}" style="max-width:200px;margin-top:10px;border-radius:8px;">
-    </div>
-  `;
-  return div;
-});
-
+          CMS.registerPreviewTemplate("events", EventPreview);
         }
-      }, 50);
+      });
     </script>
   </body>
 </html>
