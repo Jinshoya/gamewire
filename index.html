@@ -21,7 +21,6 @@
   border-radius: 8px;
   overflow: hidden;
 }
-
 .event_logo img {
   width: 100%;
   height: auto;
@@ -32,21 +31,37 @@
   border-bottom: none;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
-
 .event_logo img:hover {
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
   transform: scale(1.01);
 }
-
 .event_headliner {
   animation: fadeIn 0.4s ease-in;
+  border-left: 3px solid var(--event-border-color, #d9a62d);
+  border-right: 3px solid var(--event-border-color, #d9a62d);
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
-
+.event_headliner.live {
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-image: linear-gradient(135deg, #ff6b6b, #ffa07a);
+  border-image-slice: 1;
+  animation: livePulse 2s infinite ease-in-out;
+}
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
+@keyframes livePulse {
+  0%, 100% { box-shadow: 0 0 0px rgba(255, 107, 107, 0.3); }
+  50% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.6); }
+}
+.countdown {
+  transition: all 0.5s ease-in-out;
+  font-variant-numeric: tabular-nums;
+  font-weight: bold;
+}
 .live_badge {
   position: absolute;
   top: 10px;
@@ -64,7 +79,6 @@
   z-index: 2;
   opacity: 0.95;
 }
-
 .live_badge::before {
   content: "";
   display: inline-block;
@@ -74,30 +88,60 @@
   background-color: white;
   border-radius: 50%;
 }
+.events_grouped {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  display: flex;
+  gap: 20px;
+  padding: 10px 0;
+  scroll-padding: 10px;
+}
+.events_grouped > .events {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  min-width: 100%;
+}
+@media (min-width: 768px) {
+  .events_grouped {
+    overflow-x: visible;
+    display: block;
+  }
+}
+#stickyCountdown {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: #1e1e1e;
+  color: white;
+  padding: 10px 15px;
+  font-size: 1rem;
+  text-align: center;
+  display: none;
+}
+@media (max-width: 768px) {
+  #stickyCountdown {
+    display: block;
+  }
+}
   </style>
 </head>
 
 <body>
   <div class="content" style="margin-left: auto;margin-right: auto;max-width:960px;">
     <div class="container">
-      <!-- Steam Sale Section -->
       <div class="events_upnext" id="next_steam_sale">Next Steam Sale</div>
       <div class="events_grouped">
         <div class="events" id="steam-sale-event"></div>
       </div>
-
-      <!-- Live Events Section -->
       <div class="events_grouped">
         <div class="events" id="live-events"></div>
       </div>
-
-      <!-- Upcoming Events Section -->
       <div class="events_upnext" id="next_event_name">Upcoming Events</div>
       <div class="events_grouped">
         <div class="events" id="upcoming-events"></div>
       </div>
-
-      <!-- Old Events Section -->
       <div class="events_upcoming" id="old_events_name">Old Events</div>
       <div class="events_grouped">
         <div class="events" id="past-events"></div>
@@ -105,144 +149,35 @@
     </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="./scripts/timer.js"></script>
-  <script src="./scripts/translations.js"></script>
+  <div id="stickyCountdown">Loading event timer...</div>
+
   <script>
-    function parseFrontmatter(md) {
-      const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/m.exec(md);
-      if (!match) return { attributes: {}, body: md };
+    window.addEventListener("load", () => {
+      const live = document.querySelector(".event_headliner.live");
+      if (live) live.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
 
-      const yamlText = match[1];
-      const body = match[2];
-      const lines = yamlText.split('\n');
-
-      const attributes = {};
-      for (const line of lines) {
-        const [key, ...rest] = line.split(':');
-        attributes[key.trim()] = rest.join(':').trim();
-      }
-
-      return { attributes, body };
+    function updateStickyCountdown() {
+      const el = document.querySelector(".countdown");
+      const bar = document.getElementById("stickyCountdown");
+      if (!el || !bar) return;
+      const txt = el.textContent;
+      const title = el.closest(".event_headliner")?.querySelector(".event_upc_title")?.textContent;
+      if (txt && title) bar.textContent = `${title} starts in ${txt}`;
     }
+    setInterval(updateStickyCountdown, 10000);
 
-    function renderLinks(data) {
-      const links = [];
-      if (data.youtube && data.youtube.url) links.push(data.youtube);
-      if (data.twitch && data.twitch.url) links.push(data.twitch);
-      if (data.website && data.website.url) links.push(data.website);
-      if (data.steam && data.steam.url) links.push(data.steam);
-      if (Array.isArray(data.links)) links.push(...data.links);
-
-      return links.map(link => `
-        <a href="${link.url}" target="_blank">
-          <img src="${link.icon}" alt="${link.label}" class="links_image">
-        </a>
-      `).join('');
+    function tagLiveEvents() {
+      document.querySelectorAll(".event_headliner").forEach(el => {
+        const badge = el.querySelector(".live_badge");
+        if (badge && getComputedStyle(badge).display !== "none") {
+          el.classList.add("live");
+        } else {
+          el.classList.remove("live");
+        }
+      });
     }
-
-    function startCountdowns() {
-      setInterval(() => {
-        document.querySelectorAll('.countdown').forEach((el) => {
-          const dateStr = el.getAttribute('data-start-event-date');
-          const endStr = el.getAttribute('data-end-event-date');
-          const parent = el.closest('.event_headliner');
-          const eventDate = new Date(dateStr);
-          const now = new Date();
-          const diff = eventDate - now;
-          const diffFromStart = now - eventDate;
-          const isSteam = parent.closest('#steam-sale-event');
-
-          if (isSteam && endStr) {
-            const endDate = new Date(endStr);
-            if (now >= endDate) {
-              parent.remove();
-              return;
-            }
-          }
-
-          if (diff <= 0) {
-            if (diffFromStart < 3600000) {
-              el.textContent = 'Started';
-              if (!isSteam && parent.parentElement.id !== 'live-events') {
-                document.getElementById('live-events').appendChild(parent);
-                const liveLabel = parent.querySelector('.live_badge');if (liveLabel) liveLabel.style.display = 'flex';
-              }
-            } else if (!isSteam && parent.parentElement.id !== 'past-events') {
-              document.getElementById('past-events').appendChild(parent);
-              parent.querySelector('#live_event_label').style.display = 'none'; // Hide 'NOW LIVE' once it's in the past
-            }
-            return;
-          }
-
-          const totalSeconds = Math.floor(diff / 1000);
-          const days = Math.floor(totalSeconds / (3600 * 24));
-          const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-          const mins = Math.floor((totalSeconds % 3600) / 60);
-
-          el.textContent = `${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m`;
-        });
-      }, 1000);
-    }
-
-    async function loadEvents() {
-      const res = await fetch('/events/index.json');
-      const files = await res.json();
-      const now = new Date();
-
-      for (const file of files) {
-        const response = await fetch(`/events/${file}`);
-        const raw = await response.text();
-        const parsed = parseFrontmatter(raw);
-        const data = parsed.attributes;
-
-        const eventDate = new Date(data.date);
-        const isPast = eventDate < now;
-        const isSteam = data.type === 'steam_sale';
-        const borderColor = data.borderColor || '#d9a62d';
-
-        const html = `
-  <div class="event_headliner">
-    <div class="event_head">
-      <div class="event_logo" data-border-color="${borderColor}">
-        <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-        <div class="live_badge" style="display: none;">NOW LIVE</div>
-      </div>
-      <div class="event_flex">
-        <div class="col-sm">
-          <div class="event_upc_title">${data.title}</div>
-        </div>
-        <div class="col-sm">
-          <div class="event_date">
-            ${isSteam ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : new Date(data.date).toLocaleString()}
-          </div>
-        </div>
-        <div class="col-sm">
-          <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div>
-        </div>
-        <div class="col-sm">
-          <div class="event_links">
-            ${renderLinks(data)}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>`
-
-        const targetId = isPast
-          ? "past-events"
-          : isSteam
-            ? "steam-sale-event"
-            : "upcoming-events";
-
-        document.getElementById(targetId).insertAdjacentHTML("beforeend", html);
-      }
-      startCountdowns();
-    }
-
-    window.addEventListener("DOMContentLoaded", loadEvents);
+    setInterval(tagLiveEvents, 5000);
   </script>
 </body>
-
 </html>
