@@ -275,7 +275,6 @@
     }
     
     async function loadEvents() {
-      const isPast = date < now;
       const res = await fetch('/events/index.json');
       const files = await res.json();
       const now = new Date();
@@ -285,13 +284,7 @@
         const raw = await response.text();
         const { attributes: data } = parseFrontmatter(raw);
         const date = new Date(data.date);
-        const reactionsHTML = ['😂','😴','💩','😞','🔥'].map(e => {
-  const reactCode = isPast
-    ? `<button class="disabled"><span class="emoji">${e}</span> <span class="count">0</span></button>`
-    : `<button onclick="react(this, '${e}')"><span class="emoji">${e}</span> <span class="count">0</span></button>`;
-  return reactCode;
-}).join('');
-
+        const isPast = date < now;
         const isSteam = data.type === 'steam_sale';
         const slug = data.slug || file.replace('.md', '');
         const borderColor = data.borderColor || '#d9a62d';
@@ -301,10 +294,9 @@
             <div class="event_head">
 <div class="event_logo" data-border-color="${borderColor}">
   <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-<div class="reaction-bar" data-event="${slug}">
-  ${reactionsHTML}
-</div>
-
+  <div class="reaction-bar" data-event="${slug}">
+    ${['😂','😴','💩','😞','🔥'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+  </div>
 </div>
               <div class="event_flex">
                 <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
