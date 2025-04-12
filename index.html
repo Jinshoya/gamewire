@@ -120,23 +120,21 @@
     }
 
     async function react(button, emoji) {
-      const wrapper = button.closest('.reaction-bar');
-      const eventId = wrapper.getAttribute('data-event');
+  const wrapper = button.closest('.reaction-bar');
+  const eventId = wrapper.getAttribute('data-event');
 
-      const res = await fetch('/.netlify/functions/react', {
-        method: 'POST',
-        body: JSON.stringify({ eventId, emoji })
-      });
+  const { data, error } = await supabase
+    .from('reactions')
+    .upsert([{ event: eventId, emoji }], { onConflict: ['event', 'emoji'] });
 
-      const data = await res.json();
-      if (data.success) {
-        for (const btn of wrapper.querySelectorAll('button')) {
-          const e = btn.textContent.trim().split(' ')[0];
-          const count = data.reactions[e] || 0;
-          btn.querySelector('span').textContent = count;
-        }
-      }
-    }
+  if (error) {
+    console.error(error.message);
+    return;
+  }
+
+  // You’d probably want to refetch or preload the new count here
+}
+
 
     function startCountdowns() {
       setInterval(() => {
