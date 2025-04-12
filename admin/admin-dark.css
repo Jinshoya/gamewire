@@ -1,0 +1,49 @@
+:root {
+    --primary-color: #ff6600;
+    --text-color: #f0f0f0;
+    --bg-color: #1a1a1a;
+    --card-color: #2a2a2a;
+    --border-color: #333;
+    --input-bg: #262626;
+    --input-border: #444;
+  }
+  
+  body, .cms {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+  
+  input, textarea, select, .nc-widget, .nc-controlPane-widget, .nc-controlPane {
+    background-color: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--input-border) !important;
+  }
+  
+  .nc-entryEditor, .nc-entryCard, .nc-previewPane, .nc-entryEditor-sidebar, .nc-entryEditor-main {
+    background-color: var(--card-color) !important;
+    color: var(--text-color);
+  }
+  
+  .nc-app-header, .nc-toolbar {
+    background-color: #111;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .nc-toolbar {
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .nc-entryEditor-header {
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  button, .nc-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+  }
+  
+  button:hover {
+    background-color: #ff8533;
+  }
+  

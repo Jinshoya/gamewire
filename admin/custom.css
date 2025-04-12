@@ -75,4 +75,31 @@ body {
     background: #555;
     border-radius: 4px;
   }
+  .event_card_preview {
+    background: #222;
+    border: 1px solid #444;
+    padding: 16px;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    max-width: 600px;
+  }
+  
+  .event_card_preview .event_logo img {
+    width: 100%;
+    max-height: 240px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .event_card_preview .event_info h2 {
+    margin-top: 12px;
+    font-size: 1.4rem;
+  }
+  
+  .event_card_preview .event_links a {
+    color: #4cc3ff;
+    margin-right: 10px;
+    text-decoration: none;
+  }
   

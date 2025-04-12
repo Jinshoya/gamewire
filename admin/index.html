@@ -5,8 +5,11 @@
     <title>GGPause Admin</title>
     <link rel="cms-config-url" href="/admin/config.yml" />
     <link rel="stylesheet" href="/admin/custom.css" />
+    <link rel="stylesheet" href="admin-dark.css" />
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script src="https://unpkg.com/netlify-cms@2.10.192/dist/netlify-cms.js" defer></script>
+    <script src="cms-preview.js"></script>
+
   </head>
   
   <body>
@@ -18,5 +21,29 @@
         }
       });
     </script>
+    <script type="text/javascript">
+      CMS.registerPreviewTemplate("events", EventPreview);
+    
+      function EventPreview({ entry }) {
+        const data = entry.getIn(["data"]).toJS();
+    
+        return `
+          <div class="event_card_preview">
+            <div class="event_logo">
+              <img src="${data.image || ''}" alt="${data.title || ''}" />
+            </div>
+            <div class="event_info">
+              <h2>${data.title || 'Untitled Event'}</h2>
+              <p><strong>Date:</strong> ${data.date || 'TBD'}</p>
+              ${data.end ? `<p><strong>Ends:</strong> ${data.end}</p>` : ''}
+              <div class="event_links">
+                ${(data.links || []).map(link => `<a href="${link.url}" target="_blank">${link.label}</a>`).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    </script>
+    
   </body>
 </html>
