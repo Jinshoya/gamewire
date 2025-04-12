@@ -8,11 +8,123 @@
   <link rel="stylesheet" href="./styles/main.css" />
   <title>Event schedule - ggPause.com</title>
 
-  <!-- your inline CSS is unchanged -->
   <style>
-    /* ... all your styles stay the same, skipped here for brevity ... */
+    .reaction-bar button.selected {
+      background-color: #ffefcc;
+      font-weight: bold;
+      border-color: #ffa94d;
+    }
+
+    .reaction-bar button.top-reaction {
+      border-color: #ff5e5e;
+      box-shadow: 0 0 5px rgba(255, 94, 94, 0.4);
+    }
+
+    #past-events .event_headliner {
+      filter: grayscale(100%);
+      opacity: 0.6;
+    }
+
+    .event_logo {
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .event_logo img {
+      transition: transform 0.4s ease;
+      width: 100%;
+      height: auto;
+    }
+
+    .event_logo:hover img {
+      transform: scale(1.1);
+    }
+
+    .reaction-bar {
+      display: flex;
+      gap: 8px;
+      padding: 8px 12px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .reaction-bar button {
+      background-color: #f7f7f7;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .reaction-bar button:hover {
+      background-color: #eaeaea;
+    }
+
+    .section-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px auto;
+      max-width: 960px;
+      padding-bottom: 5px;
+    }
+
+    .section-tabs button {
+      background-color: #f0f0f0;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .section-tabs button:hover {
+      background-color: #e2e2e2;
+    }
+
+    @media (min-width: 768px) {
+      .section-tabs {
+        display: none;
+      }
+    }
+
+    #nowPlayingBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ff4d4d;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      padding: 6px 12px;
+      font-size: 0.95rem;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .skeleton-card {
+      width: 100%;
+      max-width: 920px;
+      height: 100px;
+      margin: 10px auto;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 8px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
   </style>
 </head>
+
 <body>
   <div id="nowPlayingBar" style="display:none;"></div>
 
@@ -43,232 +155,246 @@
     </div>
   </div>
 
-  <!-- Load Supabase first -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
   <script>
-    // All logic inside load event to make sure Supabase is ready
-    window.addEventListener('DOMContentLoaded', async () => {
-      const supabase = window.supabase.createClient(
-        "https://eiapztxuvodtiqgsuicf.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-      );
+    const supabase = window.supabase.createClient(
+      "https://eiapztxuvodtiqgsuicf.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    );
 
-      const USER_REACTED_KEY = 'userReactions-v2';
+    const USER_REACTED_KEY = 'userReactions-v2';
 
-      function getUserReactions() {
-        return JSON.parse(localStorage.getItem(USER_REACTED_KEY) || '{}');
-      }
+    function getUserReactions() {
+      return JSON.parse(localStorage.getItem(USER_REACTED_KEY) || '{}');
+    }
 
-      function setUserReaction(eventId, emoji) {
-        const current = getUserReactions();
-        current[eventId] = emoji;
-        localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
-      }
+    function setUserReaction(eventId, emoji) {
+      const current = getUserReactions();
+      current[eventId] = emoji;
+      localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
+    }
 
-      function clearUserReaction(eventId) {
-        const current = getUserReactions();
-        delete current[eventId];
-        localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
-      }
+    function clearUserReaction(eventId) {
+      const current = getUserReactions();
+      delete current[eventId];
+      localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
+    }
 
-      async function preloadReactions() {
-        const bars = document.querySelectorAll('.reaction-bar');
-        for (const bar of bars) {
-          const eventId = bar.getAttribute('data-event');
-          const { data, error } = await supabase
-            .from('reactions')
-            .select('emoji, count')
-            .eq('event_id', eventId);
+    async function preloadReactions() {
+      const bars = document.querySelectorAll('.reaction-bar');
+      for (const bar of bars) {
+        const eventId = bar.getAttribute('data-event');
+        const { data, error } = await supabase
+          .from('reactions')
+          .select('emoji, count')
+          .eq('event_id', eventId);
 
-          if (error) continue;
+        if (error) continue;
 
-          const userEmoji = getUserReactions()[eventId];
-          let highest = null;
-          let max = 0;
-
-          bar.querySelectorAll('button').forEach(btn => {
-            const emoji = btn.textContent.trim().split(' ')[0];
-            const record = data.find(d => d.emoji === emoji);
-            const count = record ? record.count : 0;
-            btn.querySelector('span').textContent = count;
-            btn.classList.toggle('selected', emoji === userEmoji);
-            if (count > max) {
-              highest = emoji;
-              max = count;
-            }
-          });
-
-          bar.querySelectorAll('button').forEach(btn => {
-            const emoji = btn.textContent.trim().split(' ')[0];
-            btn.classList.toggle('top-reaction', emoji === highest);
-          });
-        }
-      }
-
-      async function react(button, emoji) {
-        const wrapper = button.closest('.reaction-bar');
-        const eventId = wrapper.getAttribute('data-event');
         const userEmoji = getUserReactions()[eventId];
-        const undo = emoji === userEmoji;
+        let highest = null;
+        let max = 0;
 
-        if (undo) {
-          clearUserReaction(eventId);
-          await supabase.rpc('decrement_reaction', { e_id: eventId, em: emoji });
-        } else {
-          setUserReaction(eventId, emoji);
-          await supabase.rpc('increment_reaction', { e_id: eventId, em: emoji });
-        }
+        bar.querySelectorAll('button').forEach(btn => {
+          const emoji = btn.textContent.trim().split(' ')[0];
+          const record = data.find(d => d.emoji === emoji);
+          const count = record ? record.count : 0;
+          btn.querySelector('span').textContent = count;
+          btn.classList.toggle('selected', emoji === userEmoji);
+          if (count > max) {
+            highest = emoji;
+            max = count;
+          }
+        });
 
-        preloadReactions();
+        bar.querySelectorAll('button').forEach(btn => {
+          const emoji = btn.textContent.trim().split(' ')[0];
+          btn.classList.toggle('top-reaction', emoji === highest);
+        });
+      }
+    }
+
+    async function react(button, emoji) {
+      const wrapper = button.closest('.reaction-bar');
+      const eventId = wrapper.getAttribute('data-event');
+      const userEmoji = getUserReactions()[eventId];
+      const undo = emoji === userEmoji;
+
+      if (undo) {
+        clearUserReaction(eventId);
+        await supabase.rpc('decrement_reaction', { e_id: eventId, em: emoji });
+      } else {
+        setUserReaction(eventId, emoji);
+        await supabase.rpc('increment_reaction', { e_id: eventId, em: emoji });
       }
 
-      function scrollToSection(id) {
-        const container = document.getElementById(id);
-        if (!container) return;
-        container.scrollIntoView({ behavior: "smooth", block: "start" });
+      preloadReactions();
+    }
+
+    function scrollToSection(id) {
+      const container = document.getElementById(id);
+      if (!container) return;
+      container.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function parseFrontmatter(md) {
+      const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/m.exec(md);
+      if (!match) return { attributes: {}, body: md };
+      const yamlText = match[1];
+      const body = match[2];
+      const lines = yamlText.split('\n');
+      const attributes = {};
+      for (const line of lines) {
+        const [key, ...rest] = line.split(':');
+        attributes[key.trim()] = rest.join(':').trim();
       }
+      return { attributes, body };
+    }
 
-      function parseFrontmatter(md) {
-        const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/m.exec(md);
-        if (!match) return { attributes: {}, body: md };
-        const yamlText = match[1];
-        const body = match[2];
-        const lines = yamlText.split('\n');
-        const attributes = {};
-        for (const line of lines) {
-          const [key, ...rest] = line.split(':');
-          attributes[key.trim()] = rest.join(':').trim();
-        }
-        return { attributes, body };
-      }
+    function renderLinks(data) {
+      const links = [];
+      if (data.youtube && data.youtube.url) links.push(data.youtube);
+      if (data.twitch && data.twitch.url) links.push(data.twitch);
+      if (data.website && data.website.url) links.push(data.website);
+      if (data.steam && data.steam.url) links.push(data.steam);
+      if (Array.isArray(data.links)) links.push(...data.links);
 
-      function renderLinks(data) {
-        const links = [];
-        if (data.youtube && data.youtube.url) links.push(data.youtube);
-        if (data.twitch && data.twitch.url) links.push(data.twitch);
-        if (data.website && data.website.url) links.push(data.website);
-        if (data.steam && data.steam.url) links.push(data.steam);
-        if (Array.isArray(data.links)) links.push(...data.links);
+      return links.map(link => `
+        <a href="${link.url}" target="_blank">
+          <img src="${link.icon}" alt="${link.label}" class="links_image">
+        </a>
+      `).join('');
+    }
 
-        return links.map(link => `
-          <a href="${link.url}" target="_blank">
-            <img src="${link.icon}" alt="${link.label}" class="links_image">
-          </a>
-        `).join('');
-      }
+    async function loadEvents() {
+      const res = await fetch('/events/index.json');
+      const files = await res.json();
+      const now = new Date();
 
-      async function loadEvents() {
-        const res = await fetch('/events/index.json');
-        const files = await res.json();
-        const now = new Date();
+      for (const file of files) {
+        const response = await fetch(`/events/${file}`);
+        const raw = await response.text();
+        const parsed = parseFrontmatter(raw);
+        const data = parsed.attributes;
 
-        for (const file of files) {
-          const response = await fetch(`/events/${file}`);
-          const raw = await response.text();
-          const parsed = parseFrontmatter(raw);
-          const data = parsed.attributes;
+        const eventDate = new Date(data.date);
+        const isPast = eventDate < now;
+        const isSteam = data.type === 'steam_sale';
+        const borderColor = data.borderColor || '#d9a62d';
+        const slug = data.slug || file.replace('.md', '');
 
-          const eventDate = new Date(data.date);
-          const isPast = eventDate < now;
-          const isSteam = data.type === 'steam_sale';
-          const borderColor = data.borderColor || '#d9a62d';
-          const slug = data.slug || file.replace('.md', '');
-
-          const html = `
-            <div class="event_headliner" style="--event-border-color: ${borderColor};">
-              <div class="event_head">
-                <div class="event_logo" data-border-color="${borderColor}">
-                  <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-                </div>
-                <div class="event_flex">
-                  <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
-                  <div class="col-sm"><div class="event_date">
-                    ${isSteam
-                      ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
-                      : new Date(data.date).toLocaleString()}
-                  </div></div>
-                  <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
-                  <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
-                </div>
+        const html = `
+          <div class="event_headliner" style="--event-border-color: ${borderColor};">
+            <div class="event_head">
+              <div class="event_logo" data-border-color="${borderColor}">
+                <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
               </div>
-              <div class="reaction-bar" data-event="${slug}">
-                ${['🔥','😂','😴','💩','😞','❤️'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+              <div class="event_flex">
+                <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
+                <div class="col-sm"><div class="event_date">
+                  ${isSteam
+                    ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
+                    : new Date(data.date).toLocaleString()}
+                </div></div>
+                <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
+                <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
               </div>
-            </div>`;
+            </div>
+            <div class="reaction-bar" data-event="${slug}">
+              ${['🔥','😂','😴','💩','😞','❤️'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+            </div>
+          </div>`;
 
-          const targetId = isPast
-            ? "past-events"
-            : isSteam
-              ? "steam-sale-event"
-              : "upcoming-events";
+        const targetId = isPast
+          ? "past-events"
+          : isSteam
+            ? "steam-sale-event"
+            : "upcoming-events";
 
-          document.getElementById(targetId).insertAdjacentHTML("beforeend", html);
-        }
-
-        startCountdowns();
+        document.getElementById(targetId).insertAdjacentHTML("beforeend", html);
       }
 
-      function startCountdowns() {
-        setInterval(() => {
-          document.querySelectorAll('.countdown').forEach((el) => {
-            const dateStr = el.getAttribute('data-start-event-date');
-            const endStr = el.getAttribute('data-end-event-date');
-            const parent = el.closest('.event_headliner');
-            const eventDate = new Date(dateStr);
-            const now = new Date();
-            const diff = eventDate - now;
-            const diffFromStart = now - eventDate;
-            const isSteam = parent.closest('#steam-sale-event');
+      startCountdowns();
+    }
 
-            if (isSteam && endStr) {
-              const endDate = new Date(endStr);
-              if (now >= endDate) {
-                parent.remove();
-                return;
-              }
-            }
+    function startCountdowns() {
+      setInterval(() => {
+        document.querySelectorAll('.countdown').forEach((el) => {
+          const dateStr = el.getAttribute('data-start-event-date');
+          const endStr = el.getAttribute('data-end-event-date');
+          const parent = el.closest('.event_headliner');
+          const eventDate = new Date(dateStr);
+          const now = new Date();
+          const diff = eventDate - now;
+          const diffFromStart = now - eventDate;
+          const isSteam = parent.closest('#steam-sale-event');
 
-            if (diff <= 0) {
-              if (diffFromStart < 3600000) {
-                el.textContent = 'Started';
-                if (!isSteam && parent.parentElement.id !== 'live-events') {
-                  document.getElementById('live-events').appendChild(parent);
-                }
-              } else if (!isSteam && parent.parentElement.id !== 'past-events') {
-                document.getElementById('past-events').appendChild(parent);
-              }
+          if (isSteam && endStr) {
+            const endDate = new Date(endStr);
+            if (now >= endDate) {
+              parent.remove();
               return;
             }
+          }
 
-            const totalSeconds = Math.floor(diff / 1000);
-            const days = Math.floor(totalSeconds / (3600 * 24));
-            const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-            const mins = Math.floor((totalSeconds % 3600) / 60);
-            el.textContent = `${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m`;
-          });
-        }, 1000);
+          if (diff <= 0) {
+            if (diffFromStart < 3600000) {
+              el.textContent = 'Started';
+              if (!isSteam && parent.parentElement.id !== 'live-events') {
+                document.getElementById('live-events').appendChild(parent);
+              }
+            } else if (!isSteam && parent.parentElement.id !== 'past-events') {
+              document.getElementById('past-events').appendChild(parent);
+            }
+            return;
+          }
+
+          const totalSeconds = Math.floor(diff / 1000);
+          const days = Math.floor(totalSeconds / (3600 * 24));
+          const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+          const mins = Math.floor((totalSeconds % 3600) / 60);
+          el.textContent = `${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m`;
+        });
+      }, 1000);
+    }
+
+    function updateNowPlayingBar() {
+      const live = document.querySelector("#live-events .event_headliner");
+      const bar = document.getElementById("nowPlayingBar");
+      if (live) {
+        const title = live.querySelector(".event_upc_title")?.textContent || "LIVE EVENT";
+        const links = live.querySelector(".event_links a");
+        const url = links?.getAttribute("href") || "#";
+        bar.innerHTML = `🔴 Now Live: ${title} — <a href="${url}" style="color: white; text-decoration: underline;">Watch</a>`;
+        bar.style.display = "block";
+      } else {
+        bar.style.display = "none";
       }
+    }
 
-      function updateNowPlayingBar() {
-        const live = document.querySelector("#live-events .event_headliner");
-        const bar = document.getElementById("nowPlayingBar");
-        if (live) {
-          const title = live.querySelector(".event_upc_title")?.textContent || "LIVE EVENT";
-          const links = live.querySelector(".event_links a");
-          const url = links?.getAttribute("href") || "#";
-          bar.innerHTML = `🔴 Now Live: ${title} — <a href="${url}" style="color: white; text-decoration: underline;">Watch</a>`;
-          bar.style.display = "block";
-        } else {
-          bar.style.display = "none";
-        }
-      }
-
+    document.addEventListener("DOMContentLoaded", async () => {
       await loadEvents();
       await preloadReactions();
       updateNowPlayingBar();
-      setInterval(updateNowPlayingBar, 3000);
     });
+
+    setInterval(updateNowPlayingBar, 3000);
   </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</body>
+</html>
+lse {
+        bar.style.display = "none";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await loadEvents();
+      await preloadReactions();
+      updateNowPlayingBar();
+    });
+
+    setInterval(updateNowPlayingBar, 3000);
+  </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </body>
 </html>
