@@ -53,83 +53,45 @@
   position: absolute;
   bottom: 8px;
   right: 8px;
-  background: #1f1f1f;
-  border-radius: 999px;
   display: flex;
   gap: 6px;
-  padding: 3px 8px;
+  background: #1a1a1a;
+  padding: 6px 10px;
+  border-radius: 16px;
   z-index: 10;
-  box-shadow: 0 0 2px #000;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
 .reaction-bar button {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 6px;
+  gap: 6px;
+  padding: 3px 10px;
   border: none;
-  border-radius: 999px;
-  font-size: 0.85rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
   font-weight: bold;
-  color: #fff;
-  background-color: #333;
+  color: white;
+  background: #111;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .reaction-bar button .emoji {
-  font-size: 1rem;
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .reaction-bar button .count {
   font-size: 0.85rem;
+  line-height: 1;
+  font-weight: 600;
 }
 
+/* Selected state looks like your yellow pill */
 .reaction-bar button.reacted {
-  transform: scale(1.15);
-  background-color: #555;
-}
-
-.reaction-bar button:hover {
-  background-color: #444;
-}
-
-@keyframes pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.25); }
-  100% { transform: scale(1); }
-}
-
-.reaction-bar button.reacted {
-  animation: pop 0.3s ease;
-}
-
-/* Past events (disabled buttons) */
-#past-events .reaction-bar button {
-  filter: grayscale(100%);
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/* Optional: emoji-specific background colors */
-.reaction-bar button:has(.emoji:contains("😂")) {
-  background-color: #e0b000;
-}
-
-.reaction-bar button:has(.emoji:contains("😴")) {
-  background-color: #007bff;
-}
-
-.reaction-bar button:has(.emoji:contains("💩")) {
-  background-color: #8B4513;
-}
-
-.reaction-bar button:has(.emoji:contains("😞")) {
-  background-color: #555;
-}
-
-.reaction-bar button:has(.emoji:contains("🔥")) {
-  background-color: #ff4d4d;
+  background: #f2c94c;
+  color: #000;
 }
 
 
@@ -315,12 +277,17 @@
         const borderColor = data.borderColor || '#d9a62d';
     
         const html = `
-          <div class="event_headliner" style="--event-border-color: ${borderColor};">
-            <div class="event_head">
-<div class="event_logo" data-border-color="${borderColor}">
-  <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-  <div class="reaction-bar" data-event="${slug}">
-    ${['😂','😴','💩','😞','🔥'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+<div class="event_head">
+  <div class="event_logo" data-border-color="${borderColor}">
+    <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
+    <div class="reaction-bar" data-event="${slug}">
+      ${['😂','😴','💩','😞','🔥'].map(e => `
+        <button onclick="react(this, '${e}')">
+          <span class="emoji">${e}</span>
+          <span class="count">0</span>
+        </button>
+      `).join('')}
+    </div>
   </div>
 </div>
               <div class="event_flex">
