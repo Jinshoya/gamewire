@@ -199,6 +199,7 @@
     async function react(button, emoji) {
   const wrapper = button.closest('.reaction-bar');
   const eventId = wrapper.getAttribute('data-event');
+  console.log("Event ID:", eventId); // Add this line to see the event ID
 
   // Ensure the session is correctly initialized
   const { data: session, error: authError } = await supabase.auth.getSession();
@@ -222,12 +223,18 @@
     return;
   }
 
-  // Update the count for the emoji button
-  for (const btn of wrapper.querySelectorAll('button')) {
-    const emojiButton = btn.querySelector('span');
-    const emojiText = btn.textContent.trim().split(' ')[0];
-    const emojiCount = data.reactions[emojiText] || 0;
-    emojiButton.textContent = emojiCount;
+  console.log("Reaction data:", data); // Add this line to inspect the returned data
+
+  // Check if 'data' is valid and contains the expected structure
+  if (data && Array.isArray(data)) {
+    // Update the count for the emoji button
+    wrapper.querySelectorAll('button').forEach(btn => {
+      const emojiText = btn.textContent.trim().split(' ')[0];
+      const emojiCount = data[0]?.[emojiText] || 0; // Use the correct structure here
+      btn.querySelector('span').textContent = emojiCount;
+    });
+  } else {
+    console.error('No valid reaction data returned');
   }
 }
 
