@@ -53,41 +53,45 @@
   position: absolute;
   bottom: 8px;
   right: 8px;
-  background-color: rgba(0, 0, 0, 0.75);
-  padding: 3px 10px;
+  background: #1f1f1f;
   border-radius: 999px;
   display: flex;
-  gap: 10px;
-  z-index: 5;
+  gap: 6px;
+  padding: 3px 8px;
+  z-index: 10;
+  box-shadow: 0 0 2px #000;
 }
 
 .reaction-bar button {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: bold;
   display: flex;
   align-items: center;
   gap: 4px;
+  padding: 2px 6px;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #333;
   cursor: pointer;
-  transition: transform 0.2s ease;
-  padding: 2px 4px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.reaction-bar button .emoji {
+  font-size: 1rem;
+}
+
+.reaction-bar button .count {
+  font-size: 0.85rem;
 }
 
 .reaction-bar button.reacted {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-}
-
-.reaction-bar button span {
-  font-weight: bold;
-  font-size: 0.8rem;
-  color: #f0f0f0;
+  transform: scale(1.15);
+  background-color: #555;
 }
 
 .reaction-bar button:hover {
-  transform: scale(1.1);
+  background-color: #444;
 }
 
 @keyframes pop {
@@ -100,19 +104,34 @@
   animation: pop 0.3s ease;
 }
 
+/* Past events (disabled buttons) */
 #past-events .reaction-bar button {
   filter: grayscale(100%);
-  opacity: 0.4;
+  opacity: 0.5;
   pointer-events: none;
 }
 
-
-/* Make them inactive on old events */
-#past-events .reaction-bar button {
-  filter: grayscale(100%);
-  opacity: 0.4;
-  pointer-events: none;
+/* Optional: emoji-specific background colors */
+.reaction-bar button:has(.emoji:contains("😂")) {
+  background-color: #e0b000;
 }
+
+.reaction-bar button:has(.emoji:contains("😴")) {
+  background-color: #007bff;
+}
+
+.reaction-bar button:has(.emoji:contains("💩")) {
+  background-color: #8B4513;
+}
+
+.reaction-bar button:has(.emoji:contains("😞")) {
+  background-color: #555;
+}
+
+.reaction-bar button:has(.emoji:contains("🔥")) {
+  background-color: #ff4d4d;
+}
+
 
   </style>
 </head>
@@ -300,10 +319,15 @@
             <div class="event_head">
 <div class="event_logo" data-border-color="${borderColor}">
   <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-  <div class="reaction-bar" data-event="${slug}">
-    ${['😂','😴','💩','😞','🔥'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
-  </div>
+<div class="reaction-bar" data-event="${slug}">
+  ${['😂','😴','💩','😞','🔥'].map(e => `
+    <button onclick="react(this, '${e}')">
+      <span class="emoji">${e}</span>
+      <span class="count">0</span>
+    </button>
+  `).join('')}
 </div>
+
               <div class="event_flex">
                 <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
                 <div class="col-sm"><div class="event_date">${isSteam ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : date.toLocaleString()}</div></div>
