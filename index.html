@@ -210,36 +210,39 @@
   const current = localStorage.getItem(storageKey);
 
   if (current === emoji) {
+    // Insert or update the selected emoji
     try {
-      const { data } = await supabase
-        .from('reactions')
-        .select('count')
-        .eq('event_id', eventId)
-        .eq('emoji', emoji)
-        .single();
+  const { data } = await supabase
+    .from('reactions')
+    .select('count')
+    .eq('event_id', eventId)
+    .eq('emoji', emoji)
+    .single();
 
-      if (data?.count > 1) {
-        await supabase
-          .from('reactions')
-          .update({ count: data.count - 1 })
-          .eq('event_id', eventId)
-          .eq('emoji', emoji);
-      } else {
-        await supabase
-          .from('reactions')
-          .delete()
-          .eq('event_id', eventId)
-          .eq('emoji', emoji);
-      }
+  const currentCount = data?.count ?? 0; // fallback if null or undefined
 
-      localStorage.removeItem(storageKey);
-      wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
-    } catch (err) {
-      console.error('Undo failed:', err.message);
-    }
-    await refreshReactionCounts(eventId, wrapper);
-    return;
+  if (data) {
+    await supabase
+      .from('reactions')
+      .update({ count: currentCount + 1 })
+      .eq('event_id', eventId)
+      .eq('emoji', emoji);
+  } else {
+    await supabase
+      .from('reactions')
+      .insert({ event_id: eventId, emoji, count: 1 });
   }
+
+  localStorage.setItem(storageKey, emoji);
+  wrapper.querySelectorAll('button').forEach(btn => {
+    const e = btn.textContent.trim().split(' ')[0];
+    btn.classList.toggle('reacted', e === emoji);
+  });
+} catch (err) {
+  console.error('Failed to insert/update reaction:', err.message);
+}
+
+
 
   // Remove previous reaction
   if (current) {
