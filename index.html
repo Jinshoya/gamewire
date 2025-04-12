@@ -230,38 +230,42 @@
     }
     
     function startCountdowns() {
-      setInterval(() => {
-        document.querySelectorAll('.countdown').forEach(el => {
-          const start = new Date(el.getAttribute('data-start-event-date'));
-          const endStr = el.getAttribute('data-end-event-date');
-          const end = endStr ? new Date(endStr) : null;
-          const now = new Date();
-          const diff = start - now;
-          const elapsed = now - start;
-          const parent = el.closest('.event_headliner');
-          const isSteam = parent.closest('#steam-sale-event');
-    
-          if (isSteam && end && now >= end) return parent.remove();
-    
-          if (diff <= 0) {
-            el.textContent = 'Started';
-            if (!isSteam && elapsed < 3600000 && parent.parentElement.id !== 'live-events') {
-              document.getElementById('live-events').appendChild(parent);
-            } else if (!isSteam && parent.parentElement.id !== 'past-events') {
-              document.getElementById('past-events').appendChild(parent);
-            }
-            return;
+  setInterval(() => {
+    document.querySelectorAll('.countdown').forEach(el => {
+      const start = new Date(el.getAttribute('data-start-event-date'));
+      const endStr = el.getAttribute('data-end-event-date');
+      const end = endStr ? new Date(endStr) : null;
+      const now = new Date();
+      const diff = start - now;
+      const elapsed = now - start;
+      const parent = el.closest('.event_headliner');
+      const isSteam = parent.closest('#steam-sale-event');
+
+      // If the event is a Steam Sale and has ended, remove it
+      if (isSteam && end && now >= end) return parent.remove();
+
+      if (diff <= 0) {
+        el.textContent = 'Started';
+        // If 1 hour has passed since the event started, move it to "Past Events"
+        if (elapsed >= 3600000) {
+          if (parent.parentElement.id !== 'past-events') {
+            document.getElementById('past-events').appendChild(parent);
           }
-    
-          const totalSeconds = Math.floor(diff / 1000);
-          const days = Math.floor(totalSeconds / 86400);
-          const hours = Math.floor((totalSeconds % 86400) / 3600);
-          const mins = Math.floor((totalSeconds % 3600) / 60);
-          el.textContent = `${days ? days + 'd ' : ''}${hours}h ${mins}m`;
-        });
-      }, 1000);
-    }
-    
+        } else if (parent.parentElement.id !== 'live-events') {
+          document.getElementById('live-events').appendChild(parent);
+        }
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      el.textContent = `${days ? days + 'd ' : ''}${hours}h ${mins}m`;
+    });
+  }, 1000);
+}
+
     async function loadReactionsForEvent(wrapper, eventId) {
       const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
       const userEmoji = localStorage.getItem(`reaction_${eventId}`);
