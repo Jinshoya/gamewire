@@ -6,19 +6,21 @@
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="./styles/bootstrap.css" />
   <link rel="stylesheet" href="./styles/main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <title>Event schedule - ggPause.com</title>
 
   <style>
     .reaction-bar button.selected {
-  background-color: #ffefcc;
-  font-weight: bold;
-  border-color: #ffa94d;
-}
+      background-color: #ffefcc;
+      font-weight: bold;
+      border-color: #ffa94d;
+    }
 
-.reaction-bar button.top-reaction {
-  border-color: #ff5e5e;
-  box-shadow: 0 0 5px rgba(255, 94, 94, 0.4);
-}
+    .reaction-bar button.top-reaction {
+      border-color: #ff5e5e;
+      box-shadow: 0 0 5px rgba(255, 94, 94, 0.4);
+    }
+
     #past-events .event_headliner {
       filter: grayscale(100%);
       opacity: 0.6;
@@ -155,89 +157,79 @@
   </div>
 
   <script>
-const USER_REACTED_KEY = 'userReactions-v1';
+    const supabase = supabase.createClient(
+      "https://eiapztxuvodtiqgsuicf.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    );
 
-function getUserReactions() {
-  return JSON.parse(localStorage.getItem(USER_REACTED_KEY) || '{}');
-}
+    const USER_REACTED_KEY = 'userReactions-v2';
 
-function setUserReaction(eventId, emoji) {
-  const current = getUserReactions();
-  current[eventId] = emoji;
-  localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
-}
-
-function clearUserReaction(eventId) {
-  const current = getUserReactions();
-  delete current[eventId];
-  localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
-}
-
-async function react(button, emoji) {
-  const wrapper = button.closest('.reaction-bar');
-  const eventId = wrapper.getAttribute('data-event');
-  const current = getUserReactions()[eventId];
-
-  const isUndo = current === emoji;
-
-  const res = await fetch('/.netlify/functions/react', {
-    method: 'POST',
-    body: JSON.stringify({ eventId, emoji, undo: isUndo })
-  });
-
-  const data = await res.json();
-  if (!data.success) return;
-
-  // Save / clear local reaction
-  if (isUndo) {
-    clearUserReaction(eventId);
-  } else {
-    setUserReaction(eventId, emoji);
-  }
-
-  // Update button counts
-  for (const btn of wrapper.querySelectorAll('button')) {
-    const e = btn.textContent.trim().split(' ')[0];
-    const count = data.reactions[e] || 0;
-    btn.querySelector('span').textContent = count;
-
-    btn.classList.toggle('selected', e === (isUndo ? null : emoji));
-  }
-
-  // Highlight top reaction
-  const top = Object.entries(data.reactions).sort((a, b) => b[1] - a[1])[0]?.[0];
-  wrapper.querySelectorAll('button').forEach(btn => {
-    btn.classList.toggle('top-reaction', btn.textContent.includes(top));
-  });
-}
-
-async function preloadReactions() {
-  const bars = document.querySelectorAll('.reaction-bar');
-  for (const bar of bars) {
-    const eventId = bar.getAttribute('data-event');
-    const res = await fetch(`/.netlify/functions/react`, {
-      method: 'POST',
-      body: JSON.stringify({ eventId, emoji: '❤️' }) // dummy, will be ignored
-    });
-    const data = await res.json();
-    if (!data.success) continue;
-
-    const current = getUserReactions()[eventId];
-
-    for (const btn of bar.querySelectorAll('button')) {
-      const e = btn.textContent.trim().split(' ')[0];
-      const count = data.reactions[e] || 0;
-      btn.querySelector('span').textContent = count;
-      btn.classList.toggle('selected', e === current);
+    function getUserReactions() {
+      return JSON.parse(localStorage.getItem(USER_REACTED_KEY) || '{}');
     }
 
-    const top = Object.entries(data.reactions).sort((a, b) => b[1] - a[1])[0]?.[0];
-    bar.querySelectorAll('button').forEach(btn => {
-      btn.classList.toggle('top-reaction', btn.textContent.includes(top));
-    });
-  }
-}
+    function setUserReaction(eventId, emoji) {
+      const current = getUserReactions();
+      current[eventId] = emoji;
+      localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
+    }
 
+    function clearUserReaction(eventId) {
+      const current = getUserReactions();
+      delete current[eventId];
+      localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
+    }
+
+    async function preloadReactions() {
+      const bars = document.querySelectorAll('.reaction-bar');
+      for (const bar of bars) {
+        const eventId = bar.getAttribute('data-event');
+        const { data, error } = await supabase
+          .from('reactions')
+          .select('emoji, count')
+          .eq('event_id', eventId);
+
+        if (error) continue;
+
+        const userEmoji = getUserReactions()[eventId];
+        let highest = null;
+        let max = 0;
+
+        bar.querySelectorAll('button').forEach(btn => {
+          const emoji = btn.textContent.trim().split(' ')[0];
+          const record = data.find(d => d.emoji === emoji);
+          const count = record ? record.count : 0;
+          btn.querySelector('span').textContent = count;
+          btn.classList.toggle('selected', emoji === userEmoji);
+          if (count > max) {
+            highest = emoji;
+            max = count;
+          }
+        });
+
+        bar.querySelectorAll('button').forEach(btn => {
+          const emoji = btn.textContent.trim().split(' ')[0];
+          btn.classList.toggle('top-reaction', emoji === highest);
+        });
+      }
+    }
+
+    async function react(button, emoji) {
+      const wrapper = button.closest('.reaction-bar');
+      const eventId = wrapper.getAttribute('data-event');
+      const userEmoji = getUserReactions()[eventId];
+      const undo = emoji === userEmoji;
+
+      if (undo) {
+        clearUserReaction(eventId);
+        await supabase.rpc('decrement_reaction', { e_id: eventId, em: emoji });
+      } else {
+        setUserReaction(eventId, emoji);
+        await supabase.rpc('increment_reaction', { e_id: eventId, em: emoji });
+      }
+
+      preloadReactions();
+    }
 
     function scrollToSection(id) {
       const container = document.getElementById(id);
@@ -272,67 +264,6 @@ async function preloadReactions() {
           <img src="${link.icon}" alt="${link.label}" class="links_image">
         </a>
       `).join('');
-    }
-
-    function startCountdowns() {
-      setInterval(() => {
-        document.querySelectorAll('.countdown').forEach((el) => {
-          const dateStr = el.getAttribute('data-start-event-date');
-          const endStr = el.getAttribute('data-end-event-date');
-          const parent = el.closest('.event_headliner');
-          const eventDate = new Date(dateStr);
-          const now = new Date();
-          const diff = eventDate - now;
-          const diffFromStart = now - eventDate;
-          const isSteam = parent.closest('#steam-sale-event');
-
-          if (isSteam && endStr) {
-            const endDate = new Date(endStr);
-            if (now >= endDate) {
-              parent.remove();
-              return;
-            }
-          }
-
-          if (diff <= 0) {
-            if (diffFromStart < 3600000) {
-              el.textContent = 'Started';
-              if (!isSteam && parent.parentElement.id !== 'live-events') {
-                document.getElementById('live-events').appendChild(parent);
-              }
-            } else if (!isSteam && parent.parentElement.id !== 'past-events') {
-              document.getElementById('past-events').appendChild(parent);
-            }
-            return;
-          }
-
-          const totalSeconds = Math.floor(diff / 1000);
-          const days = Math.floor(totalSeconds / (3600 * 24));
-          const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-          const mins = Math.floor((totalSeconds % 3600) / 60);
-
-          el.textContent = `${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m`;
-        });
-      }, 1000);
-    }
-
-    async function react(button, emoji) {
-      const wrapper = button.closest('.reaction-bar');
-      const eventId = wrapper.getAttribute('data-event');
-
-      const res = await fetch('/.netlify/functions/react', {
-        method: 'POST',
-        body: JSON.stringify({ eventId, emoji })
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        for (const btn of wrapper.querySelectorAll('button')) {
-          const e = btn.textContent.trim().split(' ')[0];
-          const count = data.reactions[e] || 0;
-          btn.querySelector('span').textContent = count;
-        }
-      }
     }
 
     async function loadEvents() {
@@ -386,6 +317,47 @@ async function preloadReactions() {
       startCountdowns();
     }
 
+    function startCountdowns() {
+      setInterval(() => {
+        document.querySelectorAll('.countdown').forEach((el) => {
+          const dateStr = el.getAttribute('data-start-event-date');
+          const endStr = el.getAttribute('data-end-event-date');
+          const parent = el.closest('.event_headliner');
+          const eventDate = new Date(dateStr);
+          const now = new Date();
+          const diff = eventDate - now;
+          const diffFromStart = now - eventDate;
+          const isSteam = parent.closest('#steam-sale-event');
+
+          if (isSteam && endStr) {
+            const endDate = new Date(endStr);
+            if (now >= endDate) {
+              parent.remove();
+              return;
+            }
+          }
+
+          if (diff <= 0) {
+            if (diffFromStart < 3600000) {
+              el.textContent = 'Started';
+              if (!isSteam && parent.parentElement.id !== 'live-events') {
+                document.getElementById('live-events').appendChild(parent);
+              }
+            } else if (!isSteam && parent.parentElement.id !== 'past-events') {
+              document.getElementById('past-events').appendChild(parent);
+            }
+            return;
+          }
+
+          const totalSeconds = Math.floor(diff / 1000);
+          const days = Math.floor(totalSeconds / (3600 * 24));
+          const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+          const mins = Math.floor((totalSeconds % 3600) / 60);
+          el.textContent = `${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m`;
+        });
+      }, 1000);
+    }
+
     function updateNowPlayingBar() {
       const live = document.querySelector("#live-events .event_headliner");
       const bar = document.getElementById("nowPlayingBar");
@@ -400,15 +372,13 @@ async function preloadReactions() {
       }
     }
 
+    document.addEventListener("DOMContentLoaded", async () => {
+      await loadEvents();
+      await preloadReactions();
+      updateNowPlayingBar();
+    });
+
     setInterval(updateNowPlayingBar, 3000);
-
-    document.addEventListener("DOMContentLoaded", () => {
-  loadEvents().then(() => {
-    document.getElementById("eventLoadingSkeletons")?.remove();
-    preloadReactions(); // ← this line
-  });
-});
-
   </script>
 </body>
 </html>
