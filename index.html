@@ -275,6 +275,7 @@
     }
     
     async function loadEvents() {
+      const isPast = date < now;
       const res = await fetch('/events/index.json');
       const files = await res.json();
       const now = new Date();
