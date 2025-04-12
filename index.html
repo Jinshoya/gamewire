@@ -212,27 +212,28 @@
     console.log('Proceeding as anonymous');
   }
 
-  // Check if the reaction already exists
-  const { data, error } = await supabase
+  // Attempt to find an existing reaction for the given eventId and emoji
+  const { data: reactionData, error } = await supabase
     .from('reactions')
     .select('id, count')
     .eq('event_id', eventId)
     .eq('emoji', emoji)
-    .single(); // Get a single result
+    .single();  // Using single to ensure we get only one row
 
-  console.log("Reaction data:", data);
-  if (error) {
+  if (error && error.code !== "PGRST100") {
     console.error('Error fetching reaction:', error.message);
     return;
   }
 
-  if (data) {
+  let newCount;
+
+  if (reactionData) {
     // If reaction exists, increment the count
-    const newCount = (data.count || 0) + 1;  // Ensure count starts at 1 if it's null
+    newCount = (reactionData.count || 0) + 1;
     const { updateError } = await supabase
       .from('reactions')
       .update({ count: newCount })
-      .eq('id', data.id); // Update the count of the existing reaction
+      .eq('id', reactionData.id); // Update the count of the existing reaction
 
     if (updateError) {
       console.error('Failed to update reaction count:', updateError.message);
@@ -248,10 +249,11 @@
       }
     });
   } else {
-    // If reaction doesn't exist, insert a new row with count = 1
+    // If no reaction exists, insert a new one with count = 1
+    newCount = 1;
     const { insertError } = await supabase
       .from('reactions')
-      .insert([{ event_id: eventId, emoji, count: 1 }]);
+      .insert([{ event_id: eventId, emoji, count: newCount }]);
 
     if (insertError) {
       console.error('Failed to insert reaction:', insertError.message);
@@ -263,7 +265,7 @@
     emojiButtons.forEach(btn => {
       const emojiText = btn.textContent.trim().split(' ')[0];
       if (emojiText === emoji) {
-        btn.querySelector('span').textContent = 1;
+        btn.querySelector('span').textContent = newCount;
       }
     });
   }
