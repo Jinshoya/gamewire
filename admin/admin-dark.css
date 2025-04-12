@@ -8,10 +8,30 @@
     --input-border: #444;
   }
   
-  body, .cms {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+  body {
+    background-color: #121212;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', sans-serif;
   }
+  
+  .nc-root {
+    background-color: #121212;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #ffcc66;
+  }
+  
+  a {
+    color: #66d9ef;
+  }
+  
+  input, textarea, select {
+    background-color: #1e1e1e !important;
+    color: #f0f0f0 !important;
+    border: 1px solid #333 !important;
+  }
+  
   
   input, textarea, select, .nc-widget, .nc-controlPane-widget, .nc-controlPane {
     background-color: var(--input-bg) !important;

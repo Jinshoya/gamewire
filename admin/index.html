@@ -3,46 +3,51 @@
   <head>
     <meta charset="utf-8" />
     <title>GGPause Admin</title>
+
+    <!-- CMS config -->
     <link rel="cms-config-url" href="/admin/config.yml" />
+
+    <!-- Dark mode & custom styles -->
+    <link rel="stylesheet" href="/admin/admin-dark.css" />
     <link rel="stylesheet" href="/admin/custom.css" />
-    <link rel="stylesheet" href="admin-dark.css" />
+
+    <!-- Netlify Identity + CMS -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script src="https://unpkg.com/netlify-cms@2.10.192/dist/netlify-cms.js" defer></script>
+    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
   </head>
-  
+
   <body>
     <div id="nc-root"></div>
 
     <script>
-      window.addEventListener('load', function () {
+      // Wait for Netlify CMS to fully load before using CMS global
+      const waitForCMS = setInterval(() => {
         if (window.CMS) {
-          // ✅ Init CMS
+          clearInterval(waitForCMS);
           CMS.init();
 
-          // ✅ Register preview template
-          CMS.registerPreviewTemplate("events", EventPreview);
-
-          // ✅ Preview function
-          function EventPreview({ entry }) {
+          // Preview template
+          CMS.registerPreviewTemplate("events", ({ entry }) => {
             const data = entry.getIn(["data"]).toJS();
+
+            const links = (data.links || []).map(link => `
+              <a href="${link.url}" target="_blank" style="margin-right: 10px; color: #66d9ef;">
+                ${link.label}
+              </a>
+            `).join('');
+
             return `
-              <div class="event_card_preview">
-                <div class="event_logo">
-                  <img src="${data.image || ''}" alt="${data.title || ''}" />
-                </div>
-                <div class="event_info">
-                  <h2>${data.title || 'Untitled Event'}</h2>
-                  <p><strong>Date:</strong> ${data.date || 'TBD'}</p>
-                  ${data.end ? `<p><strong>Ends:</strong> ${data.end}</p>` : ''}
-                  <div class="event_links">
-                    ${(data.links || []).map(link => `<a href="${link.url}" target="_blank">${link.label}</a>`).join('')}
-                  </div>
-                </div>
+              <div style="background:#1e1e1e;color:white;font-family:sans-serif;padding:20px;border-radius:10px;">
+                <h2 style="color:#ffcc66;">${data.title || 'Untitled Event'}</h2>
+                <p><strong>Date:</strong> ${data.date || 'TBD'}</p>
+                ${data.end ? `<p><strong>Ends:</strong> ${data.end}</p>` : ''}
+                <img src="${data.image || ''}" alt="${data.title || ''}" style="margin-top:10px;max-width:250px;border-radius:8px;" />
+                <div style="margin-top:10px;">${links}</div>
               </div>
             `;
-          }
+          });
         }
-      });
+      }, 50);
     </script>
   </body>
 </html>
