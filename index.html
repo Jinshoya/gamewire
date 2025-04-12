@@ -17,16 +17,17 @@
     }
 
     .event_logo img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 8px;
-      border-top: none;
-      border-bottom: none;
-      border-left: 3px solid var(--event-border-color, #d9a62d);
-      border-right: 3px solid var(--event-border-color, #d9a62d);
-      transition: box-shadow 0.3s ease, transform 0.3s ease;
-    }
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  border-top: none;
+  border-bottom: none;
+  border-left: 3px solid var(--event-border-color, #d9a62d);
+  border-right: 3px solid var(--event-border-color, #d9a62d);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
 
     .event_logo img:hover {
       box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
@@ -196,24 +197,25 @@
         const isSteam = data.type === 'steam_sale';
         const borderColor = data.borderColor || '#d9a62d';
 
-        const html = `
-          <div class="event_headliner" style="--event-border-color: ${borderColor};">
-            <div class="event_head">
-              <div class="event_logo" style="--event-border-color: ${borderColor};">
-                <img src="${data.image}" alt="${data.title}">
-                <div class="live_badge" style="display: none;">NOW LIVE</div>
-              </div>
-              <div class="event_flex">
-                <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
-                <div class="col-sm"><div class="event_date">
-                  ${isSteam ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : new Date(data.date).toLocaleString()}
-                </div></div>
-                <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
-                <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
-              </div>
-            </div>
-          </div>
-        `;
+const html = `
+  <div class="event_headliner" style="--event-border-color: ${borderColor};">
+    <div class="event_head">
+      <div class="event_logo" style="--event-border-color: ${borderColor};">
+        <img src="${data.image}" alt="${data.title}">
+        <div class="live_badge" style="display: none;">NOW LIVE</div>
+      </div>
+      <div class="event_flex">
+        <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
+        <div class="col-sm"><div class="event_date">
+          ${isSteam ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : new Date(data.date).toLocaleString()}
+        </div></div>
+        <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
+        <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
+      </div>
+    </div>
+  </div>
+`;
+
 
         const targetId = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
         document.getElementById(targetId).insertAdjacentHTML("beforeend", html);
