@@ -215,26 +215,26 @@
     console.log('Proceeding as anonymous');
   }
 
-  // Attempt to find an existing reaction for the given eventId and emoji
-  const { data: reactionData, error } = await supabase
+  // Fetch existing reaction for event_id and emoji
+  const { data: reactionData, error: fetchError } = await supabase
     .from('reactions')
     .select('id, count')
     .eq('event_id', eventId)
-    .eq('emoji', emoji)
-    .single();  // Ensure we get a single row
+    .eq('emoji', emoji);
 
-  if (error && error.code !== "PGRST100") {
-    console.error('Error fetching reaction:', error.message);
+  if (fetchError) {
+    console.error('Error fetching reaction:', fetchError.message);
     return;
   }
 
-  let newCount;
+  // If no reaction data exists, create it, otherwise update the count
+  let newCount = 1;
 
-  if (reactionData) {
-    // If reaction exists, increment count
-    newCount = reactionData.count === null ? 1 : reactionData.count + 1;
-    
-    // Update the reaction count in the database
+  if (reactionData && reactionData.length > 0) {
+    // Reaction exists, increment the count
+    newCount = reactionData[0].count + 1;
+
+    // Update the reaction count
     const { updateError } = await supabase
       .from('reactions')
       .upsert([{ event_id: eventId, emoji, count: newCount }], { onConflict: ['event_id', 'emoji'] });
@@ -243,19 +243,8 @@
       console.error('Failed to update reaction count:', updateError.message);
       return;
     }
-
-    // Update the UI count
-    const emojiButtons = wrapper.querySelectorAll('button');
-    emojiButtons.forEach(btn => {
-      const emojiText = btn.textContent.trim().split(' ')[0];
-      if (emojiText === emoji) {
-        btn.classList.add('highlight'); // Add highlight if reaction is added
-        btn.querySelector('span').textContent = newCount; // Update count
-      }
-    });
   } else {
-    // If no reaction exists, insert a new one with count = 1
-    newCount = 1;
+    // No reaction exists, insert a new one
     const { insertError } = await supabase
       .from('reactions')
       .insert([{ event_id: eventId, emoji, count: newCount }]);
@@ -264,17 +253,17 @@
       console.error('Failed to insert reaction:', insertError.message);
       return;
     }
-
-    // Highlight selected emoji
-    const emojiButtons = wrapper.querySelectorAll('button');
-    emojiButtons.forEach(btn => {
-      const emojiText = btn.textContent.trim().split(' ')[0];
-      if (emojiText === emoji) {
-        btn.classList.add('highlight'); // Add highlight if reaction is added
-        btn.querySelector('span').textContent = newCount; // Set count to 1
-      }
-    });
   }
+
+  // Immediately update the UI with the new count
+  const emojiButtons = wrapper.querySelectorAll('button');
+  emojiButtons.forEach(btn => {
+    const emojiText = btn.textContent.trim().split(' ')[0];
+    if (emojiText === emoji) {
+      btn.classList.add('highlight'); // Highlight the clicked emoji
+      btn.querySelector('span').textContent = newCount; // Set count to updated value
+    }
+  });
 }
 
     // Countdown functionality
