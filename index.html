@@ -9,7 +9,11 @@
   <link rel="stylesheet" href="./styles/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    #past-events .event_head { filter: grayscale(100%); opacity: 0.6; }
+    #past-events .event_logo img {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
     .reaction-bar button.reacted { background-color: #ffd2d2; border-color: #ff4d4d; font-weight: bold; }
     .event_logo { overflow: hidden; border-radius: 8px; }
     .event_logo img { transition: transform 0.4s ease; width: 100%; height: auto; }
@@ -69,6 +73,48 @@
   border-radius: 12px;
   padding: 2px 6px;
   font-weight: bold;
+}
+.reaction-bar {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 20px;
+  padding: 4px 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.event_logo {
+  position: relative;
+}
+
+.reaction-bar button {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.reaction-bar button span {
+  margin-left: 3px;
+  font-weight: bold;
+}
+
+.reaction-bar button.reacted {
+  animation: pop 0.3s ease;
+  font-weight: bold;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
 }
 
   </style>
@@ -140,7 +186,8 @@
 
     async function react(button, emoji) {
       const wrapper = button.closest('.reaction-bar');
-      const eventId = wrapper.getAttribute('data-event');
+if (!wrapper) return console.error('Reaction wrapper not found');
+const eventId = wrapper.getAttribute('data-event');
       const storageKey = `reaction_${eventId}`;
       const current = localStorage.getItem(storageKey);
 
@@ -256,17 +303,13 @@
         const html = `
   <div class="event_headliner" style="--event-border-color: ${borderColor};">
     <div class="event_head">
-      <div class="event_logo" data-border-color="${borderColor}" style="position: relative;">
-        <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-        <div class="reaction-overlay" data-event="${slug}">
-          ${['❤️','😂','👍','😢'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
-        </div>
-      </div>
+<div class="event_logo" data-border-color="${borderColor}">
+  <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
+  <div class="reaction-bar" data-event="${slug}">
+    ${['🔥','😂','😴','💩','😞'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+  </div>
+</div>
 
-            <div class="reaction-bar" data-event="${slug}">
-              ${['🔥','😂','😴','💩','😞','❤️'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
-            </div>
-          </div>`;
 
         const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
         const container = document.getElementById(target);
