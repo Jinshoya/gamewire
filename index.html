@@ -203,13 +203,14 @@
       `).join('');
     }
 
-    async function react(button, emoji) {
+// React to event
+async function react(button, emoji) {
   const wrapper = button.closest('.reaction-bar');
   const eventId = wrapper.getAttribute('data-event');
   const storageKey = `reaction_${eventId}`;
   const current = localStorage.getItem(storageKey);
 
-  // Undo if clicking the same emoji
+  // If clicking the same emoji again — undo
   if (current === emoji) {
     try {
       const { data } = await supabase
@@ -271,7 +272,7 @@
     }
   }
 
-  // Add new reaction or increment
+  // Insert or update new reaction
   try {
     const { data } = await supabase
       .from('reactions')
@@ -305,8 +306,6 @@
 
   await refreshReactionCounts(eventId, wrapper);
 }
-
-
 // Helper: Refresh reaction numbers and highlight
 async function refreshReactionCounts(eventId, wrapper) {
   const storageKey = `reaction_${eventId}`;
@@ -314,7 +313,7 @@ async function refreshReactionCounts(eventId, wrapper) {
 
   const { data, error } = await supabase
     .from('reactions')
-    .select('emoji, count') // ✅ Fixes the 406 error
+    .select('emoji, count')
     .eq('event_id', eventId);
 
   if (error) {
@@ -325,7 +324,7 @@ async function refreshReactionCounts(eventId, wrapper) {
   wrapper.querySelectorAll('button').forEach(btn => {
     const emoji = btn.textContent.trim().split(' ')[0];
     const found = data.find(r => r.emoji === emoji);
-    const count = found?.count || 0;
+    const count = found?.count ?? 0;
 
     btn.querySelector('span').textContent = count;
     btn.classList.toggle('reacted', emoji === selected);
@@ -391,7 +390,7 @@ async function refreshReactionCounts(eventId, wrapper) {
     const reaction = data.find(r => r.emoji === e);
     const count = reaction?.count || 0;
     btn.querySelector('span').textContent = count;
-    btn.classList.toggle('selected', userEmoji === e);
+    btn.classList.toggle('reacted', userEmoji === e);
   });
 }
 
