@@ -26,6 +26,7 @@ a:hover {
 }
 body {
 	background:#0e0e10!important;
+	padding-top: 50px; /* Make space for the Now Live bar, adjust the height if needed */
 }
 .events_upnext{
 color:#fff;

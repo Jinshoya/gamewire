@@ -22,10 +22,20 @@
     .section-tabs button:hover { background-color: #e2e2e2; }
     @media (min-width: 768px) { .section-tabs { display: none; } }
     #nowPlayingBar {
-      position: fixed; top: 0; left: 0; right: 0; background: #ff4d4d;
-      color: white; font-weight: bold; text-align: center; padding: 6px 12px;
-      font-size: 0.95rem; z-index: 1000; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
+  position: fixed;   /* Fix it to the top of the page */
+  top: 0;            /* Align it to the top */
+  left: 0;
+  right: 0;
+  background: #ff4d4d; /* Customize the background color */
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 6px 12px;
+  font-size: 1rem;  /* Adjust size for visibility */
+  z-index: 1000;    /* Ensure it stays above other content */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Add shadow to make it pop */
+  display: none;    /* Start with it hidden */
+}
     .skeleton-card {
       width: 100%; max-width: 920px; height: 100px; margin: 10px auto;
       background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
@@ -106,6 +116,9 @@
   pointer-events: none;
   opacity: 0.5;
   filter: grayscale(100%);
+}
+.content {
+  padding-top: 60px; /* Adjust this value to create enough space for the fixed bar */
 }
   </style>
 </head>
