@@ -11,10 +11,11 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    #past-events .event_headliner {
-      filter: grayscale(100%);
-      opacity: 0.6;
-    }
+#past-events .event_head {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
     .reaction-bar button.selected {
   background-color: #d1eaff;
   border-color: #007acc;
@@ -204,58 +205,62 @@
     async function react(button, emoji) {
   const wrapper = button.closest('.reaction-bar');
   const eventId = wrapper.getAttribute('data-event');
-  const storageKey = `reaction_${eventId}`;
-  const previous = localStorage.getItem(storageKey);
 
-  let remove = false;
-  if (previous === emoji) {
-    // Undo reaction
-    const { data: existing } = await supabase
-  .from('reactions')
-  .select('count')
-  .eq('event_id', eventId)
-  .eq('emoji', emoji)
-  .single();
+  const current = localStorage.getItem(`reaction-${eventId}`);
+  if (current === emoji) {
+    // 🔁 Undo logic
+    try {
+      const { data: existing } = await supabase
+        .from('reactions')
+        .select('count')
+        .eq('event_id', eventId)
+        .eq('emoji', emoji)
+        .single();
 
-if (existing?.count > 1) {
-  await supabase
-    .from('reactions')
-    .update({ count: existing.count - 1 })
-    .eq('event_id', eventId)
-    .eq('emoji', emoji);
-} else {
-  await supabase
-    .from('reactions')
-    .delete()
-    .eq('event_id', eventId)
-    .eq('emoji', emoji);
-}
+      if (existing?.count > 1) {
+        await supabase
+          .from('reactions')
+          .update({ count: existing.count - 1 })
+          .eq('event_id', eventId)
+          .eq('emoji', emoji);
+      } else {
+        await supabase
+          .from('reactions')
+          .delete()
+          .eq('event_id', eventId)
+          .eq('emoji', emoji);
+      }
 
+      localStorage.removeItem(`reaction-${eventId}`);
+      wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
+    } catch (err) {
+      console.error('Undo failed:', err.message);
+    }
 
-    if (error) return console.error('Undo failed:', error.message);
-    localStorage.removeItem(storageKey);
-    remove = true;
-  } else {
-    // Insert or update reaction
-    const { data: existing } = await supabase
-  .from('reactions')
-  .select('count')
-  .eq('event_id', eventId)
-  .eq('emoji', emoji)
-  .single();
-
-const newCount = (existing?.count || 0) + 1;
-
-const { error } = await supabase
-  .from('reactions')
-  .upsert([{ event_id: eventId, emoji, count: newCount }], { onConflict: ['event_id', 'emoji'] });
-
-    if (error) return console.error('React failed:', error.message);
-    localStorage.setItem(storageKey, emoji);
+    return; // ✅ exit early after undo
   }
 
-  // Reload reactions for this event
-  await loadReactionsForEvent(wrapper, eventId);
+  // ✅ Main reaction upsert
+  const { data, error } = await supabase
+    .from('reactions')
+    .upsert({ event_id: eventId, emoji })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Failed to insert reaction:', error.message);
+    return;
+  }
+
+  localStorage.setItem(`reaction-${eventId}`, emoji);
+
+  // update UI
+  wrapper.querySelectorAll('button').forEach(btn => {
+    const e = btn.textContent.trim().split(' ')[0];
+    btn.classList.toggle('reacted', e === emoji);
+  });
+
+  // optionally fetch updated count here again if needed
 }
 
     // Countdown functionality
