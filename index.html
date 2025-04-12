@@ -8,20 +8,31 @@
   <link rel="stylesheet" type="text/css" href="./styles/bootstrap.css" />
   <link rel="stylesheet" type="text/css" href="./styles/main.css" />
   <title>Event schedule - ggPause.com</title>
-  <meta property="og:url" content="https://ggpause.com/">
-  <meta property="og:image" content="https://ggpause.com/images/gamewire.jpg">
-  <meta property="og:title" content="ggPause Event Countdown">
-  <meta property="og:description" content="Your #1 source for upcoming gaming event schedule.">
-  <meta property="og:type" content="website">
-  <meta name="description" content="Countdown to events with links to the streams">
-  <meta name="keywords" content="XBOX,Playstation,State of Play,Countdown,2022,2023,2024,2025,2026,2027,gaming,gamelink,game,wire,game countdown,conference countdown,timer,steam,steam sale">
 
   <style>
-    .countdown {
-      transition: all 0.5s ease-in-out;
-      font-variant-numeric: tabular-nums;
-      font-weight: bold;
+    .event_logo {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
     }
+
+    .event_logo img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+      border-top: none;
+      border-bottom: none;
+      border-left: 3px solid var(--event-border-color, #d9a62d);
+      border-right: 3px solid var(--event-border-color, #d9a62d);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .event_logo img:hover {
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+      transform: scale(1.01);
+    }
+
     .event_headliner.live {
       border-left: 3px solid transparent;
       border-right: 3px solid transparent;
@@ -29,10 +40,12 @@
       border-image-slice: 1;
       animation: livePulse 2s infinite ease-in-out;
     }
+
     @keyframes livePulse {
       0%, 100% { box-shadow: 0 0 0px rgba(255, 107, 107, 0.3); }
       50% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.6); }
     }
+
     .live_badge {
       position: absolute;
       top: 10px;
@@ -50,6 +63,7 @@
       z-index: 2;
       opacity: 0.95;
     }
+
     .live_badge::before {
       content: "";
       display: inline-block;
@@ -59,6 +73,7 @@
       background-color: white;
       border-radius: 50%;
     }
+
     .events_grouped {
       overflow-x: auto;
       scroll-snap-type: x mandatory;
@@ -67,17 +82,20 @@
       padding: 10px 0;
       scroll-padding: 10px;
     }
+
     .events_grouped > .events {
       scroll-snap-align: start;
       flex-shrink: 0;
       min-width: 100%;
     }
+
     @media (min-width: 768px) {
       .events_grouped {
         overflow-x: visible;
         display: block;
       }
     }
+
     #stickyCountdown {
       position: fixed;
       bottom: 0;
@@ -91,10 +109,17 @@
       text-align: center;
       display: none;
     }
+
     @media (max-width: 768px) {
       #stickyCountdown {
         display: block;
       }
+    }
+
+    .countdown {
+      transition: all 0.5s ease-in-out;
+      font-variant-numeric: tabular-nums;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -106,13 +131,16 @@
       <div class="events_grouped">
         <div class="events" id="steam-sale-event"></div>
       </div>
+
       <div class="events_grouped">
         <div class="events" id="live-events"></div>
       </div>
+
       <div class="events_upnext" id="next_event_name">Upcoming Events</div>
       <div class="events_grouped">
         <div class="events" id="upcoming-events"></div>
       </div>
+
       <div class="events_upcoming" id="old_events_name">Old Events</div>
       <div class="events_grouped">
         <div class="events" id="past-events"></div>
@@ -139,12 +167,59 @@
 
     function renderLinks(data) {
       const links = [];
-      if (data.youtube && data.youtube.url) links.push(data.youtube);
-      if (data.twitch && data.twitch.url) links.push(data.twitch);
-      if (data.website && data.website.url) links.push(data.website);
-      if (data.steam && data.steam.url) links.push(data.steam);
+      if (data.youtube?.url) links.push(data.youtube);
+      if (data.twitch?.url) links.push(data.twitch);
+      if (data.website?.url) links.push(data.website);
+      if (data.steam?.url) links.push(data.steam);
       if (Array.isArray(data.links)) links.push(...data.links);
-      return links.map(link => `<a href="${link.url}" target="_blank"><img src="${link.icon}" alt="${link.label}" class="links_image"></a>`).join('');
+
+      return links.map(link => `
+        <a href="${link.url}" target="_blank">
+          <img src="${link.icon}" alt="${link.label}" class="links_image">
+        </a>
+      `).join('');
+    }
+
+    async function loadEvents() {
+      const res = await fetch('/events/index.json');
+      const files = await res.json();
+      const now = new Date();
+
+      for (const file of files) {
+        const response = await fetch(`/events/${file}`);
+        const raw = await response.text();
+        const parsed = parseFrontmatter(raw);
+        const data = parsed.attributes;
+
+        const eventDate = new Date(data.date);
+        const isPast = eventDate < now;
+        const isSteam = data.type === 'steam_sale';
+        const borderColor = data.borderColor || '#d9a62d';
+
+        const html = `
+          <div class="event_headliner" style="--event-border-color: ${borderColor};">
+            <div class="event_head">
+              <div class="event_logo" style="--event-border-color: ${borderColor};">
+                <img src="${data.image}" alt="${data.title}">
+                <div class="live_badge" style="display: none;">NOW LIVE</div>
+              </div>
+              <div class="event_flex">
+                <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
+                <div class="col-sm"><div class="event_date">
+                  ${isSteam ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : new Date(data.date).toLocaleString()}
+                </div></div>
+                <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
+                <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        const targetId = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
+        document.getElementById(targetId).insertAdjacentHTML("beforeend", html);
+      }
+
+      startCountdowns();
     }
 
     function startCountdowns() {
@@ -158,6 +233,8 @@
           const diff = eventDate - now;
           const diffFromStart = now - eventDate;
           const isSteam = parent.closest('#steam-sale-event');
+          const liveLabel = parent.querySelector('.live_badge');
+
           if (isSteam && endStr) {
             const endDate = new Date(endStr);
             if (now >= endDate) {
@@ -165,7 +242,7 @@
               return;
             }
           }
-          const liveLabel = parent.querySelector('.live_badge');
+
           if (diff <= 0) {
             if (diffFromStart < 3600000) {
               el.textContent = 'Started';
@@ -179,6 +256,7 @@
             }
             return;
           }
+
           const totalSeconds = Math.floor(diff / 1000);
           const days = Math.floor(totalSeconds / (3600 * 24));
           const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
@@ -186,40 +264,6 @@
           el.textContent = `${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m`;
         });
       }, 1000);
-    }
-
-    async function loadEvents() {
-      const res = await fetch('/events/index.json');
-      const files = await res.json();
-      const now = new Date();
-      for (const file of files) {
-        const response = await fetch(`/events/${file}`);
-        const raw = await response.text();
-        const parsed = parseFrontmatter(raw);
-        const data = parsed.attributes;
-        const eventDate = new Date(data.date);
-        const isPast = eventDate < now;
-        const isSteam = data.type === 'steam_sale';
-        const borderColor = data.borderColor || '#d9a62d';
-        const html = `
-          <div class="event_headliner" style="--event-border-color: ${borderColor};">
-            <div class="event_head">
-              <div class="event_logo">
-                <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-                <div class="live_badge" style="display: none;">NOW LIVE</div>
-              </div>
-              <div class="event_flex">
-                <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
-                <div class="col-sm"><div class="event_date">${isSteam ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : new Date(data.date).toLocaleString()}</div></div>
-                <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
-                <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
-              </div>
-            </div>
-          </div>`;
-        const targetId = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
-        document.getElementById(targetId).insertAdjacentHTML("beforeend", html);
-      }
-      startCountdowns();
     }
 
     window.addEventListener("DOMContentLoaded", loadEvents);
@@ -233,17 +277,16 @@
       }
     });
 
-    function updateStickyCountdown() {
+    setInterval(() => {
       const el = document.querySelector(".countdown");
       const bar = document.getElementById("stickyCountdown");
       if (!el || !bar) return;
       const txt = el.textContent;
       const title = el.closest(".event_headliner")?.querySelector(".event_upc_title")?.textContent;
       if (txt && title) bar.textContent = `${title} starts in ${txt}`;
-    }
-    setInterval(updateStickyCountdown, 10000);
+    }, 10000);
 
-    function tagLiveEvents() {
+    setInterval(() => {
       document.querySelectorAll(".event_headliner").forEach(el => {
         const badge = el.querySelector(".live_badge");
         if (badge && getComputedStyle(badge).display !== "none") {
@@ -252,8 +295,7 @@
           el.classList.remove("live");
         }
       });
-    }
-    setInterval(tagLiveEvents, 3000);
+    }, 3000);
   </script>
 </body>
 </html>
