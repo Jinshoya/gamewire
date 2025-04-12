@@ -41,6 +41,36 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
+    .reaction-overlay {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 20px;
+  padding: 4px 8px;
+}
+
+.reaction-overlay button {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.reaction-overlay button.reacted {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 2px 6px;
+  font-weight: bold;
+}
+
   </style>
 </head>
 <body>
@@ -224,16 +254,15 @@
         const borderColor = data.borderColor || '#d9a62d';
 
         const html = `
-          <div class="event_headliner" style="--event-border-color: ${borderColor};">
-            <div class="event_head">
-              <div class="event_logo"><img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};"></div>
-              <div class="event_flex">
-                <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
-                <div class="col-sm"><div class="event_date">${isSteam ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : date.toLocaleString()}</div></div>
-                <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
-                <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
-              </div>
-            </div>
+  <div class="event_headliner" style="--event-border-color: ${borderColor};">
+    <div class="event_head">
+      <div class="event_logo" data-border-color="${borderColor}" style="position: relative;">
+        <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
+        <div class="reaction-overlay" data-event="${slug}">
+          ${['❤️','😂','👍','😢'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+        </div>
+      </div>
+
             <div class="reaction-bar" data-event="${slug}">
               ${['🔥','😂','😴','💩','😞','❤️'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
             </div>
