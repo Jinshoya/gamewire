@@ -28,24 +28,20 @@
 
           // Preview template
           CMS.registerPreviewTemplate("events", ({ entry }) => {
-            const data = entry.getIn(["data"]).toJS();
+  const data = entry.getIn(["data"]).toJS();
 
-            const links = (data.links || []).map(link => `
-              <a href="${link.url}" target="_blank" style="margin-right: 10px; color: #66d9ef;">
-                ${link.label}
-              </a>
-            `).join('');
+  const div = document.createElement("div");
+  div.innerHTML = `
+    <div style="background:#1e1e1e;padding:20px;border-radius:10px;color:white;">
+      <h2>${data.title || 'Untitled Event'}</h2>
+      <p><strong>Date:</strong> ${data.date || 'TBD'}</p>
+      ${data.end ? `<p><strong>Ends:</strong> ${data.end}</p>` : ''}
+      <img src="${data.image || ''}" style="max-width:200px;margin-top:10px;border-radius:8px;">
+    </div>
+  `;
+  return div;
+});
 
-            return `
-              <div style="background:#1e1e1e;color:white;font-family:sans-serif;padding:20px;border-radius:10px;">
-                <h2 style="color:#ffcc66;">${data.title || 'Untitled Event'}</h2>
-                <p><strong>Date:</strong> ${data.date || 'TBD'}</p>
-                ${data.end ? `<p><strong>Ends:</strong> ${data.end}</p>` : ''}
-                <img src="${data.image || ''}" alt="${data.title || ''}" style="margin-top:10px;max-width:250px;border-radius:8px;" />
-                <div style="margin-top:10px;">${links}</div>
-              </div>
-            `;
-          });
         }
       }, 50);
     </script>
