@@ -1,40 +1,78 @@
-/* admin/custom.css */
+/* Make background dark and text light */
 body {
-    background-color: #f7f7f7;
+    background: #1a1a1a;
+    color: #e0e0e0;
     font-family: 'Segoe UI', sans-serif;
   }
   
+  /* App Header */
   .nc-app-header {
-    background-color: #202020;
-    color: white;
+    background-color: #111 !important;
+    color: #f0f0f0 !important;
+    border-bottom: 1px solid #333;
   }
   
-  .nc-app-header a {
-    color: #f29c1f;
-    font-weight: bold;
+  /* Sidebar Navigation */
+  .nc-navControl {
+    background: #121212 !important;
+    border-right: 1px solid #333;
   }
   
-  .nc-entryEditor-header {
-    background: #f0f0f0;
-    border-bottom: 1px solid #ccc;
+  .nc-navControl a {
+    color: #ccc !important;
   }
   
-  .nc-entryEditor-sidebar {
-    background-color: #fafafa;
+  .nc-navControl a:hover {
+    color: #fff !important;
+    background-color: #2a2a2a !important;
   }
   
-  .nc-entryEditor-sidebar h3 {
-    color: #333;
+  /* Main Panel / Editor Area */
+  .nc-editor, .nc-collectionPage {
+    background: #1e1e1e !important;
+    color: #e0e0e0;
   }
   
-  button[class*='PublishButton'] {
-    background: #ff6600 !important;
-    border: none !important;
-    color: white !important;
-    font-weight: bold;
+  .nc-collectionPage h1,
+  .nc-editor h1 {
+    color: #fff;
   }
   
-  button[class*='PublishButton']:hover {
-    background: #e65700 !important;
+  /* Inputs / Form Fields */
+  input, textarea, select {
+    background-color: #2c2c2c !important;
+    color: #f0f0f0 !important;
+    border: 1px solid #444 !important;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    border-color: #999 !important;
+    outline: none;
+  }
+  
+  /* Buttons */
+  button {
+    background-color: #444 !important;
+    color: #fff !important;
+    border: 1px solid #666 !important;
+  }
+  
+  button:hover {
+    background-color: #666 !important;
+  }
+  
+  /* Publish bar */
+  .nc-toolbar {
+    background: #121212 !important;
+    border-top: 1px solid #333;
+  }
+  
+  /* Fix scrollbars and spacing */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
   }
   
