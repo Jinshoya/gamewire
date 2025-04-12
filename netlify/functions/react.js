@@ -5,11 +5,15 @@ export async function handler(event, context) {
   
     const { eventId, emoji, undo } = JSON.parse(event.body || '{}');
   
+    if (!eventId || !emoji) {
+      return { statusCode: 400, body: 'Missing eventId or emoji' };
+    }
+  
     const key = `reaction:${eventId}`;
     let data = await context.kv.get(key, { type: 'json' }) || {};
   
-    data[emoji] = (data[emoji] || 0) + (undo ? -1 : 1);
-    if (data[emoji] < 0) data[emoji] = 0;
+    data[emoji] = data[emoji] || 0;
+    data[emoji] = Math.max(0, data[emoji] + (undo ? -1 : 1));
   
     await context.kv.set(key, JSON.stringify(data));
   
