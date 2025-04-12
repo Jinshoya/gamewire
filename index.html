@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=0.8">
@@ -8,187 +7,99 @@
   <link rel="stylesheet" href="./styles/bootstrap.css" />
   <link rel="stylesheet" href="./styles/main.css" />
   <title>Event schedule - ggPause.com</title>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-#past-events .event_head {
-  filter: grayscale(100%);
-  opacity: 0.6;
-}
-
-.reaction-bar button.reacted {
-  background-color: #ffd2d2;
-  border-color: #ff4d4d;
-  font-weight: bold;
-}
-
-
-
-    .event_logo {
-      overflow: hidden;
-      border-radius: 8px;
+    #past-events .event_head { filter: grayscale(100%); opacity: 0.6; }
+    .reaction-bar button.reacted {
+      background-color: #ffd2d2;
+      border-color: #ff4d4d;
+      font-weight: bold;
     }
-
-    .event_logo img {
-      transition: transform 0.4s ease;
-      width: 100%;
-      height: auto;
-    }
-
-    .event_logo:hover img {
-      transform: scale(1.1);
-    }
-
+    .event_logo { overflow: hidden; border-radius: 8px; }
+    .event_logo img { transition: transform 0.4s ease; width: 100%; height: auto; }
+    .event_logo:hover img { transform: scale(1.1); }
     .reaction-bar {
-      display: flex;
-      gap: 8px;
-      padding: 8px 12px;
-      margin-top: 6px;
-      flex-wrap: wrap;
+      display: flex; gap: 8px; padding: 8px 12px; margin-top: 6px; flex-wrap: wrap;
     }
-
     .reaction-bar button {
-      background-color: #f7f7f7;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      padding: 4px 10px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      background-color: #f7f7f7; border: 1px solid #ccc; border-radius: 20px;
+      padding: 4px 10px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease;
     }
-
-    .reaction-bar button:hover {
-      background-color: #eaeaea;
-    }
-
+    .reaction-bar button:hover { background-color: #eaeaea; }
     .section-tabs {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 10px auto;
-      max-width: 960px;
-      padding-bottom: 5px;
+      display: flex; justify-content: center; gap: 10px; margin: 10px auto;
+      max-width: 960px; padding-bottom: 5px;
     }
-
     .section-tabs button {
-      background-color: #f0f0f0;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: background-color 0.2s ease;
+      background-color: #f0f0f0; border: none; border-radius: 8px; padding: 6px 14px;
+      font-weight: bold; cursor: pointer; font-size: 0.9rem; transition: background-color 0.2s ease;
     }
-
-    .section-tabs button:hover {
-      background-color: #e2e2e2;
-    }
-
-    @media (min-width: 768px) {
-      .section-tabs {
-        display: none;
-      }
-    }
-
+    .section-tabs button:hover { background-color: #e2e2e2; }
+    @media (min-width: 768px) { .section-tabs { display: none; } }
     #nowPlayingBar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: #ff4d4d;
-      color: white;
-      font-weight: bold;
-      text-align: center;
-      padding: 6px 12px;
-      font-size: 0.95rem;
-      z-index: 1000;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      position: fixed; top: 0; left: 0; right: 0; background: #ff4d4d;
+      color: white; font-weight: bold; text-align: center; padding: 6px 12px;
+      font-size: 0.95rem; z-index: 1000; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-
     .skeleton-card {
-      width: 100%;
-      max-width: 920px;
-      height: 100px;
-      margin: 10px auto;
+      width: 100%; max-width: 920px; height: 100px; margin: 10px auto;
       background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.2s infinite;
-      border-radius: 8px;
+      background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px;
     }
-
     @keyframes shimmer {
-      0% {
-        background-position: 200% 0;
-      }
-
-      100% {
-        background-position: -200% 0;
-      }
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
   </style>
 </head>
-
 <body>
   <div id="nowPlayingBar" style="display:none;"></div>
-
   <div class="section-tabs">
     <button onclick="scrollToSection('steam-sale-event')">Steam Sale</button>
     <button onclick="scrollToSection('live-events')">Now Live</button>
     <button onclick="scrollToSection('upcoming-events')">Upcoming</button>
   </div>
-
   <div id="eventLoadingSkeletons">
     <div class="skeleton-card"></div>
     <div class="skeleton-card"></div>
   </div>
-
   <div class="content" style="margin-left: auto; margin-right: auto; max-width:960px;">
     <div class="container">
       <div class="events_upnext">Next Steam Sale</div>
       <div class="events_grouped"><div class="events" id="steam-sale-event"></div></div>
-
       <div class="events_upnext">NOW LIVE</div>
       <div class="events_grouped"><div class="events" id="live-events"></div></div>
-
       <div class="events_upnext">Upcoming Events</div>
       <div class="events_grouped"><div class="events" id="upcoming-events"></div></div>
-
       <div class="events_upcoming">Old Events</div>
       <div class="events_grouped"><div class="events" id="past-events"></div></div>
     </div>
   </div>
 
   <script>
-    // Initialize Supabase client
     const supabase = window.supabase.createClient(
       "https://eiapztxuvodtiqgsuicf.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpYXB6dHh1dm9kdGlxZ3N1aWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MzQ5MTQsImV4cCI6MjA2MDAxMDkxNH0.QH8wxJeLGsP2ny1j-sA1t1FiiU0Y-0PWh2FmbGb9ni4" // Replace with your actual public API key
+      "YOUR_SUPABASE_PUBLIC_API_KEY"
     );
 
-    // Scroll to section function
     function scrollToSection(id) {
       const container = document.getElementById(id);
-      if (!container) return;
-      container.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (container) container.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    // Parse frontmatter from markdown files
     function parseFrontmatter(md) {
       const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/m.exec(md);
       if (!match) return { attributes: {}, body: md };
       const yamlText = match[1];
-      const body = match[2];
       const lines = yamlText.split('\n');
       const attributes = {};
       for (const line of lines) {
         const [key, ...rest] = line.split(':');
         attributes[key.trim()] = rest.join(':').trim();
       }
-      return { attributes, body };
+      return { attributes, body: match[2] };
     }
 
-    // Render event links (YouTube, Twitch, Website, Steam, etc.)
     function renderLinks(data) {
       const links = [];
       if (data.youtube?.url) links.push(data.youtube);
@@ -199,241 +110,132 @@
       return links.map(link => `
         <a href="${link.url}" target="_blank">
           <img src="${link.icon}" alt="${link.label}" class="links_image">
-        </a>
-      `).join('');
+        </a>`).join('');
     }
 
-// React to event
-async function react(button, emoji) {
-  const wrapper = button.closest('.reaction-bar');
-  const eventId = wrapper.getAttribute('data-event');
-  const storageKey = `reaction_${eventId}`;
-  const current = localStorage.getItem(storageKey);
+    async function react(button, emoji) {
+      const wrapper = button.closest('.reaction-bar');
+      const eventId = wrapper.getAttribute('data-event');
+      const storageKey = `reaction_${eventId}`;
+      const current = localStorage.getItem(storageKey);
 
-  // Fetch existing reactions for this event
-  const { data: reactions, error } = await supabase
-    .from('reactions')
-    .select('emoji, count')
-    .eq('event_id', eventId);
-
-  if (error) return console.error('Failed to fetch reactions:', error.message);
-
-  const prev = reactions.find(r => r.emoji === current);
-  const curr = reactions.find(r => r.emoji === emoji);
-
-  // Undo if clicked same emoji again
-  if (current === emoji) {
-    if (curr?.count > 1) {
-      await supabase
+      const { data: reactions, error } = await supabase
         .from('reactions')
-        .update({ count: curr.count - 1 })
-        .eq('event_id', eventId)
-        .eq('emoji', emoji);
-    } else {
-      await supabase
-        .from('reactions')
-        .delete()
-        .eq('event_id', eventId)
-        .eq('emoji', emoji);
-    }
+        .select('emoji, count')
+        .eq('event_id', eventId);
 
-    localStorage.removeItem(storageKey);
-    wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
-    await refreshReactionCounts(eventId, wrapper);
-    return;
-  }
+      if (error) return console.error('Fetch error:', error.message);
 
-  // Remove previous selection if different
-  if (current && prev) {
-    if (prev.count > 1) {
-      await supabase
-        .from('reactions')
-        .update({ count: prev.count - 1 })
-        .eq('event_id', eventId)
-        .eq('emoji', current);
-    } else {
-      await supabase
-        .from('reactions')
-        .delete()
-        .eq('event_id', eventId)
-        .eq('emoji', current);
-    }
-  }
+      const prev = reactions.find(r => r.emoji === current);
+      const curr = reactions.find(r => r.emoji === emoji);
 
-  // Add new reaction
-  if (curr) {
-    await supabase
-      .from('reactions')
-      .update({ count: curr.count + 1 })
-      .eq('event_id', eventId)
-      .eq('emoji', emoji);
-  } else {
-    await supabase
-      .from('reactions')
-      .insert({ event_id: eventId, emoji, count: 1 });
-  }
-
-  localStorage.setItem(storageKey, emoji);
-
-  // Update UI
-  wrapper.querySelectorAll('button').forEach(btn => {
-    const e = btn.textContent.trim().split(' ')[0];
-    btn.classList.toggle('reacted', e === emoji);
-  });
-
-  await refreshReactionCounts(eventId, wrapper);
-}
-
-
-  // Remove previous reaction if different
-  if (current) {
-    try {
-      const { data } = await supabase
-  .from('reactions')
-  .select('emoji, count')
-  .eq('event_id', eventId);
-
-const currentReaction = data.find(r => r.emoji === emoji);
-const count = currentReaction?.count ?? 0;
-      if (data?.count > 1) {
-        await supabase
-          .from('reactions')
-          .update({ count: data.count - 1 })
-          .eq('event_id', eventId)
-          .eq('emoji', current);
-      } else {
-        await supabase
-          .from('reactions')
-          .delete()
-          .eq('event_id', eventId)
-          .eq('emoji', current);
+      if (current === emoji) {
+        if (curr?.count > 1) {
+          await supabase.from('reactions').update({ count: curr.count - 1 }).eq('event_id', eventId).eq('emoji', emoji);
+        } else {
+          await supabase.from('reactions').delete().eq('event_id', eventId).eq('emoji', emoji);
+        }
+        localStorage.removeItem(storageKey);
+        wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
+        await refreshReactionCounts(eventId, wrapper);
+        return;
       }
-    } catch (err) {
-      console.error('Remove previous reaction failed:', err.message);
-    }
-  }
 
-  // Insert or update new reaction
-  try {
-    const { data } = await supabase
-  .from('reactions')
-  .select('emoji, count')
-  .eq('event_id', eventId);
+      if (current && prev) {
+        if (prev.count > 1) {
+          await supabase.from('reactions').update({ count: prev.count - 1 }).eq('event_id', eventId).eq('emoji', current);
+        } else {
+          await supabase.from('reactions').delete().eq('event_id', eventId).eq('emoji', current);
+        }
+      }
 
-const currentReaction = data.find(r => r.emoji === emoji);
-const count = currentReaction?.count ?? 0;
+      if (curr) {
+        await supabase.from('reactions').update({ count: curr.count + 1 }).eq('event_id', eventId).eq('emoji', emoji);
+      } else {
+        await supabase.from('reactions').insert({ event_id: eventId, emoji, count: 1 });
+      }
 
-    if (data) {
-      await supabase
-        .from('reactions')
-        .update({ count: count + 1 })
-        .eq('event_id', eventId)
-        .eq('emoji', emoji);
-    } else {
-      await supabase
-        .from('reactions')
-        .insert({ event_id: eventId, emoji, count: 1 });
+      localStorage.setItem(storageKey, emoji);
+      wrapper.querySelectorAll('button').forEach(btn => {
+        const e = btn.textContent.trim().split(' ')[0];
+        btn.classList.toggle('reacted', e === emoji);
+      });
+
+      await refreshReactionCounts(eventId, wrapper);
     }
 
-    localStorage.setItem(storageKey, emoji);
-    wrapper.querySelectorAll('button').forEach(btn => {
-      const e = btn.textContent.trim().split(' ')[0];
-      btn.classList.toggle('reacted', e === emoji);
-    });
-  } catch (err) {
-    console.error('Insert reaction failed:', err.message);
-  }
+    async function refreshReactionCounts(eventId, wrapper) {
+      const { data, error } = await supabase
+        .from('reactions')
+        .select('emoji, count')
+        .eq('event_id', eventId);
 
-  await refreshReactionCounts(eventId, wrapper);
-}
-// Helper: Refresh reaction numbers and highlight
-async function refreshReactionCounts(eventId, wrapper) {
-  const storageKey = `reaction_${eventId}`;
-  const selected = localStorage.getItem(storageKey);
+      if (error) return console.error('Count refresh failed:', error.message);
 
-  const { data, error } = await supabase
-    .from('reactions')
-    .select('emoji, count')
-    .eq('event_id', eventId);
+      const storageKey = `reaction_${eventId}`;
+      const selected = localStorage.getItem(storageKey);
 
-  if (error) {
-    console.error('Fetch failed:', error.message);
-    return;
-  }
+      wrapper.querySelectorAll('button').forEach(btn => {
+        const emoji = btn.textContent.trim().split(' ')[0];
+        const found = data.find(r => r.emoji === emoji);
+        btn.querySelector('span').textContent = found?.count ?? 0;
+        btn.classList.toggle('reacted', emoji === selected);
+      });
+    }
 
-  wrapper.querySelectorAll('button').forEach(btn => {
-    const emoji = btn.textContent.trim().split(' ')[0];
-    const found = data.find(r => r.emoji === emoji);
-    const count = found?.count ?? 0;
-
-    btn.querySelector('span').textContent = count;
-    btn.classList.toggle('reacted', emoji === selected);
-  });
-}
-
-
-    // Countdown functionality
     function startCountdowns() {
       setInterval(() => {
         document.querySelectorAll('.countdown').forEach(el => {
-          const dateStr = el.getAttribute('data-start-event-date');
+          const start = new Date(el.getAttribute('data-start-event-date'));
           const endStr = el.getAttribute('data-end-event-date');
-          const parent = el.closest('.event_headliner');
-          const eventDate = new Date(dateStr);
+          const end = endStr ? new Date(endStr) : null;
           const now = new Date();
-          const diff = eventDate - now;
-          const diffFromStart = now - eventDate;
+          const diff = start - now;
+          const elapsed = now - start;
+          const parent = el.closest('.event_headliner');
           const isSteam = parent.closest('#steam-sale-event');
 
-          if (isSteam && endStr) {
-            const endDate = new Date(endStr);
-            if (now >= endDate) {
-              parent.remove();
-              return;
-            }
+          if (isSteam && end && now >= end) {
+            parent.remove();
+            return;
           }
 
           if (diff <= 0) {
-            if (diffFromStart < 3600000) {
-              el.textContent = 'Started';
-              if (!isSteam && parent.parentElement.id !== 'live-events') {
-                document.getElementById('live-events').appendChild(parent);
-              }
+            el.textContent = 'Started';
+            if (!isSteam && elapsed < 3600000 && parent.parentElement.id !== 'live-events') {
+              document.getElementById('live-events').appendChild(parent);
             } else if (!isSteam && parent.parentElement.id !== 'past-events') {
               document.getElementById('past-events').appendChild(parent);
             }
             return;
           }
 
-          const totalSeconds = Math.floor(diff / 1000);
-          const days = Math.floor(totalSeconds / (3600 * 24));
-          const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-          const mins = Math.floor((totalSeconds % 3600) / 60);
-
-          el.textContent = `${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m`;
+          const seconds = Math.floor(diff / 1000);
+          const days = Math.floor(seconds / 86400);
+          const hours = Math.floor((seconds % 86400) / 3600);
+          const mins = Math.floor((seconds % 3600) / 60);
+          el.textContent = `${days ? days + 'd ' : ''}${hours}h ${mins}m`;
         });
       }, 1000);
     }
 
-    // Load events
     async function loadReactionsForEvent(wrapper, eventId) {
-  const { data, error } = await supabase
-    .from('reactions')
-    .select('emoji, count')
-    .eq('event_id', eventId);
+      const { data, error } = await supabase
+        .from('reactions')
+        .select('emoji, count')
+        .eq('event_id', eventId);
 
-  if (error) return console.error('Reaction fetch failed:', error.message);
-  const storageKey = `reaction_${eventId}`;
-  const userEmoji = localStorage.getItem(storageKey);
+      if (error) return console.error('Reaction fetch failed:', error.message);
+      const storageKey = `reaction_${eventId}`;
+      const userEmoji = localStorage.getItem(storageKey);
 
-  wrapper.querySelectorAll('button').forEach(btn => {
-    const e = btn.textContent.trim().split(' ')[0];
-    const reaction = data.find(r => r.emoji === e);
-    const count = reaction?.count || 0;
-    btn.querySelector('span').textContent = count;
-    btn.classList.toggle('reacted', userEmoji === e);
-  });
-}
+      wrapper.querySelectorAll('button').forEach(btn => {
+        const emoji = btn.textContent.trim().split(' ')[0];
+        const reaction = data.find(r => r.emoji === emoji);
+        btn.querySelector('span').textContent = reaction?.count || 0;
+        btn.classList.toggle('reacted', emoji === userEmoji);
+      });
+    }
 
     async function loadEvents() {
       const res = await fetch('/events/index.json');
@@ -443,14 +245,12 @@ async function refreshReactionCounts(eventId, wrapper) {
       for (const file of files) {
         const response = await fetch(`/events/${file}`);
         const raw = await response.text();
-        const parsed = parseFrontmatter(raw);
-        const data = parsed.attributes;
-
-        const eventDate = new Date(data.date);
-        const isPast = eventDate < now;
+        const { attributes: data } = parseFrontmatter(raw);
+        const date = new Date(data.date);
+        const isPast = date < now;
         const isSteam = data.type === 'steam_sale';
-        const borderColor = data.borderColor || '#d9a62d';
         const slug = data.slug || file.replace('.md', '');
+        const borderColor = data.borderColor || '#d9a62d';
 
         const html = `
           <div class="event_headliner" style="--event-border-color: ${borderColor};">
@@ -461,7 +261,7 @@ async function refreshReactionCounts(eventId, wrapper) {
               <div class="event_flex">
                 <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
                 <div class="col-sm"><div class="event_date">
-                  ${isSteam ? `Starts: ${eventDate.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : eventDate.toLocaleString()}
+                  ${isSteam ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : date.toLocaleString()}
                 </div></div>
                 <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
                 <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
@@ -472,32 +272,24 @@ async function refreshReactionCounts(eventId, wrapper) {
             </div>
           </div>`;
 
-        const targetId = isPast
-          ? "past-events"
-          : isSteam
-            ? "steam-sale-event"
-            : "upcoming-events";
-
-        document.getElementById(targetId).insertAdjacentHTML("beforeend", html);
+        const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
+        document.getElementById(target).insertAdjacentHTML("beforeend", html);
       }
 
       startCountdowns();
       document.querySelectorAll('.reaction-bar').forEach(wrapper => {
-  const eventId = wrapper.getAttribute('data-event');
-  loadReactionsForEvent(wrapper, eventId);
-});
-
+        const eventId = wrapper.getAttribute('data-event');
+        loadReactionsForEvent(wrapper, eventId);
+      });
     }
 
-    // Update Now Playing Bar
     function updateNowPlayingBar() {
       const live = document.querySelector("#live-events .event_headliner");
       const bar = document.getElementById("nowPlayingBar");
       if (live) {
         const title = live.querySelector(".event_upc_title")?.textContent || "LIVE EVENT";
-        const links = live.querySelector(".event_links a");
-        const url = links?.getAttribute("href") || "#";
-        bar.innerHTML = `🔴 Now Live: ${title} — <a href="${url}" style="color: white; text-decoration: underline;">Watch</a>`;
+        const url = live.querySelector(".event_links a")?.getAttribute("href") || "#";
+        bar.innerHTML = `🔴 Now Live: ${title} — <a href="${url}" style="color:white;text-decoration:underline;">Watch</a>`;
         bar.style.display = "block";
       } else {
         bar.style.display = "none";
@@ -513,5 +305,4 @@ async function refreshReactionCounts(eventId, wrapper) {
     setInterval(updateNowPlayingBar, 3000);
   </script>
 </body>
-
 </html>
