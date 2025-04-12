@@ -210,20 +210,45 @@
   let remove = false;
   if (previous === emoji) {
     // Undo reaction
-    const { error } = await supabase
-      .from('reactions')
-      .delete()
-      .eq('event_id', eventId)
-      .eq('emoji', emoji);
+    const { data: existing } = await supabase
+  .from('reactions')
+  .select('count')
+  .eq('event_id', eventId)
+  .eq('emoji', emoji)
+  .single();
+
+if (existing?.count > 1) {
+  await supabase
+    .from('reactions')
+    .update({ count: existing.count - 1 })
+    .eq('event_id', eventId)
+    .eq('emoji', emoji);
+} else {
+  await supabase
+    .from('reactions')
+    .delete()
+    .eq('event_id', eventId)
+    .eq('emoji', emoji);
+}
+
 
     if (error) return console.error('Undo failed:', error.message);
     localStorage.removeItem(storageKey);
     remove = true;
   } else {
     // Insert or update reaction
-    const { error } = await supabase
-      .from('reactions')
-      .upsert([{ event_id: eventId, emoji }], { onConflict: ['event_id', 'emoji'] });
+    const { data: existing } = await supabase
+  .from('reactions')
+  .select('count')
+  .eq('event_id', eventId)
+  .eq('emoji', emoji)
+  .single();
+
+const newCount = (existing?.count || 0) + 1;
+
+const { error } = await supabase
+  .from('reactions')
+  .upsert([{ event_id: eventId, emoji, count: newCount }], { onConflict: ['event_id', 'emoji'] });
 
     if (error) return console.error('React failed:', error.message);
     localStorage.setItem(storageKey, emoji);
