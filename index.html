@@ -15,7 +15,10 @@
       filter: grayscale(100%);
       opacity: 0.6;
     }
-
+    .reaction-bar button.highlight {
+  background-color: #d0d0d0;  /* Change the background color to indicate selection */
+  border: 2px solid #ff4d4d;  /* Add a border around the selected emoji */
+}
     .event_logo {
       overflow: hidden;
       border-radius: 8px;
@@ -218,7 +221,7 @@
     .select('id, count')
     .eq('event_id', eventId)
     .eq('emoji', emoji)
-    .single();  // Using single to ensure we get only one row
+    .single();  // Ensure we get a single row
 
   if (error && error.code !== "PGRST100") {
     console.error('Error fetching reaction:', error.message);
@@ -228,12 +231,13 @@
   let newCount;
 
   if (reactionData) {
-    // If reaction exists, increment the count
-    newCount = (reactionData.count || 0) + 1;
+    // If reaction exists, increment count
+    newCount = reactionData.count === null ? 1 : reactionData.count + 1;
+    
+    // Update the reaction count in the database
     const { updateError } = await supabase
       .from('reactions')
-      .update({ count: newCount })
-      .eq('id', reactionData.id); // Update the count of the existing reaction
+      .upsert([{ event_id: eventId, emoji, count: newCount }], { onConflict: ['event_id', 'emoji'] });
 
     if (updateError) {
       console.error('Failed to update reaction count:', updateError.message);
@@ -245,7 +249,8 @@
     emojiButtons.forEach(btn => {
       const emojiText = btn.textContent.trim().split(' ')[0];
       if (emojiText === emoji) {
-        btn.querySelector('span').textContent = newCount;
+        btn.classList.add('highlight'); // Add highlight if reaction is added
+        btn.querySelector('span').textContent = newCount; // Update count
       }
     });
   } else {
@@ -260,12 +265,13 @@
       return;
     }
 
-    // Update the UI with the initial count of 1
+    // Highlight selected emoji
     const emojiButtons = wrapper.querySelectorAll('button');
     emojiButtons.forEach(btn => {
       const emojiText = btn.textContent.trim().split(' ')[0];
       if (emojiText === emoji) {
-        btn.querySelector('span').textContent = newCount;
+        btn.classList.add('highlight'); // Add highlight if reaction is added
+        btn.querySelector('span').textContent = newCount; // Set count to 1
       }
     });
   }
