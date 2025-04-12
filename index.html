@@ -9,16 +9,6 @@
   <title>Event schedule - ggPause.com</title>
 
   <style>
-    .reaction-bar button.selected {
-  background-color: #ffefcc;
-  font-weight: bold;
-  border-color: #ffa94d;
-}
-
-.reaction-bar button.top-reaction {
-  border-color: #ff5e5e;
-  box-shadow: 0 0 5px rgba(255, 94, 94, 0.4);
-}
     #past-events .event_headliner {
       filter: grayscale(100%);
       opacity: 0.6;
@@ -153,87 +143,8 @@
       <div class="events_grouped"><div class="events" id="past-events"></div></div>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
-
-const supabase = supabase.createClient(
-  "https://eiapztxuvodtiqgsuicf.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpYXB6dHh1dm9kdGlxZ3N1aWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MzQ5MTQsImV4cCI6MjA2MDAxMDkxNH0.QH8wxJeLGsP2ny1j-sA1t1FiiU0Y-0PWh2FmbGb9ni4"
-);
-
-const USER_REACTED_KEY = 'userReactions-v2';
-
-function getUserReactions() {
-  return JSON.parse(localStorage.getItem(USER_REACTED_KEY) || '{}');
-}
-
-function setUserReaction(eventId, emoji) {
-  const current = getUserReactions();
-  current[eventId] = emoji;
-  localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
-}
-
-function clearUserReaction(eventId) {
-  const current = getUserReactions();
-  delete current[eventId];
-  localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
-}
-
-async function preloadReactions() {
-  const bars = document.querySelectorAll('.reaction-bar');
-  for (const bar of bars) {
-    const eventId = bar.getAttribute('data-event');
-    const { data, error } = await supabase
-      .from('reactions')
-      .select('emoji, count')
-      .eq('event_id', eventId);
-
-    if (error) continue;
-
-    const userEmoji = getUserReactions()[eventId];
-    let highest = null;
-    let max = 0;
-
-    bar.querySelectorAll('button').forEach(btn => {
-      const emoji = btn.textContent.trim().split(' ')[0];
-      const record = data.find(d => d.emoji === emoji);
-      const count = record ? record.count : 0;
-
-      btn.querySelector('span').textContent = count;
-      btn.classList.toggle('selected', emoji === userEmoji);
-
-      if (count > max) {
-        highest = emoji;
-        max = count;
-      }
-    });
-
-    bar.querySelectorAll('button').forEach(btn => {
-      const emoji = btn.textContent.trim().split(' ')[0];
-      btn.classList.toggle('top-reaction', emoji === highest);
-    });
-  }
-}
-
-async function react(button, emoji) {
-  const wrapper = button.closest('.reaction-bar');
-  const eventId = wrapper.getAttribute('data-event');
-  const userEmoji = getUserReactions()[eventId];
-  const undo = emoji === userEmoji;
-
-  if (undo) {
-    clearUserReaction(eventId);
-    await supabase.rpc('decrement_reaction', { e_id: eventId, em: emoji });
-  } else {
-    setUserReaction(eventId, emoji);
-    await supabase.rpc('increment_reaction', { e_id: eventId, em: emoji });
-  }
-
-  preloadReactions();
-}
-
-
     function scrollToSection(id) {
       const container = document.getElementById(id);
       if (!container) return;
@@ -397,7 +308,11 @@ async function react(button, emoji) {
 
     setInterval(updateNowPlayingBar, 3000);
 
-
+    document.addEventListener("DOMContentLoaded", () => {
+      loadEvents().then(() => {
+        document.getElementById("eventLoadingSkeletons")?.remove();
+      });
+    });
   </script>
 </body>
 </html>
