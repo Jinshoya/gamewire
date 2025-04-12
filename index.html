@@ -197,40 +197,40 @@
 
     // React to event
     async function react(button, emoji) {
-      const wrapper = button.closest('.reaction-bar');
-      const eventId = wrapper.getAttribute('data-event');
+  const wrapper = button.closest('.reaction-bar');
+  const eventId = wrapper.getAttribute('data-event');
 
-      // Check if the user is authenticated
-      const { data: session, error: authError } = await supabase.auth.getSession();
-      
-      if (authError) {
-        console.error('Authentication error:', authError.message);
-        return;
-      }
+  // Get the session to ensure the user is authenticated
+  const { data: session, error: authError } = await supabase.auth.getSession();
 
-      if (session) {
-        console.log('Authenticated as:', session.user);
-      } else {
-        console.log('No user logged in, proceeding as anon.');
-      }
+  if (authError) {
+    console.error('Authentication error:', authError.message);
+    return;
+  }
 
-      // Send reaction to Supabase
-      const { data, error } = await supabase
-        .from('reactions')
-        .upsert([{ event_id: eventId, emoji }], { onConflict: ['event_id', 'emoji'] });
+  if (!session) {
+    console.log('No user logged in, proceeding as anon.');
+  } else {
+    console.log('Authenticated as:', session.user);
+  }
 
-      if (error) {
-        console.error('Reaction failed:', error.message);
-        return;
-      }
+  // Send the reaction to Supabase if authenticated or as anon
+  const { data, error } = await supabase
+    .from('reactions')
+    .upsert([{ event_id: eventId, emoji }], { onConflict: ['event_id', 'emoji'] });
 
-      // Update the reaction button counts
-      for (const btn of wrapper.querySelectorAll('button')) {
-        const e = btn.textContent.trim().split(' ')[0];
-        const count = data.reactions[e] || 0;
-        btn.querySelector('span').textContent = count;
-      }
-    }
+  if (error) {
+    console.error('Reaction failed:', error.message);
+    return;
+  }
+
+  // Update the reaction button counts
+  for (const btn of wrapper.querySelectorAll('button')) {
+    const e = btn.textContent.trim().split(' ')[0];
+    const count = data.reactions[e] || 0;
+    btn.querySelector('span').textContent = count;
+  }
+}
 
     // Countdown functionality
     function startCountdowns() {
