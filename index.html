@@ -210,26 +210,23 @@ async function react(button, emoji) {
   const storageKey = `reaction_${eventId}`;
   const current = localStorage.getItem(storageKey);
 
-  // Fetch all reactions for this event
-  const { data, error } = await supabase
+  // Fetch existing reactions for this event
+  const { data: reactions, error } = await supabase
     .from('reactions')
     .select('emoji, count')
     .eq('event_id', eventId);
 
-  if (error) {
-    console.error('Reaction fetch failed:', error.message);
-    return;
-  }
+  if (error) return console.error('Failed to fetch reactions:', error.message);
 
-  const currentReaction = data.find(r => r.emoji === emoji);
-  const previousReaction = data.find(r => r.emoji === current);
+  const prev = reactions.find(r => r.emoji === current);
+  const curr = reactions.find(r => r.emoji === emoji);
 
-  // === UNDO ===
+  // Undo if clicked same emoji again
   if (current === emoji) {
-    if (currentReaction?.count > 1) {
+    if (curr?.count > 1) {
       await supabase
         .from('reactions')
-        .update({ count: currentReaction.count - 1 })
+        .update({ count: curr.count - 1 })
         .eq('event_id', eventId)
         .eq('emoji', emoji);
     } else {
@@ -246,12 +243,12 @@ async function react(button, emoji) {
     return;
   }
 
-  // === Remove previous reaction if different ===
-  if (current && previousReaction) {
-    if (previousReaction.count > 1) {
+  // Remove previous selection if different
+  if (current && prev) {
+    if (prev.count > 1) {
       await supabase
         .from('reactions')
-        .update({ count: previousReaction.count - 1 })
+        .update({ count: prev.count - 1 })
         .eq('event_id', eventId)
         .eq('emoji', current);
     } else {
@@ -263,11 +260,11 @@ async function react(button, emoji) {
     }
   }
 
-  // === Insert or Update new reaction ===
-  if (currentReaction) {
+  // Add new reaction
+  if (curr) {
     await supabase
       .from('reactions')
-      .update({ count: currentReaction.count + 1 })
+      .update({ count: curr.count + 1 })
       .eq('event_id', eventId)
       .eq('emoji', emoji);
   } else {
@@ -278,7 +275,7 @@ async function react(button, emoji) {
 
   localStorage.setItem(storageKey, emoji);
 
-  // Update button classes
+  // Update UI
   wrapper.querySelectorAll('button').forEach(btn => {
     const e = btn.textContent.trim().split(' ')[0];
     btn.classList.toggle('reacted', e === emoji);
@@ -412,6 +409,7 @@ async function refreshReactionCounts(eventId, wrapper) {
     btn.classList.toggle('reacted', emoji === selected);
   });
 }
+
 
     // Countdown functionality
     function startCountdowns() {
