@@ -205,62 +205,74 @@
     async function react(button, emoji) {
   const wrapper = button.closest('.reaction-bar');
   const eventId = wrapper.getAttribute('data-event');
+  const storageKey = `reaction_${eventId}`;
+  const current = localStorage.getItem(storageKey);
 
-  const current = localStorage.getItem(`reaction-${eventId}`);
+  // UNDO reaction if clicked again
   if (current === emoji) {
-    // 🔁 Undo logic
     try {
-      const { data: existing } = await supabase
+      await supabase
         .from('reactions')
-        .select('count')
+        .delete()
         .eq('event_id', eventId)
-        .eq('emoji', emoji)
-        .single();
+        .eq('emoji', emoji);
 
-      if (existing?.count > 1) {
-        await supabase
-          .from('reactions')
-          .update({ count: existing.count - 1 })
-          .eq('event_id', eventId)
-          .eq('emoji', emoji);
-      } else {
-        await supabase
-          .from('reactions')
-          .delete()
-          .eq('event_id', eventId)
-          .eq('emoji', emoji);
-      }
-
-      localStorage.removeItem(`reaction-${eventId}`);
+      localStorage.removeItem(storageKey);
       wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
     } catch (err) {
-      console.error('Undo failed:', err.message);
+      console.error('Failed to undo reaction:', err.message);
     }
-
-    return; // ✅ exit early after undo
-  }
-
-  // ✅ Main reaction upsert
-  const { data, error } = await supabase
-    .from('reactions')
-    .upsert({ event_id: eventId, emoji })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Failed to insert reaction:', error.message);
     return;
   }
 
-  localStorage.setItem(`reaction-${eventId}`, emoji);
+  // REMOVE previous if user reacted with another emoji
+  if (current) {
+    try {
+      await supabase
+        .from('reactions')
+        .delete()
+        .eq('event_id', eventId)
+        .eq('emoji', current);
+    } catch (err) {
+      console.error('Failed to remove previous reaction:', err.message);
+    }
+  }
 
-  // update UI
-  wrapper.querySelectorAll('button').forEach(btn => {
-    const e = btn.textContent.trim().split(' ')[0];
-    btn.classList.toggle('reacted', e === emoji);
-  });
+  // INSERT new reaction
+  try {
+    await supabase
+      .from('reactions')
+      .upsert({ event_id: eventId, emoji });
 
-  // optionally fetch updated count here again if needed
+    localStorage.setItem(storageKey, emoji);
+
+    // Update button classes
+    wrapper.querySelectorAll('button').forEach(btn => {
+      const e = btn.textContent.trim().split(' ')[0];
+      btn.classList.toggle('reacted', e === emoji);
+    });
+
+    // Refresh counts
+    const { data: counts, error } = await supabase
+      .from('reactions')
+      .select('event_id, emoji, count')
+      .eq('event_id', eventId);
+
+    if (error) return console.error('Count refresh failed:', error.message);
+
+    wrapper.querySelectorAll('button').forEach(btn => {
+      const e = btn.textContent.trim().split(' ')[0];
+      const found = counts.find(r => r.emoji === e);
+      if (found) {
+        btn.querySelector('span').textContent = found.count;
+      } else {
+        btn.querySelector('span').textContent = '0';
+      }
+    });
+
+  } catch (err) {
+    console.error('Failed to insert reaction:', err.message);
+  }
 }
 
     // Countdown functionality
