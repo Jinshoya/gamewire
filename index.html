@@ -210,6 +210,88 @@ async function react(button, emoji) {
   const storageKey = `reaction_${eventId}`;
   const current = localStorage.getItem(storageKey);
 
+  // Fetch all reactions for this event
+  const { data, error } = await supabase
+    .from('reactions')
+    .select('emoji, count')
+    .eq('event_id', eventId);
+
+  if (error) {
+    console.error('Reaction fetch failed:', error.message);
+    return;
+  }
+
+  const currentReaction = data.find(r => r.emoji === emoji);
+  const previousReaction = data.find(r => r.emoji === current);
+
+  // === UNDO ===
+  if (current === emoji) {
+    if (currentReaction?.count > 1) {
+      await supabase
+        .from('reactions')
+        .update({ count: currentReaction.count - 1 })
+        .eq('event_id', eventId)
+        .eq('emoji', emoji);
+    } else {
+      await supabase
+        .from('reactions')
+        .delete()
+        .eq('event_id', eventId)
+        .eq('emoji', emoji);
+    }
+
+    localStorage.removeItem(storageKey);
+    wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
+    await refreshReactionCounts(eventId, wrapper);
+    return;
+  }
+
+  // === Remove previous reaction if different ===
+  if (current && previousReaction) {
+    if (previousReaction.count > 1) {
+      await supabase
+        .from('reactions')
+        .update({ count: previousReaction.count - 1 })
+        .eq('event_id', eventId)
+        .eq('emoji', current);
+    } else {
+      await supabase
+        .from('reactions')
+        .delete()
+        .eq('event_id', eventId)
+        .eq('emoji', current);
+    }
+  }
+
+  // === Insert or Update new reaction ===
+  if (currentReaction) {
+    await supabase
+      .from('reactions')
+      .update({ count: currentReaction.count + 1 })
+      .eq('event_id', eventId)
+      .eq('emoji', emoji);
+  } else {
+    await supabase
+      .from('reactions')
+      .insert({ event_id: eventId, emoji, count: 1 });
+  }
+
+  localStorage.setItem(storageKey, emoji);
+
+  // Update button classes
+  wrapper.querySelectorAll('button').forEach(btn => {
+    const e = btn.textContent.trim().split(' ')[0];
+    btn.classList.toggle('reacted', e === emoji);
+  });
+
+  await refreshReactionCounts(eventId, wrapper);
+}
+
+  const wrapper = button.closest('.reaction-bar');
+  const eventId = wrapper.getAttribute('data-event');
+  const storageKey = `reaction_${eventId}`;
+  const current = localStorage.getItem(storageKey);
+
   // If clicking the same emoji again — undo
   if (current === emoji) {
     try {
