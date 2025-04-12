@@ -214,11 +214,12 @@ async function react(button, emoji) {
   if (current === emoji) {
     try {
       const { data } = await supabase
-        .from('reactions')
-        .select('count')
-        .eq('event_id', eventId)
-        .eq('emoji', emoji)
-        .single();
+  .from('reactions')
+  .select('emoji, count')
+  .eq('event_id', eventId);
+
+const currentReaction = data.find(r => r.emoji === emoji);
+const count = currentReaction?.count ?? 0;
 
       if (data?.count > 1) {
         await supabase
@@ -248,12 +249,12 @@ async function react(button, emoji) {
   if (current) {
     try {
       const { data } = await supabase
-        .from('reactions')
-        .select('count')
-        .eq('event_id', eventId)
-        .eq('emoji', current)
-        .single();
+  .from('reactions')
+  .select('emoji, count')
+  .eq('event_id', eventId);
 
+const currentReaction = data.find(r => r.emoji === emoji);
+const count = currentReaction?.count ?? 0;
       if (data?.count > 1) {
         await supabase
           .from('reactions')
@@ -275,13 +276,12 @@ async function react(button, emoji) {
   // Insert or update new reaction
   try {
     const { data } = await supabase
-      .from('reactions')
-      .select('count')
-      .eq('event_id', eventId)
-      .eq('emoji', emoji)
-      .single();
+  .from('reactions')
+  .select('emoji, count')
+  .eq('event_id', eventId);
 
-    const count = data?.count ?? 0;
+const currentReaction = data.find(r => r.emoji === emoji);
+const count = currentReaction?.count ?? 0;
 
     if (data) {
       await supabase
