@@ -309,6 +309,10 @@ const eventId = wrapper.getAttribute('data-event');
     ${['🔥','😂','😴','💩','😞'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
   </div>
 </div>
+            <div class="reaction-bar" data-event="${slug}">
+              ${['🔥','😂','😴','💩','😞','❤️'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+            </div>
+          </div>`;
 
 
         const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
