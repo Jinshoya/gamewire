@@ -199,7 +199,7 @@
     async function react(button, emoji) {
   const wrapper = button.closest('.reaction-bar');
   const eventId = wrapper.getAttribute('data-event');
-  
+
   // Ensure the session is correctly initialized
   const { data: session, error: authError } = await supabase.auth.getSession();
   
@@ -220,15 +220,15 @@
     .eq('emoji', emoji)
     .single(); // Get a single result
 
-  if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+  console.log("Reaction data:", data);
+  if (error) {
     console.error('Error fetching reaction:', error.message);
     return;
   }
 
   if (data) {
     // If reaction exists, increment the count
-    const newCount = data.count + 1;
-
+    const newCount = (data.count || 0) + 1;  // Ensure count starts at 1 if it's null
     const { updateError } = await supabase
       .from('reactions')
       .update({ count: newCount })
@@ -238,6 +238,15 @@
       console.error('Failed to update reaction count:', updateError.message);
       return;
     }
+
+    // Update the UI count
+    const emojiButtons = wrapper.querySelectorAll('button');
+    emojiButtons.forEach(btn => {
+      const emojiText = btn.textContent.trim().split(' ')[0];
+      if (emojiText === emoji) {
+        btn.querySelector('span').textContent = newCount;
+      }
+    });
   } else {
     // If reaction doesn't exist, insert a new row with count = 1
     const { insertError } = await supabase
@@ -248,16 +257,16 @@
       console.error('Failed to insert reaction:', insertError.message);
       return;
     }
-  }
 
-  // After reaction update/insert, update the UI count
-  const emojiButtons = wrapper.querySelectorAll('button');
-  emojiButtons.forEach(btn => {
-    const emojiText = btn.textContent.trim().split(' ')[0];
-    if (emojiText === emoji) {
-      btn.querySelector('span').textContent = newCount || 1; // Update count on the button
-    }
-  });
+    // Update the UI with the initial count of 1
+    const emojiButtons = wrapper.querySelectorAll('button');
+    emojiButtons.forEach(btn => {
+      const emojiText = btn.textContent.trim().split(' ')[0];
+      if (emojiText === emoji) {
+        btn.querySelector('span').textContent = 1;
+      }
+    });
+  }
 }
 
     // Countdown functionality
