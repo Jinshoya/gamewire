@@ -319,14 +319,9 @@
             <div class="event_head">
 <div class="event_logo" data-border-color="${borderColor}">
   <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-<div class="reaction-bar" data-event="${slug}">
-  ${['😂','😴','💩','😞','🔥'].map(e => `
-    <button onclick="react(this, '${e}')">
-      <span class="emoji">${e}</span>
-      <span class="count">0</span>
-    </button>
-  `).join('')}
-</div>
+  <div class="reaction-bar" data-event="${slug}">
+    ${['😂','😴','💩','😞','🔥'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+  </div>
 </div>
               <div class="event_flex">
                 <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
