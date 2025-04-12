@@ -11,63 +11,49 @@ collections:
     folder: "events"
     create: true
     slug: "{{slug}}"
+    identifier_field: title  # ✅ Ensures entries show by title in CMS sidebar
+    preview_path: "events/{{slug}}"
     fields:
-      - label: "Main Info"
-        name: "main"
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD HH:mm", time_format: "HH:mm" }
+      - { label: "End Date (only for Steam Sale)", name: "end", widget: "datetime", required: false, format: "YYYY-MM-DD HH:mm", time_format: "HH:mm" }
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Border Color", name: "borderColor", widget: "color", required: false, default: "#ff6600" }
+      - label: "Event Type"
+        name: "type"
+        widget: "select"
+        options:
+          - { label: "Upcoming Event", value: "event" }
+          - { label: "Steam Sale", value: "steam_sale" }
+          - { label: "Old Event", value: "old_event" }
+      - label: "YouTube Link"
+        name: "youtube"
+        required: false
         widget: "object"
         fields:
-          - { label: "Title", name: "title", widget: "string" }
-          - { label: "Date", name: "date", widget: "datetime" }
-          - { label: "End Date (only for Steam Sale)", name: "end", widget: "datetime", required: false }
-          - { label: "Event Type", name: "type", widget: "select", options: [
-              { label: "Upcoming Event", value: "event" },
-              { label: "Steam Sale", value: "steam_sale" },
-              { label: "Old Event", value: "old_event" }
-            ]
-          }
-      - label: "Image + Style"
-        name: "visuals"
+          - { label: "URL", name: "url", widget: "string", required: false }
+          - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/youtube_link.png" }
+      - label: "Twitch Link"
+        name: "twitch"
+        required: false
         widget: "object"
         fields:
-          - { label: "Image", name: "image", widget: "image" }
-          - { label: "Border Color", name: "borderColor", widget: "color", required: false, default: "#ff6600" }
-
-      - label: "Standard Links"
-        name: "standard_links"
+          - { label: "URL", name: "url", widget: "string", required: false }
+          - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/twitch_link.png" }
+      - label: "Website Link"
+        name: "website"
+        required: false
         widget: "object"
         fields:
-          - label: "YouTube Link"
-            name: "youtube"
-            widget: "object"
-            required: false
-            fields:
-              - { label: "URL", name: "url", widget: "string", required: false }
-              - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/youtube_link.png" }
-
-          - label: "Twitch Link"
-            name: "twitch"
-            widget: "object"
-            required: false
-            fields:
-              - { label: "URL", name: "url", widget: "string", required: false }
-              - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/twitch_link.png" }
-
-          - label: "Website Link"
-            name: "website"
-            widget: "object"
-            required: false
-            fields:
-              - { label: "URL", name: "url", widget: "string", required: false }
-              - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/web_link.png" }
-
-          - label: "Steam Link"
-            name: "steam"
-            widget: "object"
-            required: false
-            fields:
-              - { label: "URL", name: "url", widget: "string", required: false }
-              - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/steam_link.png" }
-
+          - { label: "URL", name: "url", widget: "string", required: false }
+          - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/web_link.png" }
+      - label: "Steam Link"
+        name: "steam"
+        required: false
+        widget: "object"
+        fields:
+          - { label: "URL", name: "url", widget: "string", required: false }
+          - { label: "Icon", name: "icon", widget: "hidden", default: "/images/links/steam_link.png" }
       - label: "Custom Links"
         name: "links"
         required: false
