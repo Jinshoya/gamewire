@@ -15,10 +15,12 @@
       filter: grayscale(100%);
       opacity: 0.6;
     }
-    .reaction-bar button.highlight {
-  background-color: #d0d0d0;  /* Change the background color to indicate selection */
-  border: 2px solid #ff4d4d;  /* Add a border around the selected emoji */
+    .reaction-bar button.selected {
+  background-color: #d1eaff;
+  border-color: #007acc;
+  font-weight: bold;
 }
+
     .event_logo {
       overflow: hidden;
       border-radius: 8px;
@@ -202,68 +204,33 @@
     async function react(button, emoji) {
   const wrapper = button.closest('.reaction-bar');
   const eventId = wrapper.getAttribute('data-event');
+  const storageKey = `reaction_${eventId}`;
+  const previous = localStorage.getItem(storageKey);
 
-  // Ensure the session is correctly initialized
-  const { data: session, error: authError } = await supabase.auth.getSession();
-  
-  if (authError) {
-    console.error('Authentication error:', authError.message);
-    return;
-  }
-
-  if (!session) {
-    console.log('Proceeding as anonymous');
-  }
-
-  // Fetch existing reaction for event_id and emoji
-  const { data: reactionData, error: fetchError } = await supabase
-    .from('reactions')
-    .select('id, count')
-    .eq('event_id', eventId)
-    .eq('emoji', emoji);
-
-  if (fetchError) {
-    console.error('Error fetching reaction:', fetchError.message);
-    return;
-  }
-
-  // If no reaction data exists, create it, otherwise update the count
-  let newCount = 1;
-
-  if (reactionData && reactionData.length > 0) {
-    // Reaction exists, increment the count
-    newCount = reactionData[0].count + 1;
-
-    // Update the reaction count
-    const { updateError } = await supabase
+  let remove = false;
+  if (previous === emoji) {
+    // Undo reaction
+    const { error } = await supabase
       .from('reactions')
-      .upsert([{ event_id: eventId, emoji, count: newCount }], { onConflict: ['event_id', 'emoji'] });
+      .delete()
+      .eq('event_id', eventId)
+      .eq('emoji', emoji);
 
-    if (updateError) {
-      console.error('Failed to update reaction count:', updateError.message);
-      return;
-    }
+    if (error) return console.error('Undo failed:', error.message);
+    localStorage.removeItem(storageKey);
+    remove = true;
   } else {
-    // No reaction exists, insert a new one
-    const { insertError } = await supabase
+    // Insert or update reaction
+    const { error } = await supabase
       .from('reactions')
-      .insert([{ event_id: eventId, emoji, count: newCount }]);
+      .upsert([{ event_id: eventId, emoji }], { onConflict: ['event_id', 'emoji'] });
 
-    if (insertError) {
-      console.error('Failed to insert reaction:', insertError.message);
-      return;
-    }
+    if (error) return console.error('React failed:', error.message);
+    localStorage.setItem(storageKey, emoji);
   }
 
-  // Immediately update the UI with the new count
-  const emojiButtons = wrapper.querySelectorAll('button');
-  emojiButtons.forEach(btn => {
-    const emojiText = btn.textContent.trim().split(' ')[0];
-    if (emojiText === emoji) {
-      btn.classList.add('highlight'); // Highlight the clicked emoji
-      btn.querySelector('span').textContent = newCount; // Set count to updated value
-    }
-  });
+  // Reload reactions for this event
+  await loadReactionsForEvent(wrapper, eventId);
 }
 
     // Countdown functionality
@@ -310,6 +277,25 @@
     }
 
     // Load events
+    async function loadReactionsForEvent(wrapper, eventId) {
+  const { data, error } = await supabase
+    .from('reactions')
+    .select('emoji, count')
+    .eq('event_id', eventId);
+
+  if (error) return console.error('Reaction fetch failed:', error.message);
+  const storageKey = `reaction_${eventId}`;
+  const userEmoji = localStorage.getItem(storageKey);
+
+  wrapper.querySelectorAll('button').forEach(btn => {
+    const e = btn.textContent.trim().split(' ')[0];
+    const reaction = data.find(r => r.emoji === e);
+    const count = reaction?.count || 0;
+    btn.querySelector('span').textContent = count;
+    btn.classList.toggle('selected', userEmoji === e);
+  });
+}
+
     async function loadEvents() {
       const res = await fetch('/events/index.json');
       const files = await res.json();
@@ -357,6 +343,11 @@
       }
 
       startCountdowns();
+      document.querySelectorAll('.reaction-bar').forEach(wrapper => {
+  const eventId = wrapper.getAttribute('data-event');
+  loadReactionsForEvent(wrapper, eventId);
+});
+
     }
 
     // Update Now Playing Bar
