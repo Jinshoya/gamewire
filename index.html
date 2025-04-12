@@ -9,6 +9,16 @@
   <title>Event schedule - ggPause.com</title>
 
   <style>
+    .reaction-bar button.selected {
+  background-color: #ffefcc;
+  font-weight: bold;
+  border-color: #ffa94d;
+}
+
+.reaction-bar button.top-reaction {
+  border-color: #ff5e5e;
+  box-shadow: 0 0 5px rgba(255, 94, 94, 0.4);
+}
     #past-events .event_headliner {
       filter: grayscale(100%);
       opacity: 0.6;
@@ -145,6 +155,90 @@
   </div>
 
   <script>
+const USER_REACTED_KEY = 'userReactions-v1';
+
+function getUserReactions() {
+  return JSON.parse(localStorage.getItem(USER_REACTED_KEY) || '{}');
+}
+
+function setUserReaction(eventId, emoji) {
+  const current = getUserReactions();
+  current[eventId] = emoji;
+  localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
+}
+
+function clearUserReaction(eventId) {
+  const current = getUserReactions();
+  delete current[eventId];
+  localStorage.setItem(USER_REACTED_KEY, JSON.stringify(current));
+}
+
+async function react(button, emoji) {
+  const wrapper = button.closest('.reaction-bar');
+  const eventId = wrapper.getAttribute('data-event');
+  const current = getUserReactions()[eventId];
+
+  const isUndo = current === emoji;
+
+  const res = await fetch('/.netlify/functions/react', {
+    method: 'POST',
+    body: JSON.stringify({ eventId, emoji, undo: isUndo })
+  });
+
+  const data = await res.json();
+  if (!data.success) return;
+
+  // Save / clear local reaction
+  if (isUndo) {
+    clearUserReaction(eventId);
+  } else {
+    setUserReaction(eventId, emoji);
+  }
+
+  // Update button counts
+  for (const btn of wrapper.querySelectorAll('button')) {
+    const e = btn.textContent.trim().split(' ')[0];
+    const count = data.reactions[e] || 0;
+    btn.querySelector('span').textContent = count;
+
+    btn.classList.toggle('selected', e === (isUndo ? null : emoji));
+  }
+
+  // Highlight top reaction
+  const top = Object.entries(data.reactions).sort((a, b) => b[1] - a[1])[0]?.[0];
+  wrapper.querySelectorAll('button').forEach(btn => {
+    btn.classList.toggle('top-reaction', btn.textContent.includes(top));
+  });
+}
+
+async function preloadReactions() {
+  const bars = document.querySelectorAll('.reaction-bar');
+  for (const bar of bars) {
+    const eventId = bar.getAttribute('data-event');
+    const res = await fetch(`/.netlify/functions/react`, {
+      method: 'POST',
+      body: JSON.stringify({ eventId, emoji: '❤️' }) // dummy, will be ignored
+    });
+    const data = await res.json();
+    if (!data.success) continue;
+
+    const current = getUserReactions()[eventId];
+
+    for (const btn of bar.querySelectorAll('button')) {
+      const e = btn.textContent.trim().split(' ')[0];
+      const count = data.reactions[e] || 0;
+      btn.querySelector('span').textContent = count;
+      btn.classList.toggle('selected', e === current);
+    }
+
+    const top = Object.entries(data.reactions).sort((a, b) => b[1] - a[1])[0]?.[0];
+    bar.querySelectorAll('button').forEach(btn => {
+      btn.classList.toggle('top-reaction', btn.textContent.includes(top));
+    });
+  }
+}
+
+
     function scrollToSection(id) {
       const container = document.getElementById(id);
       if (!container) return;
@@ -309,10 +403,12 @@
     setInterval(updateNowPlayingBar, 3000);
 
     document.addEventListener("DOMContentLoaded", () => {
-      loadEvents().then(() => {
-        document.getElementById("eventLoadingSkeletons")?.remove();
-      });
-    });
+  loadEvents().then(() => {
+    document.getElementById("eventLoadingSkeletons")?.remove();
+    preloadReactions(); // ← this line
+  });
+});
+
   </script>
 </body>
 </html>
