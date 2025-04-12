@@ -284,45 +284,6 @@ async function react(button, emoji) {
   await refreshReactionCounts(eventId, wrapper);
 }
 
-  const wrapper = button.closest('.reaction-bar');
-  const eventId = wrapper.getAttribute('data-event');
-  const storageKey = `reaction_${eventId}`;
-  const current = localStorage.getItem(storageKey);
-
-  // If clicking the same emoji again — undo
-  if (current === emoji) {
-    try {
-      const { data } = await supabase
-  .from('reactions')
-  .select('emoji, count')
-  .eq('event_id', eventId);
-
-const currentReaction = data.find(r => r.emoji === emoji);
-const count = currentReaction?.count ?? 0;
-
-      if (data?.count > 1) {
-        await supabase
-          .from('reactions')
-          .update({ count: data.count - 1 })
-          .eq('event_id', eventId)
-          .eq('emoji', emoji);
-      } else {
-        await supabase
-          .from('reactions')
-          .delete()
-          .eq('event_id', eventId)
-          .eq('emoji', emoji);
-      }
-
-      localStorage.removeItem(storageKey);
-      wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
-    } catch (err) {
-      console.error('Undo failed:', err.message);
-    }
-
-    await refreshReactionCounts(eventId, wrapper);
-    return;
-  }
 
   // Remove previous reaction if different
   if (current) {
