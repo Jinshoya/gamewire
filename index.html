@@ -7,106 +7,41 @@
   <link rel="stylesheet" href="./styles/bootstrap.css" />
   <link rel="stylesheet" href="./styles/main.css" />
   <title>Event schedule - ggPause.com</title>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    #past-events .event_headliner {
-      filter: grayscale(100%);
-      opacity: 0.6;
-    }
-
-    .event_logo {
-      overflow: hidden;
-      border-radius: 8px;
-    }
-
-    .event_logo img {
-      transition: transform 0.4s ease;
-      width: 100%;
-      height: auto;
-    }
-
-    .event_logo:hover img {
-      transform: scale(1.1);
-    }
-
+    #past-events .event_headliner { filter: grayscale(100%); opacity: 0.6; }
+    .event_logo { overflow: hidden; border-radius: 8px; }
+    .event_logo img { transition: transform 0.4s ease; width: 100%; height: auto; }
+    .event_logo:hover img { transform: scale(1.1); }
     .reaction-bar {
-      display: flex;
-      gap: 8px;
-      padding: 8px 12px;
-      margin-top: 6px;
-      flex-wrap: wrap;
+      display: flex; gap: 8px; padding: 8px 12px; margin-top: 6px; flex-wrap: wrap;
     }
-
     .reaction-bar button {
-      background-color: #f7f7f7;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      padding: 4px 10px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      background-color: #f7f7f7; border: 1px solid #ccc; border-radius: 20px;
+      padding: 4px 10px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease;
     }
-
-    .reaction-bar button:hover {
-      background-color: #eaeaea;
-    }
-
+    .reaction-bar button:hover { background-color: #eaeaea; }
     .section-tabs {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 10px auto;
-      max-width: 960px;
-      padding-bottom: 5px;
+      display: flex; justify-content: center; gap: 10px; margin: 10px auto;
+      max-width: 960px; padding-bottom: 5px;
     }
-
     .section-tabs button {
-      background-color: #f0f0f0;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.9rem;
+      background-color: #f0f0f0; border: none; border-radius: 8px;
+      padding: 6px 14px; font-weight: bold; cursor: pointer; font-size: 0.9rem;
       transition: background-color 0.2s ease;
     }
-
-    .section-tabs button:hover {
-      background-color: #e2e2e2;
-    }
-
-    @media (min-width: 768px) {
-      .section-tabs {
-        display: none;
-      }
-    }
-
+    .section-tabs button:hover { background-color: #e2e2e2; }
+    @media (min-width: 768px) { .section-tabs { display: none; } }
     #nowPlayingBar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: #ff4d4d;
-      color: white;
-      font-weight: bold;
-      text-align: center;
-      padding: 6px 12px;
-      font-size: 0.95rem;
-      z-index: 1000;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      position: fixed; top: 0; left: 0; right: 0; background: #ff4d4d;
+      color: white; font-weight: bold; text-align: center; padding: 6px 12px;
+      font-size: 0.95rem; z-index: 1000; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
-
     .skeleton-card {
-      width: 100%;
-      max-width: 920px;
-      height: 100px;
-      margin: 10px auto;
+      width: 100%; max-width: 920px; height: 100px; margin: 10px auto;
       background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.2s infinite;
-      border-radius: 8px;
+      background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px;
     }
-
     @keyframes shimmer {
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
@@ -145,6 +80,11 @@
   </div>
 
   <script>
+    const supabase = window.supabase.createClient(
+      "https://eiapztxuvodtiqgsuicf.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    );
+
     function scrollToSection(id) {
       const container = document.getElementById(id);
       if (!container) return;
@@ -167,12 +107,11 @@
 
     function renderLinks(data) {
       const links = [];
-      if (data.youtube && data.youtube.url) links.push(data.youtube);
-      if (data.twitch && data.twitch.url) links.push(data.twitch);
-      if (data.website && data.website.url) links.push(data.website);
-      if (data.steam && data.steam.url) links.push(data.steam);
+      if (data.youtube?.url) links.push(data.youtube);
+      if (data.twitch?.url) links.push(data.twitch);
+      if (data.website?.url) links.push(data.website);
+      if (data.steam?.url) links.push(data.steam);
       if (Array.isArray(data.links)) links.push(...data.links);
-
       return links.map(link => `
         <a href="${link.url}" target="_blank">
           <img src="${link.icon}" alt="${link.label}" class="links_image">
@@ -180,9 +119,28 @@
       `).join('');
     }
 
+    async function react(button, emoji) {
+      const wrapper = button.closest('.reaction-bar');
+      const eventId = wrapper.getAttribute('data-event');
+
+      const res = await fetch('/.netlify/functions/react', {
+        method: 'POST',
+        body: JSON.stringify({ eventId, emoji })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        for (const btn of wrapper.querySelectorAll('button')) {
+          const e = btn.textContent.trim().split(' ')[0];
+          const count = data.reactions[e] || 0;
+          btn.querySelector('span').textContent = count;
+        }
+      }
+    }
+
     function startCountdowns() {
       setInterval(() => {
-        document.querySelectorAll('.countdown').forEach((el) => {
+        document.querySelectorAll('.countdown').forEach(el => {
           const dateStr = el.getAttribute('data-start-event-date');
           const endStr = el.getAttribute('data-end-event-date');
           const parent = el.closest('.event_headliner');
@@ -222,25 +180,6 @@
       }, 1000);
     }
 
-    async function react(button, emoji) {
-      const wrapper = button.closest('.reaction-bar');
-      const eventId = wrapper.getAttribute('data-event');
-
-      const res = await fetch('/.netlify/functions/react', {
-        method: 'POST',
-        body: JSON.stringify({ eventId, emoji })
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        for (const btn of wrapper.querySelectorAll('button')) {
-          const e = btn.textContent.trim().split(' ')[0];
-          const count = data.reactions[e] || 0;
-          btn.querySelector('span').textContent = count;
-        }
-      }
-    }
-
     async function loadEvents() {
       const res = await fetch('/events/index.json');
       const files = await res.json();
@@ -267,9 +206,7 @@
               <div class="event_flex">
                 <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
                 <div class="col-sm"><div class="event_date">
-                  ${isSteam
-                    ? `Starts: ${new Date(data.date).toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
-                    : new Date(data.date).toLocaleString()}
+                  ${isSteam ? `Starts: ${eventDate.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : eventDate.toLocaleString()}
                 </div></div>
                 <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
                 <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
@@ -306,29 +243,13 @@
       }
     }
 
-    setInterval(updateNowPlayingBar, 3000);
-
-    document.addEventListener("DOMContentLoaded", () => {
-      loadEvents().then(() => {
-        document.getElementById("eventLoadingSkeletons")?.remove();
-      });
-    });
-  </script>
-</body>
-</html>
-lse {
-        bar.style.display = "none";
-      }
-    }
-
     document.addEventListener("DOMContentLoaded", async () => {
       await loadEvents();
-      await preloadReactions();
       updateNowPlayingBar();
+      document.getElementById("eventLoadingSkeletons")?.remove();
     });
 
     setInterval(updateNowPlayingBar, 3000);
   </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </body>
 </html>
