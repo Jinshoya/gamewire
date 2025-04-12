@@ -200,35 +200,34 @@
   const wrapper = button.closest('.reaction-bar');
   const eventId = wrapper.getAttribute('data-event');
 
-  // Get the session to ensure the user is authenticated
+  // Ensure the session is correctly initialized
   const { data: session, error: authError } = await supabase.auth.getSession();
-
+  
   if (authError) {
     console.error('Authentication error:', authError.message);
     return;
   }
 
   if (!session) {
-    console.log('No user logged in, proceeding as anon.');
-  } else {
-    console.log('Authenticated as:', session.user);
+    console.log('Proceeding as anonymous');
   }
 
-  // Send the reaction to Supabase if authenticated or as anon
+  // Attempt to upsert the reaction
   const { data, error } = await supabase
     .from('reactions')
     .upsert([{ event_id: eventId, emoji }], { onConflict: ['event_id', 'emoji'] });
 
   if (error) {
-    console.error('Reaction failed:', error.message);
+    console.error('Failed to insert reaction:', error.message);
     return;
   }
 
-  // Update the reaction button counts
+  // Update the count for the emoji button
   for (const btn of wrapper.querySelectorAll('button')) {
-    const e = btn.textContent.trim().split(' ')[0];
-    const count = data.reactions[e] || 0;
-    btn.querySelector('span').textContent = count;
+    const emojiButton = btn.querySelector('span');
+    const emojiText = btn.textContent.trim().split(' ')[0];
+    const emojiCount = data.reactions[emojiText] || 0;
+    emojiButton.textContent = emojiCount;
   }
 }
 
