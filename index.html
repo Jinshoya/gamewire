@@ -125,7 +125,7 @@
 
   const { data, error } = await supabase
     .from('reactions')
-    .upsert([{ event: eventId, emoji }], { onConflict: ['event', 'emoji'] });
+    .upsert([{ event: eventId, emoji }], { onConflict: ['event_id', 'emoji'] });
 
   if (error) {
     console.error(error.message);
