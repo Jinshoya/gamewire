@@ -1,6 +1,6 @@
 ---
 title: steve huis
-date: 2025-04-12T04:05:52.309Z
+date: 2025-04-12 12:45
 end: 2025-04-11T19:43:42.534Z
 image: /images/uploads/guerilla.png
 borderColor: "#0eff6d"
