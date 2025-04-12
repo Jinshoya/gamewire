@@ -116,7 +116,11 @@
   50% { transform: scale(1.4); }
   100% { transform: scale(1); }
 }
-
+#past-events .reaction-bar button {
+  filter: grayscale(100%);
+  opacity: 0.4;
+  pointer-events: none;
+}
   </style>
 </head>
 <body>
@@ -155,25 +159,23 @@
       "https://eiapztxuvodtiqgsuicf.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpYXB6dHh1dm9kdGlxZ3N1aWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MzQ5MTQsImV4cCI6MjA2MDAxMDkxNH0.QH8wxJeLGsP2ny1j-sA1t1FiiU0Y-0PWh2FmbGb9ni4"
     );
-
+    
     function scrollToSection(id) {
-      const container = document.getElementById(id);
-      if (container) container.scrollIntoView({ behavior: "smooth", block: "start" });
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-
+    
     function parseFrontmatter(md) {
       const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/m.exec(md);
       if (!match) return { attributes: {}, body: md };
-      const yamlText = match[1];
-      const lines = yamlText.split('\n');
       const attributes = {};
-      for (const line of lines) {
+      match[1].split('\n').forEach(line => {
         const [key, ...rest] = line.split(':');
         attributes[key.trim()] = rest.join(':').trim();
-      }
+      });
       return { attributes, body: match[2] };
     }
-
+    
     function renderLinks(data) {
       const links = [];
       if (data.youtube?.url) links.push(data.youtube);
@@ -181,20 +183,20 @@
       if (data.website?.url) links.push(data.website);
       if (data.steam?.url) links.push(data.steam);
       if (Array.isArray(data.links)) links.push(...data.links);
-      return links.map(link => `<a href="${link.url}" target="_blank"><img src="${link.icon}" alt="${link.label}" class="links_image"></a>`).join('');
+      return links.map(link => `<a href="${link.url}" target="_blank"><img src="${link.icon}" class="links_image" alt="${link.label}"></a>`).join('');
     }
-
+    
     async function react(button, emoji) {
       const wrapper = button.closest('.reaction-bar');
-if (!wrapper) return console.error('Reaction wrapper not found');
-const eventId = wrapper.getAttribute('data-event');
+      if (!wrapper) return console.error('Reaction wrapper not found');
+      const eventId = wrapper.getAttribute('data-event');
       const storageKey = `reaction_${eventId}`;
       const current = localStorage.getItem(storageKey);
-
+    
       const { data: reactions } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
       const prev = reactions.find(r => r.emoji === current);
       const curr = reactions.find(r => r.emoji === emoji);
-
+    
       if (current === emoji) {
         if (curr?.count > 1) {
           await supabase.from('reactions').update({ count: curr.count - 1 }).eq('event_id', eventId).eq('emoji', emoji);
@@ -206,7 +208,7 @@ const eventId = wrapper.getAttribute('data-event');
         await refreshReactionCounts(eventId, wrapper);
         return;
       }
-
+    
       if (current && prev) {
         if (prev.count > 1) {
           await supabase.from('reactions').update({ count: prev.count - 1 }).eq('event_id', eventId).eq('emoji', current);
@@ -214,22 +216,22 @@ const eventId = wrapper.getAttribute('data-event');
           await supabase.from('reactions').delete().eq('event_id', eventId).eq('emoji', current);
         }
       }
-
+    
       if (curr) {
         await supabase.from('reactions').update({ count: curr.count + 1 }).eq('event_id', eventId).eq('emoji', emoji);
       } else {
         await supabase.from('reactions').insert({ event_id: eventId, emoji, count: 1 });
       }
-
+    
       localStorage.setItem(storageKey, emoji);
       wrapper.querySelectorAll('button').forEach(btn => {
         const e = btn.textContent.trim().split(' ')[0];
         btn.classList.toggle('reacted', e === emoji);
       });
-
+    
       await refreshReactionCounts(eventId, wrapper);
     }
-
+    
     async function refreshReactionCounts(eventId, wrapper) {
       const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
       const selected = localStorage.getItem(`reaction_${eventId}`);
@@ -240,7 +242,7 @@ const eventId = wrapper.getAttribute('data-event');
         btn.classList.toggle('reacted', emoji === selected);
       });
     }
-
+    
     function startCountdowns() {
       setInterval(() => {
         document.querySelectorAll('.countdown').forEach(el => {
@@ -252,9 +254,9 @@ const eventId = wrapper.getAttribute('data-event');
           const elapsed = now - start;
           const parent = el.closest('.event_headliner');
           const isSteam = parent.closest('#steam-sale-event');
-
+    
           if (isSteam && end && now >= end) return parent.remove();
-
+    
           if (diff <= 0) {
             el.textContent = 'Started';
             if (!isSteam && elapsed < 3600000 && parent.parentElement.id !== 'live-events') {
@@ -264,16 +266,16 @@ const eventId = wrapper.getAttribute('data-event');
             }
             return;
           }
-
-          const seconds = Math.floor(diff / 1000);
-          const days = Math.floor(seconds / 86400);
-          const hours = Math.floor((seconds % 86400) / 3600);
-          const mins = Math.floor((seconds % 3600) / 60);
+    
+          const totalSeconds = Math.floor(diff / 1000);
+          const days = Math.floor(totalSeconds / 86400);
+          const hours = Math.floor((totalSeconds % 86400) / 3600);
+          const mins = Math.floor((totalSeconds % 3600) / 60);
           el.textContent = `${days ? days + 'd ' : ''}${hours}h ${mins}m`;
         });
       }, 1000);
     }
-
+    
     async function loadReactionsForEvent(wrapper, eventId) {
       const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
       const userEmoji = localStorage.getItem(`reaction_${eventId}`);
@@ -284,12 +286,12 @@ const eventId = wrapper.getAttribute('data-event');
         btn.classList.toggle('reacted', emoji === userEmoji);
       });
     }
-
+    
     async function loadEvents() {
       const res = await fetch('/events/index.json');
       const files = await res.json();
       const now = new Date();
-
+    
       for (const file of files) {
         const response = await fetch(`/events/${file}`);
         const raw = await response.text();
@@ -299,36 +301,38 @@ const eventId = wrapper.getAttribute('data-event');
         const isSteam = data.type === 'steam_sale';
         const slug = data.slug || file.replace('.md', '');
         const borderColor = data.borderColor || '#d9a62d';
-
+    
         const html = `
-  <div class="event_headliner" style="--event-border-color: ${borderColor};">
-    <div class="event_head">
-<div class="event_logo" data-border-color="${borderColor}">
-  <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-  <div class="reaction-bar" data-event="${slug}">
-    ${['🔥','😂','😴','💩','😞'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
-  </div>
-</div>
-            <div class="reaction-bar" data-event="${slug}">
-              ${['🔥','😂','😴','💩','😞','❤️'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+          <div class="event_headliner" style="--event-border-color: ${borderColor};">
+            <div class="event_head">
+              <div class="event_logo" data-border-color="${borderColor}">
+                <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
+                <div class="reaction-bar" data-event="${slug}">
+                  ${['🔥','😂','😴','💩','😞'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+                </div>
+              </div>
+              <div class="event_flex">
+                <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
+                <div class="col-sm"><div class="event_date">${isSteam ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : date.toLocaleString()}</div></div>
+                <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
+                <div class="col-sm"><div class="event_links">${renderLinks(data)}</div></div>
+              </div>
             </div>
           </div>`;
-
-
+    
         const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
         const container = document.getElementById(target);
-        if (container) {
-          container.insertAdjacentHTML("beforeend", html);
-        }
+        if (container) container.insertAdjacentHTML("beforeend", html);
       }
-
+    
       startCountdowns();
+    
       document.querySelectorAll('.reaction-bar').forEach(wrapper => {
         const eventId = wrapper.getAttribute('data-event');
         loadReactionsForEvent(wrapper, eventId);
       });
     }
-
+    
     function updateNowPlayingBar() {
       const live = document.querySelector("#live-events .event_headliner");
       const bar = document.getElementById("nowPlayingBar");
@@ -341,14 +345,15 @@ const eventId = wrapper.getAttribute('data-event');
         bar.style.display = "none";
       }
     }
-
+    
     document.addEventListener("DOMContentLoaded", async () => {
       await loadEvents();
       updateNowPlayingBar();
       document.getElementById("eventLoadingSkeletons")?.remove();
     });
-
+    
     setInterval(updateNowPlayingBar, 3000);
-  </script>
+    </script>
+    
 </body>
 </html>
