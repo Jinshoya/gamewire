@@ -124,7 +124,7 @@
   const eventId = wrapper.getAttribute('data-event');
 
   // Check if the user is authenticated
-  const { user, error: authError } = await supabase.auth.getUser();
+  const { data: session, error: authError } = await supabase.auth.getSession();
   
   // Handle error or logged-in user
   if (authError) {
@@ -132,9 +132,9 @@
     return;
   }
 
-  if (user) {
-    // Logged-in user (authenticated) — You can add additional logic here if needed
-    console.log('Authenticated as:', user);
+  if (session) {
+    // Logged-in user (authenticated)
+    console.log('Authenticated as:', session.user);
   } else {
     // Anon user, proceed with the reaction logic
     console.log('No user logged in, proceeding as anon.');
