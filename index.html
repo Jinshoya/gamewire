@@ -208,7 +208,7 @@
   const storageKey = `reaction_${eventId}`;
   const current = localStorage.getItem(storageKey);
 
-  // UNDO reaction if clicked again
+  // Undo reaction if clicking same emoji again
   if (current === emoji) {
     try {
       await supabase
@@ -218,14 +218,24 @@
         .eq('emoji', emoji);
 
       localStorage.removeItem(storageKey);
-      wrapper.querySelectorAll('button').forEach(btn => btn.classList.remove('reacted'));
+
+      // Update UI
+      wrapper.querySelectorAll('button').forEach(btn => {
+        btn.classList.remove('reacted');
+        if (btn.textContent.includes(emoji)) {
+          const span = btn.querySelector('span');
+          let count = parseInt(span.textContent, 10) || 0;
+          span.textContent = Math.max(count - 1, 0);
+        }
+      });
+
     } catch (err) {
       console.error('Failed to undo reaction:', err.message);
     }
     return;
   }
 
-  // REMOVE previous if user reacted with another emoji
+  // Remove previous reaction if different
   if (current) {
     try {
       await supabase
@@ -238,40 +248,45 @@
     }
   }
 
-  // INSERT new reaction
+  // Add new reaction
   try {
-    await supabase
+    const { data, error } = await supabase
       .from('reactions')
-      .upsert({ event_id: eventId, emoji });
+      .upsert({ event_id: eventId, emoji }, { onConflict: ['event_id', 'emoji'] });
+
+    if (error) {
+      console.error('Failed to insert reaction:', error.message);
+      return;
+    }
 
     localStorage.setItem(storageKey, emoji);
 
-    // Update button classes
+    // Highlight the new reaction
     wrapper.querySelectorAll('button').forEach(btn => {
       const e = btn.textContent.trim().split(' ')[0];
       btn.classList.toggle('reacted', e === emoji);
     });
 
-    // Refresh counts
-    const { data: counts, error } = await supabase
+    // Get fresh counts
+    const { data: counts, error: countErr } = await supabase
       .from('reactions')
-      .select('event_id, emoji, count')
+      .select('emoji, count')
       .eq('event_id', eventId);
 
-    if (error) return console.error('Count refresh failed:', error.message);
+    if (countErr) {
+      console.error('Count refresh failed:', countErr.message);
+      return;
+    }
 
+    // Update button counts
     wrapper.querySelectorAll('button').forEach(btn => {
       const e = btn.textContent.trim().split(' ')[0];
       const found = counts.find(r => r.emoji === e);
-      if (found) {
-        btn.querySelector('span').textContent = found.count;
-      } else {
-        btn.querySelector('span').textContent = '0';
-      }
+      btn.querySelector('span').textContent = found?.count ?? '0';
     });
 
   } catch (err) {
-    console.error('Failed to insert reaction:', err.message);
+    console.error('Insert error:', err.message);
   }
 }
 
