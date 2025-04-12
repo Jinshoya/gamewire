@@ -34,47 +34,27 @@ a:hover {
 	align-items: center;
 	gap: 8px;
   }
-  .watch-button {
-	background: rgba(255, 255, 255, 0.1);
-	border: none;
-	padding: 10px 20px;
-	border-radius: 14px;
-	color: white;
-	font-weight: 600;
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	cursor: pointer;
-	transition: background 0.3s;
-  }
-  .watch-button:hover {
-	background: rgba(255, 255, 255, 0.2);
-  }
   
-  .emoji-reactions {
+.emoji-reactions {
 	background: rgba(0, 0, 0, 0.3);
 	padding: 8px 14px;
 	border-radius: 12px;
 	display: flex;
 	gap: 12px;
 	font-size: 1rem;
-	margin-top: 12px;
   }
   
-  
-  .event-panel {
+.event-panel {
 	background: rgba(255, 255, 255, 0.05);
 	border-radius: 20px;
 	backdrop-filter: blur(12px);
 	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 	padding: 20px;
-	margin-bottom: 30px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	flex-wrap: wrap;
+	color: #fff;
   }
-  
   
 @media (max-width: 768px) {
 	#nowPlayingBar {
@@ -91,15 +71,10 @@ a:hover {
 	}
   }
   
-  body {
-	background: linear-gradient(to bottom, #101935, #3f3c85);
-	font-family: 'Inter', sans-serif;
-	color: white;
-	margin: 0;
-	padding: 20px;
-  }
-  
-  
+body {
+	background:#0e0e10!important;
+	padding-top: 50px; /* Make space for the Now Live bar, adjust the height if needed */
+}
 .events_upnext{
 color:#fff;
 padding-left:10px;
@@ -226,22 +201,12 @@ color:#fff;
 font-weight:bold;
 text-align: center;
 }
-.event-info {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-  }
-  
-  .event-info h2 {
-	font-size: 1.8rem;
-	margin: 0;
-  }
-  
-  .event-info .time {
-	font-size: 1rem;
-	opacity: 0.8;
-  }
-  
+.event_info {
+	color:#fff;
+	font-size:12px;
+	font-weight:bold;
+	
+	}
 .countdown {
 color:#fff;
 font-weight:bold;
