@@ -244,19 +244,24 @@
       // If the event is a Steam Sale and has ended, remove it
       if (isSteam && end && now >= end) return parent.remove();
 
+      // If the event has started, check if it should be moved to past events
       if (diff <= 0) {
         el.textContent = 'Started';
-        // If 1 hour has passed since the event started, move it to "Past Events"
+
+        // Only move the event to Past Events if it's been 1 hour since the start
         if (elapsed >= 3600000) {
+          // Prevent the event from being moved back to 'Now Live' after it's been moved to 'Past Events'
           if (parent.parentElement.id !== 'past-events') {
             document.getElementById('past-events').appendChild(parent);
           }
         } else if (parent.parentElement.id !== 'live-events') {
+          // Move the event to 'Live Events' if it hasn't been moved yet
           document.getElementById('live-events').appendChild(parent);
         }
         return;
       }
 
+      // Update the countdown time
       const totalSeconds = Math.floor(diff / 1000);
       const days = Math.floor(totalSeconds / 86400);
       const hours = Math.floor((totalSeconds % 86400) / 3600);
@@ -265,6 +270,7 @@
     });
   }, 1000);
 }
+
 
     async function loadReactionsForEvent(wrapper, eventId) {
       const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
