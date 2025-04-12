@@ -47,9 +47,6 @@ a:hover {
 	cursor: pointer;
 	transition: background 0.3s;
   }
-  * {
-	transition: all 0.2s ease;
-  }
   .watch-button:hover {
 	background: rgba(255, 255, 255, 0.2);
   }
@@ -95,12 +92,13 @@ a:hover {
   }
   
   body {
-	background: linear-gradient(to bottom, #0c1c3d, #453e7f);
-	font-family: 'Inter', sans-serif; /* or a modern clean font */
+	background: linear-gradient(to bottom, #101935, #3f3c85);
+	font-family: 'Inter', sans-serif;
 	color: white;
 	margin: 0;
-	padding: 0;
+	padding: 20px;
   }
+  
   
 .events_upnext{
 color:#fff;
