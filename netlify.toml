@@ -1,3 +1,9 @@
 [build]
   publish = "."
   command = "node scripts/generate-event-index.js"
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[functions.react]
+  kv_namespace = "reactions"
