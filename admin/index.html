@@ -13,32 +13,39 @@
     <div id="nc-root"></div>
 
     <script>
-      window.addEventListener("load", function () {
+      window.CMS_MANUAL_INIT = true;
+    
+      window.addEventListener('load', function () {
         if (window.CMS) {
-          // ✅ Register preview first
-          function EventPreview({ entry }) {
-            const data = entry.getIn(["data"]).toJS();
-            const wrapper = document.createElement("div");
-            wrapper.innerHTML = `
-              <div style="background: #121212; color: #fff; padding: 20px; font-family: sans-serif; border-radius: 10px; max-width: 600px;">
-                <h2 style="margin-top: 0;">${data.title || 'Untitled Event'}</h2>
-                <p><strong>Date:</strong> ${data.date || 'TBD'}</p>
-                ${data.end ? `<p><strong>Ends:</strong> ${data.end}</p>` : ''}
-                <img src="${data.image || ''}" alt="${data.title || ''}" style="max-width: 100%; border-radius: 8px; margin-top: 10px;" />
-                <div style="margin-top: 15px;">
-                  ${(data.links || []).map(link =>
-                    `<a href="${link.url}" target="_blank" style="color: #90caf9; display: inline-block; margin-right: 10px;">${link.label}</a>`
-                  ).join('')}
-                </div>
-              </div>
-            `;
-            return wrapper;
-          }
-
-          CMS.init();
+          const h = window.h; // hyperscript (from Netlify CMS preview)
+    
+          const EventPreview = ({ entry }) => {
+            const data = entry.getIn(['data']).toJS();
+    
+            return h("div", { style: { background: "#121212", color: "white", padding: "20px", borderRadius: "10px", fontFamily: "sans-serif" } }, [
+              h("h2", {}, data.title || "Untitled Event"),
+              h("p", {}, `Date: ${data.date || "TBD"}`),
+              data.end ? h("p", {}, `Ends: ${data.end}`) : null,
+              h("img", {
+                src: data.image || "",
+                alt: data.title || "",
+                style: { maxWidth: "100%", borderRadius: "8px", marginTop: "10px" }
+              }),
+              h("div", { style: { marginTop: "12px" } }, (data.links || []).map(link =>
+                h("a", {
+                  href: link.url,
+                  target: "_blank",
+                  style: { color: "#90caf9", display: "inline-block", marginRight: "10px" }
+                }, link.label)
+              ))
+            ]);
+          };
+    
           CMS.registerPreviewTemplate("events", EventPreview);
+          CMS.init();
         }
       });
     </script>
+    
   </body>
 </html>
