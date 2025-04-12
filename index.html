@@ -199,8 +199,7 @@
     async function react(button, emoji) {
   const wrapper = button.closest('.reaction-bar');
   const eventId = wrapper.getAttribute('data-event');
-  console.log("Event ID:", eventId); // Add this line to see the event ID
-
+  
   // Ensure the session is correctly initialized
   const { data: session, error: authError } = await supabase.auth.getSession();
   
@@ -213,29 +212,52 @@
     console.log('Proceeding as anonymous');
   }
 
-  // Attempt to upsert the reaction
+  // Check if the reaction already exists
   const { data, error } = await supabase
     .from('reactions')
-    .upsert([{ event_id: eventId, emoji }], { onConflict: ['event_id', 'emoji'] });
+    .select('id, count')
+    .eq('event_id', eventId)
+    .eq('emoji', emoji)
+    .single(); // Get a single result
 
-  if (error) {
-    console.error('Failed to insert reaction:', error.message);
+  if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+    console.error('Error fetching reaction:', error.message);
     return;
   }
 
-  console.log("Reaction data:", data); // Add this line to inspect the returned data
+  if (data) {
+    // If reaction exists, increment the count
+    const newCount = data.count + 1;
 
-  // Check if 'data' is valid and contains the expected structure
-  if (data && Array.isArray(data)) {
-    // Update the count for the emoji button
-    wrapper.querySelectorAll('button').forEach(btn => {
-      const emojiText = btn.textContent.trim().split(' ')[0];
-      const emojiCount = data[0]?.[emojiText] || 0; // Use the correct structure here
-      btn.querySelector('span').textContent = emojiCount;
-    });
+    const { updateError } = await supabase
+      .from('reactions')
+      .update({ count: newCount })
+      .eq('id', data.id); // Update the count of the existing reaction
+
+    if (updateError) {
+      console.error('Failed to update reaction count:', updateError.message);
+      return;
+    }
   } else {
-    console.error('No valid reaction data returned');
+    // If reaction doesn't exist, insert a new row with count = 1
+    const { insertError } = await supabase
+      .from('reactions')
+      .insert([{ event_id: eventId, emoji, count: 1 }]);
+
+    if (insertError) {
+      console.error('Failed to insert reaction:', insertError.message);
+      return;
+    }
   }
+
+  // After reaction update/insert, update the UI count
+  const emojiButtons = wrapper.querySelectorAll('button');
+  emojiButtons.forEach(btn => {
+    const emojiText = btn.textContent.trim().split(' ')[0];
+    if (emojiText === emoji) {
+      btn.querySelector('span').textContent = newCount || 1; // Update count on the button
+    }
+  });
 }
 
     // Countdown functionality
