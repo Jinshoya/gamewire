@@ -9,6 +9,22 @@
   <title>Event schedule - ggPause.com</title>
 
   <style>
+.event_logo {
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.event_logo img {
+  transition: transform 0.4s ease;
+  width: 100%;
+  height: auto;
+}
+
+.event_logo:hover img {
+  transform: scale(1.1);
+}
+
+
     #past-events .event_headliner {
       filter: grayscale(100%);
       opacity: 0.6;
@@ -22,14 +38,6 @@
       max-width: 960px;
       padding-bottom: 5px;
     }
-    .event_logo img {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.event_logo img:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
-}
 
     .section-tabs button {
       background-color: #f0f0f0;
