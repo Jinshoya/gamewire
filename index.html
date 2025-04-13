@@ -34,27 +34,29 @@ body {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 28px;
   padding: 50px 60px;
-  padding-left: 160px; /* enough room so text doesn't overlap logo */
-  min-height: 180px;
+  padding-left: 180px; /* leave room for logo */
+  min-height: 200px;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   justify-content: center;
   backdrop-filter: blur(24px);
+  background-size: cover;
+  background-position: center;
 }
 
 
 .event_logo {
   position: absolute;
   top: 50%;
-  left: 40px;
+  left: -70px;
   transform: translateY(-50%);
-  width: 180px;
-  height: 180px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
   z-index: 5;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .event_logo img {
@@ -67,7 +69,7 @@ body {
 .event_title {
   font-size: 2.5rem;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .event_time {
@@ -76,6 +78,7 @@ body {
   opacity: 0.9;
   margin-bottom: 25px;
 }
+
 
 .event_expectations {
   margin-top: 12px;
@@ -134,17 +137,20 @@ body {
   background: #392b7a;
 }
 
+/* Mobile responsiveness */
 @media (max-width: 768px) {
   .event_card {
+    padding: 40px;
     padding-left: 40px;
   }
 
   .event_logo {
-    left: 20px;
+    left: 50%;
+    top: -60px;
+    transform: translateX(-50%);
     width: 100px;
     height: 100px;
   }
-}
 
 
   .event_title {
@@ -341,9 +347,9 @@ body {
       const backgroundStyle = data.image ? `background-image: url('${data.image}');` : 'background-color: #2e2e57;';
 
       const html = `
-        <div class="event_block">
-          ${data.logo ? `<div class="event_logo"><img src="${data.logo}" alt="logo" /></div>` : ""}
-          <div class="event_card" style="${backgroundStyle};">
+<div class="event_block">
+  ${data.logo ? `<div class="event_logo"><img src="${data.logo}" alt="logo" /></div>` : ""}
+  <div class="event_card" style="${backgroundStyle};">
             <div class="event_content">
               <div class="event_text">
                 <h2 class="event_title">${data.title}</h2>
