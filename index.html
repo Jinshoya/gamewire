@@ -19,23 +19,23 @@
     }
     
     .content {
-      width: 1300px;
+      width: 1070px;
       margin: 100px auto;
       padding: 0 20px;
     }
     
     .event_block {
       position: relative;
-      width: 1300px;
-      margin: 160px auto 120px;
+      width: 1070px;
+      margin: 140px auto 100px;
     }
     
     .event_logo {
       position: absolute;
-      top: -80px;
-      left: -100px;
-      width: 329px;
-      height: 329px;
+      top: -60px;
+      left: -80px;
+      width: 255px;
+      height: 255px;
       border-radius: 50%;
       overflow: hidden;
       z-index: 3;
@@ -52,14 +52,14 @@
     
     .event_card {
       position: relative;
-      width: 1300px;
-      height: 360px;
+      width: 1070px;
+      height: 280px;
       border-radius: 20px;
       background-size: cover;
       background-position: center;
       overflow: hidden;
       box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      padding-left: 360px; /* spacing so content never overlaps logo */
+      padding-left: 300px; /* Leaves space for 255px logo + gap */
     }
     
     .event_card_overlay {
@@ -77,33 +77,34 @@
       justify-content: space-between;
       align-items: center;
       height: 100%;
-      padding: 32px 40px;
-      gap: 32px;
+      padding: 24px 36px;
+      gap: 28px;
     }
     
     .event_card_main {
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       min-width: 250px;
+      margin-top: 6px; /* pulls title closer to top */
     }
     
     .event_title {
-      font-size: 2.4rem;
+      font-size: 2.2rem;
       font-weight: 600;
-      margin: 0 0 12px;
+      margin: 0 0 8px;
     }
     
     .event_date {
-      font-size: 1.1rem;
+      font-size: 1rem;
       opacity: 0.85;
-      margin: 0 0 20px;
+      margin: 0 0 16px;
       line-height: 1.4;
     }
     
     .countdown {
-      font-size: 1rem;
+      font-size: 0.95rem;
       opacity: 0.8;
       margin-bottom: 16px;
     }
@@ -185,9 +186,9 @@
     
       .event_logo {
         position: static;
-        width: 220px;
-        height: 220px;
-        margin: -110px auto 20px;
+        width: 200px;
+        height: 200px;
+        margin: -100px auto 20px;
       }
     
       .event_card {
@@ -410,29 +411,27 @@
       const html = `
 <div class="event_block">
   <div class="event_logo">
-    <img src="${data.logo}" alt="logo" />
+    <img src="logo-url.png" />
   </div>
 
-  <div class="event_card" style="background-image: url('${data.image}')">
+  <div class="event_card" style="background-image: url('bg-image.jpg')">
     <div class="event_card_overlay"></div>
-
     <div class="event_card_content">
       <div class="event_card_main">
-        <h2 class="event_title">${data.title}</h2>
-        <p class="event_date">${isSteam
-          ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
-          : date.toLocaleString()}</p>
-
+        <h2 class="event_title">Event Name</h2>
+        <p class="event_date">June 6 • 11 PM</p>
         <div class="event_expectations">
           <div class="label">Your expectations</div>
-          <div class="reaction-bar" data-event="${slug}">
-            ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+          <div class="reaction-bar">
+            <button>👍 <span>0</span></button>
+            <button>😊 <span>0</span></button>
+            <button>😲 <span>0</span></button>
+            <button>😔 <span>0</span></button>
           </div>
         </div>
       </div>
-
       <div class="event_card_action">
-        <a class="watch-button" href="${data.links?.[0]?.url || '#'}" target="_blank">
+        <a class="watch-button" href="#">
           Watch here <span class="play_icon">▶</span>
         </a>
       </div>
