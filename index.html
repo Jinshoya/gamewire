@@ -377,14 +377,11 @@
     return `<div class="event_links">NO LINKS</div>`;
   }
 
-  return `
-    <div class="event_links">
-      ${links.map(link => `
-        <a href="${link.url}" target="_blank" title="${link.label}">
-          <img src="${link.icon}" class="links_image" alt="${link.label}" />
-        </a>
-      `).join('')}
-    </div>`;
+  return links.map(link => `
+  <a href="${link.url}" target="_blank" title="${link.label}">
+    <img src="${link.icon}" class="links_image" alt="${link.label}" />
+  </a>
+`).join('');
 }
 
 
@@ -564,11 +561,10 @@
         </div>
       </div>
 
-      <div class="event_card_action">
-        <div class="event_links">
-          ${renderLinks(data)}
-        </div>
-      </div>
+<div class="event_card_action">
+  ${renderLinks(data)}
+</div>
+
     </div>
   </div>
 </div>
