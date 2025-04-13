@@ -8,9 +8,10 @@
   <link rel="stylesheet" href="./styles/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
   <style>
     @import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
-    
+  
     body {
       background: linear-gradient(to bottom, #041935, #241c56);
       font-family: 'General Sans', sans-serif;
@@ -18,37 +19,19 @@
       margin: 0;
       padding: 0;
     }
-    
+  
     .content {
       width: 100%;
       max-width: 840px;
       margin: 100px auto;
       padding: 0 20px;
     }
-    
+  
     .event_past {
       filter: grayscale(100%) brightness(0.7);
       opacity: 0.85;
     }
-    
-    @keyframes pulseGlow {
-      0% {
-        box-shadow: 0 0 10px rgba(255, 90, 90, 0.15);
-      }
-      50% {
-        box-shadow: 0 0 20px rgba(255, 90, 90, 0.4);
-      }
-      100% {
-        box-shadow: 0 0 10px rgba(255, 90, 90, 0.15);
-      }
-    }
-    
-    .event_block.now_live .event_card {
-      border: 2px solid rgba(255, 90, 90, 0.25);
-      box-shadow: 0 0 12px rgba(255, 90, 90, 0.35);
-      animation: pulseGlow 3s ease-in-out infinite;
-    }
-    
+  
     .event_block {
       position: relative;
       max-width: 840px;
@@ -57,7 +40,7 @@
       flex-direction: column;
       align-items: center;
     }
-    
+  
     .event_logo {
       position: absolute;
       top: -60px;
@@ -70,14 +53,14 @@
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
       background: #000;
     }
-    
+  
     .event_logo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
-    
+  
     .event_card {
       position: relative;
       width: 840px;
@@ -89,7 +72,7 @@
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
       padding-left: 300px;
     }
-    
+  
     .event_card_overlay {
       position: absolute;
       inset: 0;
@@ -97,7 +80,7 @@
       backdrop-filter: blur(18px);
       z-index: 0;
     }
-    
+  
     .event_card_content {
       position: relative;
       z-index: 1;
@@ -108,7 +91,7 @@
       padding: 24px 36px;
       gap: 28px;
     }
-    
+  
     .event_card_main {
       flex: 1;
       display: flex;
@@ -117,30 +100,30 @@
       align-items: flex-start;
       gap: 12px;
     }
-    
+  
     .event_title {
       font-size: 2.2rem;
       font-weight: 600;
       margin: 0;
     }
-    
+  
     .event_date {
       font-size: 1rem;
       opacity: 0.85;
       margin: 0;
       line-height: 1.4;
     }
-    
+  
     .event_date .muted {
       color: #aaa;
     }
-    
+  
     .countdown {
       font-size: 0.95rem;
       opacity: 0.8;
       margin-bottom: 6px;
     }
-    
+  
     .event_countdown {
       margin-top: 4px;
       font-size: 1rem;
@@ -149,54 +132,53 @@
       align-items: center;
       gap: 10px;
     }
-    
+  
     .event_countdown span.number {
       color: white;
       font-weight: 600;
       font-size: 1.05rem;
     }
-    
+  
     .event_countdown span.unit {
       color: #aaa;
       margin-left: 2px;
       font-weight: 500;
       font-size: 0.95rem;
     }
-    
-    /* 🌟 Bottom expectations + links row */
+  
+    /* ⚡️ Bottom bars: Expectation + Links */
     .event_expectations_wrapper {
       position: absolute;
       bottom: 24px;
       left: 36px;
       right: 36px;
-      width: auto;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
     }
-    
-    /* 👈 Your expectations */
+  
     .event_reacts {
       background: #14142b;
       border-radius: 14px;
       padding: 12px 16px;
       display: flex;
       flex-direction: column;
-      max-width: 80%;
+      width: fit-content;
+      max-width: 60%;
     }
-    
+  
     .event_reacts .label {
       font-weight: 600;
       font-size: 1rem;
       margin-bottom: 10px;
     }
-    
+  
     .reaction-bar {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
     }
-    
+  
     .reaction-bar button {
       background: white;
       color: black;
@@ -206,20 +188,142 @@
       font-size: 0.95rem;
       border: none;
       display: flex;
-      align-items: center
-    
-    
-    
-    
-    
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
   
-    
-    
-    
-    
-    
-    
-    
+    .reaction-bar button:hover,
+    .reaction-bar button.reacted {
+      background: #f2c94c;
+    }
+  
+    .event_links_block {
+      background: #14142b;
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      min-width: 140px;
+    }
+  
+    .event_links_block .label {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: white;
+      text-align: right;
+    }
+  
+    .event_links {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+  
+    .event_links img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      border-radius: 6px;
+      transition: transform 0.2s ease;
+    }
+  
+    .event_links img:hover {
+      transform: scale(1.1);
+    }
+  
+    .watch-button {
+      background: #271e6e;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      border-radius: 16px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+  
+    .watch-button:hover {
+      background: #322c84;
+      transform: scale(1.03);
+    }
+  
+    .play_icon {
+      font-size: 1.2rem;
+    }
+  
+    /* 🌟 LIVE GLOW */
+    .event_block.now_live .event_card {
+      border: 2px solid rgba(255, 80, 80, 0.25);
+      box-shadow:
+        0 0 0 3px rgba(255, 70, 70, 0.2),
+        0 0 18px 6px rgba(255, 50, 50, 0.25),
+        0 0 40px 14px rgba(255, 40, 40, 0.2);
+      animation: pulseLive 3s ease-in-out infinite;
+    }
+  
+    @keyframes pulseLive {
+      0%   { box-shadow: 0 0 0 rgba(255, 70, 70, 0.2); }
+      50%  { box-shadow: 0 0 20px 6px rgba(255, 50, 50, 0.4); }
+      100% { box-shadow: 0 0 0 rgba(255, 70, 70, 0.2); }
+    }
+  
+    /* 📱 Mobile Responsive */
+    @media (max-width: 768px) {
+      .content,
+      .event_block,
+      .event_card {
+        width: 100%;
+      }
+  
+      .event_logo {
+        position: static;
+        width: 200px;
+        height: 200px;
+        margin: -100px auto 20px;
+      }
+  
+      .event_card {
+        padding-left: 24px;
+        padding-top: 140px;
+        height: auto;
+      }
+  
+      .event_card_content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+  
+      .event_expectations_wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        position: static;
+        margin-top: 16px;
+        gap: 16px;
+      }
+  
+      .event_links_block {
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 100%;
+      }
+  
+      .event_links {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+  
+
 </head>
 <body>
   <div id="nowPlayingBar" style="display:none;"></div>
@@ -508,7 +612,6 @@ const html = `
     <div class="event_card_content">
       <div class="event_card_main">
         <h2 class="event_title">${data.title}</h2>
-
         <p class="event_date">
           ${
             isSteam
@@ -516,32 +619,32 @@ const html = `
               : formatSingle(data.date)
           }
         </p>
-
         <div class="countdown"
              data-start-event-date="${data.date}"
              ${data.end ? `data-end-event-date="${data.end}"` : ''}>
         </div>
+      </div>
 
-        <div class="event_expectations_wrapper">
-          <div class="event_reacts">
-            <div class="label">Your expectations</div>
-            <div class="reaction-bar" data-event="${slug}">
-              ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
-            </div>
-          </div>
-
-          <div class="event_links_block">
-            <div class="label">Check it out</div>
-            <div class="event_links">
-              ${renderLinks(data)}
-            </div>
+      <div class="event_expectations_wrapper">
+        <div class="event_reacts">
+          <div class="label">Your expectations</div>
+          <div class="reaction-bar" data-event="${slug}">
+            ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
           </div>
         </div>
-      </div> <!-- close .event_card_main -->
-    </div>   <!-- close .event_card_content -->
-  </div>     <!-- close .event_card -->
-</div>       <!-- close .event_block -->
+
+        <div class="event_links_block">
+          <div class="label">Check it out</div>
+          <div class="event_links">
+            ${renderLinks(data)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 `;
+
 
 
       const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
