@@ -342,15 +342,15 @@
     
       .event_links {
         justify-content: flex-start;
-      }
-      .event_block.now_live .event_card {
+      }  
+    }
+    .event_block.now_live .event_card {
   box-shadow:
-    0 0 30px rgba(255, 90, 90, 0.35),
+    0 0 30px rgba(255, 120, 120, 0.3);
     0 0 0 3px rgba(255, 90, 90, 0.2);
   border: 2px solid rgba(255, 90, 90, 0.15);
   transition: box-shadow 0.4s ease;
-}      
-    }
+}        
     </style>
     
     
@@ -640,7 +640,7 @@ function formatRange(start, end) {
 
 
 const html = `
-<div class="event_block">
+<div class="event_block ${data.status === 'live' ? 'now_live' : ''}">
   <div class="event_logo">
     <img src="${data.logo}" alt="logo" />
   </div>
@@ -673,14 +673,13 @@ const html = `
             </div>
           </div>
         </div>
-
       </div>
+    </div>
 
-      <div class="event_links_floater">
-        <div class="label">Check it out</div>
-        <div class="event_links">
-          ${renderLinks(data)}
-        </div>
+    <div class="event_links_block">
+      <div class="label">Check it out</div>
+      <div class="event_links">
+        ${renderLinks(data)}
       </div>
     </div>
   </div>
