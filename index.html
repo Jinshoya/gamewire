@@ -350,15 +350,15 @@
     }
   };
 
-  // YouTube, Twitch, Website
+// After — add null check safety (defensive fallback):
+try {
   tryPush(data.youtube, 'YouTube', '/images/links/youtube_link.png');
   tryPush(data.twitch, 'Twitch', '/images/links/twitch_link.png');
   tryPush(data.website, 'Website', '/images/links/web_link.png');
+} catch (e) {
+  console.warn(`🔧 Failed pushing links for ${data.title}:`, e);
+}
 
-  // ✅ Steam only if type is steam_sale and URL exists
-  if (data.type === 'steam_sale' && data.steam?.url) {
-    tryPush(data.steam, 'Steam', '/images/links/steam_link.png');
-  }
 
   // Additional custom links
   if (Array.isArray(data.links)) {
