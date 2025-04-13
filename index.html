@@ -442,21 +442,23 @@
 
       // If the event has started
       if (diff <= 0) {
-        el.innerHTML = `<div class="event_countdown"><span class="number">NOW LIVE</span></div>`;
+  if (elapsed >= 3600000) {
+    if (parent.parentElement.id !== 'past-events') {
+      document.getElementById('past-events').appendChild(parent);
+      parent.classList.add('event_past');
+    }
+    el.innerHTML = ''; // Hide countdown for old events
+  } else {
+    el.innerHTML = `<div class="event_countdown"><span class="number">NOW LIVE</span></div>`;
 
-        if (elapsed >= 3600000) {
-  if (parent.parentElement.id !== 'past-events') {
-    document.getElementById('past-events').appendChild(parent);
-    parent.classList.add('event_past');
+    if (parent.parentElement.id !== 'live-events') {
+      document.getElementById('live-events').appendChild(parent);
+    }
   }
-  el.innerHTML = ''; // ❌ remove countdown entirely
-}
-        } else if (parent.parentElement.id !== 'live-events') {
-          document.getElementById('live-events').appendChild(parent);
-        }
 
-        return;
-      }
+  return;
+}
+
 
       // Else: show countdown
       const totalSeconds = Math.floor(diff / 1000);
