@@ -611,61 +611,6 @@ if (diff <= 0) {
       });
     }
     
-    async function loadEvents() {
-  const res = await fetch('/events/index.json');
-  const files = await res.json();
-
-  const parsedEvents = [];
-
-  for (const file of files) {
-    const response = await fetch(`/events/${file}`);
-    const raw = await response.text();
-    const { attributes: data } = parseFrontmatter(raw);
-    data._filename = file;
-    parsedEvents.push(data);
-  }
-
-  // ✅ Sort events by the actual event date
-  parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  const now = new Date();
-
-  for (const data of parsedEvents) {
-    const file = data._filename;
-    const date = new Date(data.date);
-    const isPast = date < now;
-    const isSteam = data.type === 'steam_sale';
-    const slug = data.slug || file.replace('.md', '');
-
-    const html = renderYourHTML(data, slug, isSteam); // Replace with your rendering logic
-
-    const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
-    const container = document.getElementById(target);
-    if (container) container.insertAdjacentHTML("beforeend", html);
-  }
-
-  startCountdowns();
-  document.querySelectorAll('.reaction-bar').forEach(wrapper => {
-    const eventId = wrapper.getAttribute('data-event');
-    loadReactionsForEvent(wrapper, eventId);
-  });
-}
-
-      const res = await fetch('/events/index.json');
-      const files = await res.json();
-
-const events = [];
-
-for (const file of files) {
-  const response = await fetch(`/events/${file}`);
-  const raw = await response.text();
-  const { attributes: data } = parseFrontmatter(raw);
-  data._filename = file;
-  events.push(data);
-}
-
-// 🗂️ Sort all events by start date
-events.sort((a, b) => new Date(a.date) - new Date(b.date));
 async function loadEvents() {
   const res = await fetch('/events/index.json');
   const files = await res.json();
@@ -782,11 +727,13 @@ async function loadEvents() {
     }
     
     document.addEventListener("DOMContentLoaded", async () => {
-  await loadEvents();});
+  await loadEvents();
   updateNowPlayingBar();
   startCountdowns(); // ✅ make sure this is here
   document.getElementById("eventLoadingSkeletons")?.remove();
 });
+
+
 
     
     setInterval(updateNowPlayingBar, 3000);
