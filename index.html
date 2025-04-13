@@ -350,21 +350,17 @@
     }
   };
 
+  // YouTube, Twitch, Website
   tryPush(data.youtube, 'YouTube', '/images/links/youtube_link.png');
   tryPush(data.twitch, 'Twitch', '/images/links/twitch_link.png');
   tryPush(data.website, 'Website', '/images/links/web_link.png');
-  tryPush(data.steam, 'Steam', '/images/links/steam_link.png');
 
-  // ✅ NEW: Check top-level 'link' field directly
-  if (data.link) {
-    console.log(`✅ Top-level link found: ${data.link}`);
-    links.push({
-      url: data.link,
-      icon: '/images/links/web_link.png',
-      label: 'Website'
-    });
+  // ✅ Steam only if type is steam_sale and URL exists
+  if (data.type === 'steam_sale' && data.steam?.url) {
+    tryPush(data.steam, 'Steam', '/images/links/steam_link.png');
   }
 
+  // Additional custom links
   if (Array.isArray(data.links)) {
     data.links.forEach((link, i) => {
       if (link.url) {
