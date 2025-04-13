@@ -20,20 +20,20 @@
     
     .content {
   width: 100%;
-  max-width: 960px;
+  max-width: 840px;
   margin: 100px auto;
   padding: 0 20px;
 }
 
-    
 .event_block {
   position: relative;
-  max-width: 960px;
+  max-width: 840px;
   margin: 160px auto 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
     
 .event_logo {
   position: absolute;
@@ -57,15 +57,16 @@
     
     .event_card {
   position: relative;
-  width: 960px;
+  width: 840px;
   height: 280px;
   border-radius: 20px;
   background-size: cover;
   background-position: center;
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-  padding-left: 300px; /* accounts for logo space visually */
+  padding-left: 300px; /* leave space for 255px logo + gap */
 }
+
     .event_card_overlay {
       position: absolute;
       inset: 0;
