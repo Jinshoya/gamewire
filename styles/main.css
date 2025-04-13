@@ -247,25 +247,39 @@ transparent
 }
 
 .reaction-bar button {
-  background: white;
-  color: black;
-  font-weight: 600;
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 0.95rem;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
+	background: #2a2a2a;
+	color: white;
+	border: none;
+	border-radius: 999px;
+	padding: 6px 10px;
+	font-size: 0.95rem;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+  }
+@keyframes reactPop {
+	0%   { transform: scale(1); }
+	50%  { transform: scale(1.25); }
+	100% { transform: scale(1); }
+  }
+  
 .reaction-bar button:hover,
 .reaction-bar button.reacted {
-  background: #f2c94c;
-}
-
+	background: #3a3a3a;
+	color: white;
+	box-shadow:
+	  inset 2px 2px 4px rgba(0, 0, 0, 0.6),
+	  inset -2px -2px 4px rgba(255, 255, 255, 0.05);
+	transform: translateY(1px);
+  }
+  .reaction-bar button img.reaction-icon {
+	width: 20px;
+	height: 20px;
+	object-fit: contain;
+	pointer-events: none;
+  }
 /* 🔗 Check it out */
 .event_links_block {
   background: #14142b;
