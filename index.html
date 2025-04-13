@@ -389,28 +389,30 @@
 
       const html = `
 <div class="event_block">
-  ${data.logo ? `<div class="event_logo"><img src="${data.logo}" alt="logo" /></div>` : ""}
   <div class="event_card" style="${backgroundStyle};">
-            <div class="event_content">
-              <div class="event_text">
-                <h2 class="event_title">${data.title}</h2>
-                <div class="event_time">${isSteam ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : date.toLocaleString()}</div>
-                <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div>
-                <div class="event_expectations">
-                  <div class="label">Your expectations</div>
-                  <div class="reaction-bar" data-event="${slug}">
-                    ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
-                  </div>
-                </div>
-              </div>
-              <div class="event_watch">
-                <a href="${data.links?.[0]?.url || '#'}" class="watch-button" target="_blank">
-                  Watch here <div class="play_icon">▶</div>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>`;
+    ${data.logo ? `<div class="event_logo"><img src="${data.logo}" alt="logo" /></div>` : ""}
+    <div class="event_content">
+      <h2 class="event_title">${data.title}</h2>
+      <div class="event_time">
+        ${isSteam
+          ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
+          : date.toLocaleString()}
+      </div>
+      <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div>
+
+      <div class="event_expectations">
+        <div class="label">Your expectations</div>
+        <div class="reaction-bar" data-event="${slug}">
+          ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+        </div>
+      </div>
+
+      <a href="${data.links?.[0]?.url || '#'}" class="watch-button" target="_blank">
+        Watch here <div class="play_icon">▶</div>
+      </a>
+    </div>
+  </div>
+</div>`;
 
       const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
       const container = document.getElementById(target);
