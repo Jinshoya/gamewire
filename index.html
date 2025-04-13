@@ -20,24 +20,25 @@
     
     .content {
       width: 1300px;
-      margin: 100px auto; /* gives room for logo overlap without hitting headers */
+      margin: 100px auto;
       padding: 0 20px;
     }
     
     .event_block {
       position: relative;
-      margin-bottom: 120px; /* more space to prevent overlap of sections */
+      width: 1300px;
+      margin: 160px auto 120px;
     }
     
     .event_logo {
       position: absolute;
       top: -80px;
-      left: -80px;
+      left: -100px;
       width: 329px;
       height: 329px;
       border-radius: 50%;
       overflow: hidden;
-      z-index: 2;
+      z-index: 3;
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
       background: #000;
     }
@@ -58,7 +59,7 @@
       background-position: center;
       overflow: hidden;
       box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      padding-left: 300px; /* space for big logo */
+      padding-left: 360px; /* spacing so content never overlaps logo */
     }
     
     .event_card_overlay {
@@ -75,9 +76,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 32px;
       height: 100%;
-      padding: 32px 40px 32px 0;
+      padding: 32px 40px;
+      gap: 32px;
     }
     
     .event_card_main {
@@ -99,6 +100,12 @@
       opacity: 0.85;
       margin: 0 0 20px;
       line-height: 1.4;
+    }
+    
+    .countdown {
+      font-size: 1rem;
+      opacity: 0.8;
+      margin-bottom: 16px;
     }
     
     .event_expectations .label {
@@ -142,6 +149,7 @@
     .event_card_action {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
     }
     
     .watch-button {
@@ -169,16 +177,23 @@
     }
     
     @media (max-width: 768px) {
-      .content {
+      .content,
+      .event_block,
+      .event_card {
         width: 100%;
-        padding: 0 12px;
+      }
+    
+      .event_logo {
+        position: static;
+        width: 220px;
+        height: 220px;
+        margin: -110px auto 20px;
       }
     
       .event_card {
-        flex-direction: column;
-        width: 100%;
+        padding-left: 24px;
+        padding-top: 140px;
         height: auto;
-        padding: 100px 20px 40px;
       }
     
       .event_card_content {
@@ -186,13 +201,6 @@
         align-items: center;
         text-align: center;
         padding: 32px 20px;
-      }
-    
-      .event_logo {
-        position: static;
-        width: 200px;
-        height: 200px;
-        margin: -100px auto 20px;
       }
     
       .event_card_action {
@@ -208,6 +216,7 @@
       }
     }
     </style>
+    
     
     
     
