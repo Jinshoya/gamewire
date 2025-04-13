@@ -335,39 +335,55 @@
     function renderLinks(data) {
   const links = [];
 
-  // Handle CMS object structure for each known source
-  if (data.youtube?.url) links.push({
-    url: data.youtube.url,
-    icon: data.youtube.icon || '/images/links/youtube_link.png',
-    label: 'YouTube'
-  });
+  // Add legacy "link" field
+  if (data.link) {
+    links.push({
+      url: data.link,
+      icon: '/images/links/web_link.png',
+      label: 'Official Site'
+    });
+  }
 
-  if (data.twitch?.url) links.push({
-    url: data.twitch.url,
-    icon: data.twitch.icon || '/images/links/twitch_link.png',
-    label: 'Twitch'
-  });
+  // Support CMS-style youtube/twitch/website/steam if ever used
+  if (data.youtube?.url) {
+    links.push({
+      url: data.youtube.url,
+      icon: data.youtube.icon || '/images/links/youtube_link.png',
+      label: 'YouTube'
+    });
+  }
 
-  if (data.website?.url) links.push({
-    url: data.website.url,
-    icon: data.website.icon || '/images/links/web_link.png',
-    label: 'Website'
-  });
+  if (data.twitch?.url) {
+    links.push({
+      url: data.twitch.url,
+      icon: data.twitch.icon || '/images/links/twitch_link.png',
+      label: 'Twitch'
+    });
+  }
 
-  if (data.steam?.url) links.push({
-    url: data.steam.url,
-    icon: data.steam.icon || '/images/links/steam_link.png',
-    label: 'Steam'
-  });
+  if (data.website?.url) {
+    links.push({
+      url: data.website.url,
+      icon: data.website.icon || '/images/links/web_link.png',
+      label: 'Website'
+    });
+  }
 
-  // Handle custom links
+  if (data.steam?.url) {
+    links.push({
+      url: data.steam.url,
+      icon: data.steam.icon || '/images/links/steam_link.png',
+      label: 'Steam'
+    });
+  }
+
   if (Array.isArray(data.links)) {
     links.push(...data.links);
   }
 
   return links.map(link => `
     <a href="${link.url}" target="_blank" title="${link.label || 'Watch'}">
-      <img src="${link.icon || '/icons/default.png'}" class="links_image" alt="${link.label || 'Watch'}" />
+      <img src="${link.icon || '/images/links/default.png'}" class="links_image" alt="${link.label || 'Watch'}" />
     </a>
   `).join('');
 }
