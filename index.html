@@ -1061,19 +1061,33 @@ if (skeleton) {
 }
 });
 function hideEmptySections() {
+  // NOW LIVE section
   const live = document.getElementById('live-events');
-  const header = document.querySelector('.events_upnext.now_live');
-
+  const liveHeader = document.querySelector('.events_upnext.now_live');
   const hasLiveEvent = live?.querySelector('.event_block.now_live');
 
   if (hasLiveEvent) {
     live.parentElement.style.display = '';
-    if (header) header.style.display = '';
+    if (liveHeader) liveHeader.style.display = '';
   } else {
     live.parentElement.style.display = 'none';
-    if (header) header.style.display = 'none';
+    if (liveHeader) liveHeader.style.display = 'none';
+  }
+
+  // STEAM SALE section
+  const steam = document.getElementById('steam-sale-event');
+  const steamHeader = document.querySelector('.events_upnext:not(.now_live)');
+  const hasSteamSale = steam?.querySelector('.event_block');
+
+  if (hasSteamSale) {
+    steam.parentElement.style.display = '';
+    if (steamHeader) steamHeader.style.display = '';
+  } else {
+    steam.parentElement.style.display = 'none';
+    if (steamHeader) steamHeader.style.display = 'none';
   }
 }
+
 
 
 
