@@ -147,13 +147,52 @@
     
     /* 👉 Expectations + Links as distant blocks */
     .event_expectations_wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-top: auto;
-      width: 100%;
-    }
-    
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  margin-top: auto;
+  width: 100%;
+}
+/* 👇 Absolute "Check it out" floater in bottom-right */
+.event_links_floater {
+  position: absolute;
+  bottom: 24px;
+  right: 36px;
+  background: #14142b;
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  min-width: 150px;
+}
+
+.event_links_floater .label {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  color: white;
+  text-align: right;
+}
+
+.event_links_floater .event_links {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.event_links_floater .event_links img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+}
+
+.event_links_floater .event_links img:hover {
+  transform: scale(1.1);
+}    
     /* 👈 Your expectations */
     .event_reacts {
       background: #14142b;
@@ -619,13 +658,14 @@ const html = `
               ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
             </div>
           </div>
+        </div>
 
-          <div class="event_links_block">
-            <div class="label">Check it out</div>
-            <div class="event_links">
-              ${renderLinks(data)}
-            </div>
-          </div>
+      </div>
+
+      <div class="event_links_floater">
+        <div class="label">Check it out</div>
+        <div class="event_links">
+          ${renderLinks(data)}
         </div>
       </div>
     </div>
