@@ -459,7 +459,6 @@ function renderLinks(data) {
 
     
     async function react(button, emoji) {
-      window.react = react; 
       const wrapper = button.closest('.reaction-bar');
       if (!wrapper) return console.error('Reaction wrapper not found');
       const eventId = wrapper.getAttribute('data-event');
@@ -504,7 +503,7 @@ function renderLinks(data) {
     
       await refreshReactionCounts(eventId, wrapper);
     }
-    
+    window.react = react;  
     async function refreshReactionCounts(eventId, wrapper) {
       window.refreshReactionCounts = refreshReactionCounts;
       const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
