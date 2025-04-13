@@ -18,7 +18,40 @@
       margin: 0;
       padding: 0;
     }
-  
+    .reaction-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #14142b;
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-top: 6px;
+}
+
+.reaction-row .reaction-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.reaction-row .event_links {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.reaction-row .event_links img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.reaction-row .event_links img:hover {
+  transform: scale(1.1);
+}
+
     .event_past {
       filter: grayscale(100%) brightness(0.7);
       opacity: 0.85;
@@ -81,15 +114,25 @@
     }
   
     .event_card_content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      height: 100%;
-      padding: 24px 36px;
-      gap: 28px;
-    }
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  height: 100%;
+  padding: 24px 36px;
+  gap: 28px;
+}
+
+/* ✅ Fix vertical alignment of action links */
+.event_card_action {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  margin-top: 36px; /* pushes it down closer to reactions */
+}
+
   
     .event_card_main {
       flex: 1;
@@ -563,13 +606,16 @@ function renderLinks(data) {
        ${data.end ? `data-end-event-date="${data.end}"` : ''}>
   </div>
 
-  <div class="event_expectations">
-    <div class="label">Your expectations</div>
-    <div class="reaction-bar" data-event="${slug}">
+<div class="event_expectations">
+  <div class="label">Your expectations</div>
+  <div class="reaction-row" data-event="${slug}">
+    <div class="reaction-bar">
       ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
     </div>
+    ${renderLinks(data)}
   </div>
 </div>
+
 
 <div class="event_card_action">
   ${renderLinks(data)}
