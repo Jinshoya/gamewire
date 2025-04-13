@@ -608,21 +608,20 @@ if (diff <= 0) {
     
     async function loadEvents() {
       const res = await fetch('/events/index.json');
-const files = await res.json();
+      const files = await res.json();
 
 // 🧠 Load and parse all events first
 const events = [];
-for (const data of events) {
+for (const data of parsedEvents) {
   const file = data._filename;
-  const response = await fetch(`/events/${file}`);
-  const raw = await response.text();
-  const { attributes: data } = parseFrontmatter(raw);
-  data._filename = file; // store filename for later
-  events.push(data);
+  const date = new Date(data.date);
+  const isPast = date < new Date();
+  const isSteam = data.type === 'steam_sale';
+  const slug = data.slug || file.replace('.md', '');
+  const html = `...`; // keep your existing template generation logic
+  // then insert HTML as you already do
 }
 
-// 🗂️ Sort events by start date
-events.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const now = new Date();
 
