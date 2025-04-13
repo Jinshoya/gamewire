@@ -139,16 +139,16 @@
 
 .events_upnext,
 .events_upcoming {
-  font-size: 1.4rem;
+  max-width: 840px;
+  margin: 100px auto 20px;
+  padding: 0 20px;
+  font-size: 1.2rem;
   font-weight: 600;
-  margin: 60px 0 20px;
-  padding-left: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: white;
-  border-left: 4px solid #ffffff22;
-  background: linear-gradient(to right, #ffffff10, transparent);
+  display: block;
 }
+
 
 .events_upnext.now_live {
   color: #ff5e5e;
@@ -728,18 +728,7 @@ if (diff <= 0) {
     loadReactionsForEvent(wrapper, eventId);
   });
 }
-function hideEmptySections() {
-  const live = document.getElementById('live-events');
-  const header = document.querySelector('.events_upnext.now_live');
 
-  if (live && live.children.length === 0) {
-    live.parentElement.style.display = 'none';   // hides event group
-    if (header) header.style.display = 'none';   // hides "NOW LIVE" title
-  } else {
-    live.parentElement.style.display = '';
-    if (header) header.style.display = '';
-  }
-}
 
     function updateNowPlayingBar() {
       const live = document.querySelector("#live-events .event_headliner");
@@ -761,7 +750,18 @@ function hideEmptySections() {
   startCountdowns();
   document.getElementById("eventLoadingSkeletons")?.remove();
 });
+function hideEmptySections() {
+  const live = document.getElementById('live-events');
+  const header = document.querySelector('.events_upnext.now_live');
 
+  if (live && live.children.length === 0) {
+    live.parentElement.style.display = 'none';   // hides event group
+    if (header) header.style.display = 'none';   // hides "NOW LIVE" title
+  } else {
+    live.parentElement.style.display = '';
+    if (header) header.style.display = '';
+  }
+}
     
     setInterval(updateNowPlayingBar, 3000);
     </script>
