@@ -347,8 +347,6 @@
         icon: entry.icon || icon,
         label
       });
-    } else {
-      console.log(`❌ ${label} link missing or broken`);
     }
   };
 
@@ -357,31 +355,42 @@
   tryPush(data.website, 'Website', '/images/links/web_link.png');
   tryPush(data.steam, 'Steam', '/images/links/steam_link.png');
 
+  // ✅ NEW: Check top-level 'link' field directly
+  if (data.link) {
+    console.log(`✅ Top-level link found: ${data.link}`);
+    links.push({
+      url: data.link,
+      icon: '/images/links/web_link.png',
+      label: 'Website'
+    });
+  }
+
   if (Array.isArray(data.links)) {
     data.links.forEach((link, i) => {
       if (link.url) {
-        console.log(`✅ Custom Link [${i}]`, link.url);
+        console.log(`✅ Custom Link [${i}]:`, link.url);
         links.push({
           url: link.url,
           icon: link.icon || '/images/links/web_link.png',
           label: link.label || `Link ${i + 1}`
         });
-      } else {
-        console.log(`❌ Custom Link [${i}] is missing a URL`);
       }
     });
   }
 
   if (links.length === 0) {
     console.warn(`🚫 No valid links found for ${data.title}`);
-    return `<div class="event_links">NO LINKS</div>`;
+    return '';
   }
 
-  return links.map(link => `
-  <a href="${link.url}" target="_blank" title="${link.label}">
-    <img src="${link.icon}" class="links_image" alt="${link.label}" />
-  </a>
-`).join('');
+  return `
+    <div class="event_links">
+      ${links.map(link => `
+        <a href="${link.url}" target="_blank" title="${link.label}">
+          <img src="${link.icon}" class="links_image" alt="${link.label}" />
+        </a>
+      `).join('')}
+    </div>`;
 }
 
 
