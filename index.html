@@ -5,118 +5,139 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.8">
   <title>Event schedule - ggPause.com</title>
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="./styles/bootstrap.css" />
   <link rel="stylesheet" href="./styles/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    #past-events .event_logo img {
-  filter: grayscale(100%);
-  opacity: 0.6;
-}
-    .event_logo:hover img { transform: scale(1.1); }
-    .section-tabs { display: flex; justify-content: center; gap: 10px; margin: 10px auto; max-width: 960px; padding-bottom: 5px; }
-    .section-tabs button {
-      background-color: #f0f0f0; border: none; border-radius: 8px; padding: 6px 14px;
-      font-weight: bold; cursor: pointer; font-size: 0.9rem; transition: background-color 0.2s ease;
+    body {
+      background: linear-gradient(to bottom, #051937, #342e71);
+      font-family: 'Inter', sans-serif;
+      color: white;
+      margin: 0;
+      padding: 40px 20px;
     }
-    .section-tabs button:hover { background-color: #e2e2e2; }
-    @media (min-width: 768px) { .section-tabs { display: none; } }
+
+    .event_headliner {
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 24px;
+      padding: 30px;
+      margin: 40px auto;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      max-width: 1000px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .event_logo img {
+      max-width: 160px;
+      height: auto;
+      border-radius: 50%;
+    }
+
+    .event_info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .event_upc_title {
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .event_date {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .emoji-reactions {
+      background: #181c3a;
+      border-radius: 16px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 1rem;
+      font-weight: 500;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+    }
+
+    .reaction-bar button {
+      background: #fff;
+      color: #111;
+      border-radius: 999px;
+      border: none;
+      padding: 6px 12px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .reaction-bar button.reacted {
+      background: #f2c94c;
+      color: #000;
+    }
+
+    .watch-button {
+      background: #1f2251;
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 12px 24px;
+      font-weight: bold;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .watch-button:hover {
+      background: #2b2e67;
+    }
+
     #nowPlayingBar {
-  position: fixed;   /* Fix it to the top of the page */
-  top: 0;            /* Align it to the top */
-  left: 0;
-  right: 0;
-  background: #ff4d4d; /* Customize the background color */
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  padding: 6px 12px;
-  font-size: 1rem;  /* Adjust size for visibility */
-  z-index: 1000;    /* Ensure it stays above other content */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Add shadow to make it pop */
-  display: none;    /* Start with it hidden */
-}
-    .skeleton-card {
-      width: 100%; max-width: 920px; height: 100px; margin: 10px auto;
-      background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
-      background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px;
-    }
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ff4d4d;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      padding: 6px 12px;
+      font-size: 1rem;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: none;
     }
 
-    .event_logo {
-  position: relative;
-  overflow: hidden;
-  border-radius: 8px;
-}
+    .content {
+      padding-top: 60px;
+    }
 
-.event_logo img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
+    @media (max-width: 768px) {
+      .event_headliner {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px;
+      }
 
-.reaction-bar {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  display: flex;
-  gap: 6px;
-  background: #1a1a1a;
-  padding: 6px 10px;
-  border-radius: 16px;
-  z-index: 10;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
-}
+      .event_logo img {
+        margin: 0 auto;
+      }
 
-.reaction-bar button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  border: none;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: white;
-  background: #111;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.reaction-bar button .emoji {
-  font-size: 1.05rem;
-  line-height: 1;
-}
-
-.reaction-bar button .count {
-  font-size: 0.85rem;
-  line-height: 1;
-  font-weight: 600;
-}
-
-/* Selected state looks like your yellow pill */
-.reaction-bar button.reacted {
-  background: #f2c94c;
-  color: #000;
-}
-.reaction-bar button.reacted {
-  animation: pop 0.25s ease;
-}
-
-@keyframes pop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-#past-events .reaction-bar {
-  pointer-events: none;
-  opacity: 0.5;
-  filter: grayscale(100%);
-}
+      .watch-button {
+        justify-content: center;
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
