@@ -611,14 +611,12 @@ if (diff <= 0) {
       });
     }
     
-
 async function loadEvents() {
   const res = await fetch('/events/index.json');
   const files = await res.json();
 
   const parsedEvents = [];
 
-  // Parse and store all events with their dates
   for (const file of files) {
     const response = await fetch(`/events/${file}`);
     const raw = await response.text();
@@ -627,7 +625,7 @@ async function loadEvents() {
     parsedEvents.push(data);
   }
 
-  // ✅ Sort by event date
+  // ✅ Sort events by the actual event date
   parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const now = new Date();
@@ -639,7 +637,85 @@ async function loadEvents() {
     const isSteam = data.type === 'steam_sale';
     const slug = data.slug || file.replace('.md', '');
 
-    const html = `
+    const html = renderYourHTML(data, slug, isSteam); // Replace with your rendering logic
+
+    const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
+    const container = document.getElementById(target);
+    if (container) container.insertAdjacentHTML("beforeend", html);
+  }
+
+  startCountdowns();
+  document.querySelectorAll('.reaction-bar').forEach(wrapper => {
+    const eventId = wrapper.getAttribute('data-event');
+    loadReactionsForEvent(wrapper, eventId);
+  });
+}
+
+      const res = await fetch('/events/index.json');
+      const files = await res.json();
+
+const events = [];
+
+for (const file of files) {
+  const response = await fetch(`/events/${file}`);
+  const raw = await response.text();
+  const { attributes: data } = parseFrontmatter(raw);
+  data._filename = file;
+  events.push(data);
+}
+
+// 🗂️ Sort all events by start date
+events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+for (const data of events) {
+  const file = data._filename;
+  // ⬇️ move the rest of your logic here
+}
+
+// 🗂️ Sort events by start date
+events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const now = new Date();
+
+    for (const file of files) {
+      const response = await fetch(`/events/${file}`);
+      const raw = await response.text();
+      const { attributes: data } = parseFrontmatter(raw);
+      console.log("renderLinks called for", data.title);
+
+      const date = new Date(data.date);
+      const isPast = date < now;
+      const isSteam = data.type === 'steam_sale';
+      const slug = data.slug || file.replace('.md', '');
+
+      const backgroundStyle = data.image ? `background-image: url('${data.image}');` : 'background-color: #2e2e57;';
+
+      function formatTimeShort(date) {
+  const d = new Date(date);
+  const h = d.getHours();
+  const m = d.getMinutes().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'pm' : 'am';
+  const hour = ((h + 11) % 12 + 1);
+  return `${hour}:${m} <span class="muted">${ampm}</span>`;
+}
+
+function formatDateShort(date) {
+  const d = new Date(date);
+  const month = d.toLocaleString('default', { month: 'short' });
+  return `${month} ${d.getDate()}`;
+}
+
+function formatSingle(date) {
+  return `${formatDateShort(date)} - ${formatTimeShort(date)}`;
+}
+
+function formatRange(start, end) {
+  return `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
+}
+
+
+
+const html = `
 <div class="event_block ${data.status === 'live' ? 'now_live' : ''}">
   <div class="event_logo">
     <img src="${data.logo}" alt="logo" />
@@ -650,9 +726,9 @@ async function loadEvents() {
 
     <div class="event_card_content">
       <div class="event_card_main">
-        <div class="event_title_wrapper hover-scroll">
-          <h2 class="event_title">${data.title}</h2>
-        </div>
+        <div class="event_title_wrapper">
+  <h2 class="event_title">${data.title}</h2>
+</div>
 
         <p class="event_date">
           ${
@@ -685,35 +761,34 @@ async function loadEvents() {
     </div>
   </div>
 </div>
-    `;
+`;
 
-    const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
-    const container = document.getElementById(target);
-    if (container) container.insertAdjacentHTML("beforeend", html);
 
-    // Title scroll if too long
-    setTimeout(() => {
-      const titles = container.querySelectorAll('.event_title');
-      titles.forEach(title => {
-        const wrapper = title.parentElement;
-        const overflow = title.scrollWidth - wrapper.clientWidth;
-        if (overflow > 10) {
-          title.classList.add('scrolling');
-          wrapper.classList.add('hover-scroll');
-          title.style.setProperty('--scroll-distance', `-${overflow}px`);
-        }
-      });
-    }, 100);
-  }
 
-  // Start timers and load reactions
-  startCountdowns();
-  document.querySelectorAll('.reaction-bar').forEach(wrapper => {
-    const eventId = wrapper.getAttribute('data-event');
-    loadReactionsForEvent(wrapper, eventId);
-  });
+      const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
+      const container = document.getElementById(target);
+      if (container) container.insertAdjacentHTML("beforeend", html);
+      setTimeout(() => {
+  const titles = container.querySelectorAll('.event_title');
+  titles.forEach(title => {
+    const wrapper = title.parentElement;
+    const overflow = title.scrollWidth - wrapper.clientWidth;
+    if (overflow > 10) {
+  title.classList.add('scrolling');
+  title.parentElement.classList.add('hover-scroll'); // wrapper gets class
+  title.style.setProperty('--scroll-distance', `-${overflow}px`);
 }
+  });
+}, 100);
+    }
 
+    startCountdowns();
+
+    document.querySelectorAll('.reaction-bar').forEach(wrapper => {
+      const eventId = wrapper.getAttribute('data-event');
+      loadReactionsForEvent(wrapper, eventId);
+    });
+  }
     function updateNowPlayingBar() {
       const live = document.querySelector("#live-events .event_headliner");
       const bar = document.getElementById("nowPlayingBar");
@@ -733,8 +808,6 @@ async function loadEvents() {
   startCountdowns(); // ✅ make sure this is here
   document.getElementById("eventLoadingSkeletons")?.remove();
 });
-
-
 
     
     setInterval(updateNowPlayingBar, 3000);
