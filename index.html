@@ -753,9 +753,10 @@ function hideEmptySections() {
   const live = document.getElementById('live-events');
   const header = document.querySelector('.events_upnext.now_live');
 
-  const hasLiveEvent = live && live.querySelectorAll('.event_block').length > 0;
+  const blocks = live?.querySelectorAll('.event_block') || [];
+  const hasVisibleLive = blocks.length > 0;
 
-  if (hasLiveEvent) {
+  if (hasVisibleLive) {
     live.parentElement.style.display = '';
     if (header) header.style.display = '';
   } else {
@@ -763,6 +764,7 @@ function hideEmptySections() {
     if (header) header.style.display = 'none';
   }
 }
+
 
 
     
