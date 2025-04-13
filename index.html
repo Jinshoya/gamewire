@@ -568,15 +568,13 @@
             ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
           </div>
         </div>
+
+        ${renderLinks(data)} <!-- 🚀 Add links directly below main content -->
       </div>
-
-<div class="event_card_action">
-  ${renderLinks(data)}
-</div>
-
     </div>
   </div>
 </div>
+
 `;
 
       const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
