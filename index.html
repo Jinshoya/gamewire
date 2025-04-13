@@ -636,6 +636,45 @@ function formatRange(start, end) {
 async function loadEvents() {
   const res = await fetch('/events/index.json');
   const files = await res.json();
+  const now = new Date();
+  const parsedEvents = [];
+
+  for (const file of files) {
+    const response = await fetch(`/events/${file}`);
+    const raw = await response.text();
+    const { attributes: data } = parseFrontmatter(raw);
+    const date = new Date(data.date);
+    const isSteam = data.type === 'steam_sale';
+    const slug = data.slug || file.replace('.md', '');
+    const html = renderEventHTML(data, date, isSteam, slug);
+
+    parsedEvents.push({ data, date, isSteam, slug, html });
+  }
+
+  // ✅ Sort by event start date
+  parsedEvents.sort((a, b) => new Date(a.data.date) - new Date(b.data.date));
+
+  // ✅ Clear containers
+  ['past-events', 'steam-sale-event', 'live-events', 'upcoming-events'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '';
+  });
+
+  // ✅ Insert into DOM
+  for (const event of parsedEvents) {
+    const target = event.isSteam ? 'steam-sale-event'
+                  : new Date(event.data.date) < now ? 'past-events'
+                  : 'upcoming-events';
+
+    const container = document.getElementById(target);
+    if (container) container.insertAdjacentHTML('beforeend', event.html);
+  }
+
+  startCountdowns();
+}
+
+  const res = await fetch('/events/index.json');
+  const files = await res.json();
 
   const parsedEvents = [];
 
@@ -663,7 +702,8 @@ async function loadEvents() {
     const isSteam = data.type === 'steam_sale';
     const slug = data.slug || file.replace('.md', '');
 
-    const html = `
+    function renderEventHTML(data, date, isSteam, slug) {
+  return `
 <div class="event_block ${data.status === 'live' ? 'now_live' : ''}">
   <div class="event_logo">
     <img src="${data.logo}" alt="logo" />
@@ -674,9 +714,9 @@ async function loadEvents() {
 
     <div class="event_card_content">
       <div class="event_card_main">
-        <div class="event_title_wrapper hover-scroll">
-          <h2 class="event_title">${data.title}</h2>
-        </div>
+        <h2 class="event_title_wrapper">
+          <span class="event_title">${data.title}</span>
+        </h2>
 
         <p class="event_date">
           ${
@@ -709,7 +749,9 @@ async function loadEvents() {
     </div>
   </div>
 </div>
-    `;
+`;
+}
+
 
     const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
     const container = document.getElementById(target);
