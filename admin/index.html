@@ -14,18 +14,23 @@
 
     <script>
       window.CMS_MANUAL_INIT = true;
-    
+
       window.addEventListener('load', function () {
         if (window.CMS) {
           const h = window.h; // hyperscript (from Netlify CMS preview)
-    
+
           const EventPreview = ({ entry }) => {
             const data = entry.getIn(['data']).toJS();
-    
+
             return h("div", { style: { background: "#121212", color: "white", padding: "20px", borderRadius: "10px", fontFamily: "sans-serif" } }, [
               h("h2", {}, data.title || "Untitled Event"),
               h("p", {}, `Date: ${data.date || "TBD"}`),
               data.end ? h("p", {}, `Ends: ${data.end}`) : null,
+              data.logo ? h("img", {
+                src: data.logo,
+                alt: `${data.title} logo`,
+                style: { width: "72px", height: "72px", borderRadius: "8px", background: "#fff1", padding: "6px", marginBottom: "10px" }
+              }) : null,
               h("img", {
                 src: data.image || "",
                 alt: data.title || "",
@@ -40,12 +45,11 @@
               ))
             ]);
           };
-    
+
           CMS.registerPreviewTemplate("events", EventPreview);
           CMS.init();
         }
       });
     </script>
-    
   </body>
 </html>
