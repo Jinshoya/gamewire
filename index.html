@@ -24,7 +24,44 @@
   margin: 100px auto;
   padding: 0 20px;
 }
+.event_countdown {
+  margin-top: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
+.event_countdown span.number {
+  color: white;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.event_countdown span.unit {
+  color: #aaa;
+  margin-left: 2px;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.event_links {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.event_links img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+}
+
+.event_links img:hover {
+  transform: scale(1.1);
+}
 .event_block {
   position: relative;
   max-width: 840px;
@@ -395,7 +432,15 @@
       const days = Math.floor(totalSeconds / 86400);
       const hours = Math.floor((totalSeconds % 86400) / 3600);
       const mins = Math.floor((totalSeconds % 3600) / 60);
-      el.textContent = `${days ? days + 'd ' : ''}${hours}h ${mins}m`;
+      el.innerHTML = `
+  <div class="event_countdown">
+    Starting in
+    <span class="number">${days}</span><span class="unit">d</span>
+    <span class="number">${hours}</span><span class="unit">h</span>
+    <span class="number">${mins}</span><span class="unit">m</span>
+    <span class="number">${Math.floor((totalSeconds % 60))}</span><span class="unit">s</span>
+  </div>`;
+
     });
   }, 1000);
 }
@@ -443,6 +488,7 @@
         <p class="event_date">${isSteam
           ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
           : date.toLocaleString()}</p>
+        <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}></div>
 
         <div class="event_expectations">
           <div class="label">Your expectations</div>
@@ -453,9 +499,7 @@
       </div>
 
       <div class="event_card_action">
-        <a class="watch-button" href="${data.links?.[0]?.url || '#'}" target="_blank">
-          Watch here <span class="play_icon">▶</span>
-        </a>
+        <div class="event_links">${renderLinks(data)}</div>
       </div>
     </div>
   </div>
