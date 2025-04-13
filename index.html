@@ -347,10 +347,14 @@
       .event_block,
       .event_card {
         width: 92vw;
-    max-width: 100%;
     margin: 0 auto;
+    padding-top: 20px !important; /* 🔽 lower from original 140px */
+    padding-left: 20px !important;
   }
-    
+  .event_card_main {
+    width: 100%;
+    padding: 0;
+  }
       .event_logo {
         position: static;
         width: 200px;
@@ -368,7 +372,8 @@
       .event_card_content {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        padding: 0;
+        gap: 12px;
       }
     
       .event_expectations_wrapper {
@@ -376,7 +381,14 @@
         align-items: flex-start;
         gap: 12px;
       }
-    
+      .event_card_main {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .event_title_wrapper {
+    margin-top: 0;
+  }
       .event_links_block {
         align-items: flex-start;
         justify-content: flex-start;
@@ -408,7 +420,14 @@
   background-size: 400% 100%;
   animation: shimmer 2s infinite;
 }
-
+@media (max-width: 768px) {
+  .event_block,
+  .event_card,
+  .skeleton-card {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
 @keyframes shimmer {
   0% {
     background-position: -400px 0;
@@ -511,9 +530,8 @@
 }
 
 .nav-cta {
-  display: flex;
-  justify-content: flex-end;
-  grid-column: 3;
+  z-index: 3;
+  position: relative;
 }
 
 .nav-button {
@@ -579,7 +597,18 @@
   .nav-menu.show {
     display: flex;
   }
-
+  @media (max-width: 768px) {
+  .nav-menu.show {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    background: rgba(20, 20, 40, 0.95);
+    padding: 20px;
+    border-radius: 0 0 12px 12px;
+  }
+}
   /* Hide event logos on mobile */
   .event_logo {
     display: none !important;
