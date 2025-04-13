@@ -139,16 +139,16 @@
 
 .events_upnext,
 .events_upcoming {
-  max-width: 840px;
-  margin: 100px auto 20px;
-  padding: 0 20px;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 600;
+  margin: 60px 0 20px;
+  padding-left: 10px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
   color: white;
-  display: block;
+  border-left: 4px solid #ffffff22;
+  background: linear-gradient(to right, #ffffff10, transparent);
 }
-
 
 .events_upnext.now_live {
   color: #ff5e5e;
@@ -644,6 +644,7 @@ if (diff <= 0) {
   for (const data of parsedEvents) {
     const date = new Date(data.date);
     const isPast = date < now;
+    const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : 'upcoming-events';
     const isSteam = data.type === 'steam_sale';
     const slug = data.slug || data._filename.replace('.md', '');
 
@@ -729,7 +730,6 @@ if (diff <= 0) {
   });
 }
 
-
     function updateNowPlayingBar() {
       const live = document.querySelector("#live-events .event_headliner");
       const bar = document.getElementById("nowPlayingBar");
@@ -762,6 +762,7 @@ function hideEmptySections() {
     if (header) header.style.display = '';
   }
 }
+
     
     setInterval(updateNowPlayingBar, 3000);
     </script>
