@@ -577,8 +577,11 @@ if (diff <= 0) {
 
     if (parent.parentElement.id !== 'live-events') {
   document.getElementById('live-events').appendChild(parent);
-  hideEmptySections(); // ✅ Move it here so "NOW LIVE" title shows up
+
+  // ⏱ Fix timing issue with a slight delay
+  setTimeout(() => hideEmptySections(), 10);
 }
+
 
 
     parent.classList.add('now_live');        // 🔴 Glow on live
