@@ -202,7 +202,7 @@ function renderLinks(data) {
       const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
       const selected = localStorage.getItem(`reaction_${eventId}`);
       wrapper.querySelectorAll('button').forEach(btn => {
-        const emoji = btn.textContent.trim().split(' ')[0];
+        const emoji = btn.getAttribute('data-emoji');
         const found = data.find(r => r.emoji === emoji);
         btn.querySelector('span').textContent = found?.count ?? 0;
         btn.classList.toggle('reacted', emoji === selected);
@@ -374,13 +374,16 @@ const html = `
           <div class="label">Your expectations</div>
           <div class="reaction-bar" data-event="${slug}">
             ${[
-  { emoji: '👍', icon: '/images/reactions/thumbs.png' },
-  { emoji: '😊', icon: '/images/reactions/smile.png' },
-  { emoji: '🤡', icon: 'https://cdn.7tv.app/emote/01EZPNC1NG00077NX500A43YFM/1x.avif' },
-  { emoji: '😔', icon: 'https://cdn.7tv.app/emote/01F6JYT7HR000CE64F7FH369B6/1x.avif' }
+  { emoji: '🔥', icon: 'https://cdn.7tv.app/emote/01JDBDSNMQCZ7Z89PRZ712RM5N/4x.avif' },
+  { emoji: '😮', icon: 'https://cdn.7tv.app/emote/01G8TM6XNG000836WX1T1D503Y/3x.avif' },
+  { emoji: '😱', icon: 'https://cdn.7tv.app/emote/01GT61CD6R000DY5BPCJX9D3EB/3x.avif' },
+  { emoji: '😴', icon: 'https://cdn.7tv.app/emote/01FA5S9KGR0003RPW78DX3QB0Z/3x.avif' },
+  { emoji: '🤡', icon: 'https://cdn.7tv.app/emote/01HMBMJPV0000D32KQCYBK4S1D/4x.avif' },
+  { emoji: '🥶', icon: 'https://cdn.7tv.app/emote/01FZ6223S8000B4AWRZNMVN918/3x.avif' },
+  { emoji: '😂', icon: 'https://cdn.7tv.app/emote/01F9KXJ9AG00005C1KM5Y0PY1D/4x.avif' }
 ].map(r => `
-  <button onclick="react(this, '${r.emoji}')">
-    <img src="${r.icon}" alt="${r.emoji}" class="reaction-icon" />
+  <button onclick="react(this, '${r.emoji}')" data-emoji="${r.emoji}">
+    <img src="${r.icon}" class="reaction-icon" alt="${r.emoji}" />
     <span>0</span>
   </button>
 `).join('')}
