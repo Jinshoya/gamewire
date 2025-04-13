@@ -610,7 +610,6 @@ if (diff <= 0) {
   const res = await fetch('/events/index.json');
   const files = await res.json();
   const now = new Date();
-
   const parsedEvents = [];
 
   for (const file of files) {
@@ -621,7 +620,7 @@ if (diff <= 0) {
     parsedEvents.push(data);
   }
 
-  // 🔁 Sort by event date
+  // 🔁 Sort by scheduled event date
   parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   for (const data of parsedEvents) {
@@ -676,23 +675,27 @@ if (diff <= 0) {
     const container = document.getElementById(target);
     if (container) container.insertAdjacentHTML("beforeend", html);
 
-    // 🌟 Enable scrolling title if overflow
+    // 👀 Enable scrolling title if too long
     setTimeout(() => {
-      const titles = container.querySelectorAll('.event_title');
-      titles.forEach(title => {
-        const wrapper = title.parentElement;
-        const overflow = title.scrollWidth - wrapper.clientWidth;
-        if (overflow > 10) {
-          title.classList.add('scrolling');
-          title.parentElement.classList.add('hover-scroll');
-          title.style.setProperty('--scroll-distance', `-${overflow}px`);
-        }
-      });
+      const title = container.querySelector('.event_title');
+      const wrapper = container.querySelector('.event_title_wrapper');
+      if (title && wrapper && title.scrollWidth > wrapper.clientWidth) {
+        title.classList.add('scrolling');
+        title.style.setProperty('--scroll-distance', `-${title.scrollWidth - wrapper.clientWidth}px`);
+      }
     }, 100);
   }
+
+  // ⏱ Enable countdowns
+  startCountdowns();
+
+  // 🔄 Load emoji counts
+  document.querySelectorAll('.reaction-bar').forEach(wrapper => {
+    const eventId = wrapper.getAttribute('data-event');
+    loadReactionsForEvent(wrapper, eventId);
+  });
 }
 
-  const res = await fetch('/events/index.json');
   const files = await res.json();
   const now = new Date();
 
@@ -766,7 +769,6 @@ if (diff <= 0) {
   }
 }
 
-      const res = await fetch('/events/index.json');
       const files = await res.json();
 
 // 🧠 Load and parse all events first
