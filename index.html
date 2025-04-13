@@ -335,19 +335,56 @@
     }
     
     function renderLinks(data) {
+  console.log("🧠 renderLinks CALLED for:", data.title);
+
   const links = [];
 
-  if (data.youtube?.url) links.push(data.youtube);
-  if (data.twitch?.url) links.push(data.twitch);
-  if (data.website?.url) links.push(data.website);
-  if (data.steam?.url) links.push(data.steam);
-  if (Array.isArray(data.links)) links.push(...data.links);
+  const tryPush = (entry, label, icon) => {
+    if (entry?.url) {
+      console.log(`✅ ${label} LINK FOUND:`, entry.url);
+      links.push({
+        url: entry.url,
+        icon: entry.icon || icon,
+        label
+      });
+    } else {
+      console.log(`❌ ${label} link missing or broken`);
+    }
+  };
 
-  return links.map(link => `
-    <a href="${link.url}" target="_blank">
-      <img src="${link.icon}" class="links_image" alt="${link.label || 'Watch'}" />
-    </a>
-  `).join('');
+  tryPush(data.youtube, 'YouTube', '/images/links/youtube_link.png');
+  tryPush(data.twitch, 'Twitch', '/images/links/twitch_link.png');
+  tryPush(data.website, 'Website', '/images/links/web_link.png');
+  tryPush(data.steam, 'Steam', '/images/links/steam_link.png');
+
+  if (Array.isArray(data.links)) {
+    data.links.forEach((link, i) => {
+      if (link.url) {
+        console.log(`✅ Custom Link [${i}]`, link.url);
+        links.push({
+          url: link.url,
+          icon: link.icon || '/images/links/web_link.png',
+          label: link.label || `Link ${i + 1}`
+        });
+      } else {
+        console.log(`❌ Custom Link [${i}] is missing a URL`);
+      }
+    });
+  }
+
+  if (links.length === 0) {
+    console.warn(`🚫 No valid links found for ${data.title}`);
+    return `<div class="event_links">NO LINKS</div>`;
+  }
+
+  return `
+    <div class="event_links">
+      ${links.map(link => `
+        <a href="${link.url}" target="_blank" title="${link.label}">
+          <img src="${link.icon}" class="links_image" alt="${link.label}" />
+        </a>
+      `).join('')}
+    </div>`;
 }
 
 
