@@ -550,29 +550,31 @@ function renderLinks(data) {
     <div class="event_card_overlay"></div>
 
     <div class="event_card_content">
-      <div class="event_card_main">
-        <h2 class="event_title">${data.title}</h2>
-        <p class="event_date">
-          ${isSteam
-            ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
-            : date.toLocaleString()}
-        </p>
+<div class="event_card_main">
+  <h2 class="event_title">${data.title}</h2>
+  <p class="event_date">
+    ${isSteam
+      ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
+      : date.toLocaleString()}
+  </p>
 
-        <div class="countdown"
-             data-start-event-date="${data.date}"
-             ${data.end ? `data-end-event-date="${data.end}"` : ''}>
-        </div>
+  <div class="countdown"
+       data-start-event-date="${data.date}"
+       ${data.end ? `data-end-event-date="${data.end}"` : ''}>
+  </div>
 
-        <div class="event_expectations">
-          <div class="label">Your expectations</div>
-          <div class="reaction-bar" data-event="${slug}">
-            ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
-          </div>
-        </div>
+  <div class="event_expectations">
+    <div class="label">Your expectations</div>
+    <div class="reaction-bar" data-event="${slug}">
+      ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+    </div>
+  </div>
+</div>
 
-        <div class="event_card_action">
+<div class="event_card_action">
   ${renderLinks(data)}
 </div>
+
       </div>
     </div>
   </div>
