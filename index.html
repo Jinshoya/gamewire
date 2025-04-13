@@ -335,11 +335,33 @@
     function renderLinks(data) {
   const links = [];
 
-  if (data.youtube?.url) links.push(data.youtube);
-  if (data.twitch?.url) links.push(data.twitch);
-  if (data.website?.url) links.push(data.website);
-  if (data.steam?.url) links.push(data.steam);
-  if (Array.isArray(data.links)) links.push(...data.links);
+  if (data.youtube) {
+    links.push(typeof data.youtube === 'string'
+      ? { url: data.youtube, icon: '/icons/youtube.png', label: 'YouTube' }
+      : data.youtube);
+  }
+
+  if (data.twitch) {
+    links.push(typeof data.twitch === 'string'
+      ? { url: data.twitch, icon: '/icons/twitch.png', label: 'Twitch' }
+      : data.twitch);
+  }
+
+  if (data.website) {
+    links.push(typeof data.website === 'string'
+      ? { url: data.website, icon: '/icons/website.png', label: 'Website' }
+      : data.website);
+  }
+
+  if (data.steam) {
+    links.push(typeof data.steam === 'string'
+      ? { url: data.steam, icon: '/icons/steam.png', label: 'Steam' }
+      : data.steam);
+  }
+
+  if (Array.isArray(data.links)) {
+    links.push(...data.links);
+  }
 
   return links.map(link => `
     <a href="${link.url}" target="_blank" title="${link.label || 'Watch'}">
