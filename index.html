@@ -8,154 +8,153 @@
   <link rel="stylesheet" href="./styles/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-@import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
+    @import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
 
-body {
-  background: linear-gradient(to bottom, #041935, #241c56);
-  font-family: 'General Sans', sans-serif;
-  color: white;
-  margin: 0;
-  padding: 0;
-}
+    body {
+      background: linear-gradient(to bottom, #041935, #241c56);
+      font-family: 'General Sans', sans-serif;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
 
-.content {
-  max-width: 1200px;
-  margin: 80px auto;
-  padding: 0 20px;
-}
+    .content {
+      max-width: 1200px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
 
-.event_block {
-  position: relative;
-  margin-bottom: 80px;
-}
+    .event_block {
+      position: relative;
+      margin-bottom: 100px;
+    }
 
-.event_card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 28px;
-  padding: 50px 60px;
-  padding-left: 280px;
-  min-height: 240px;
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  backdrop-filter: blur(24px);
-}
+    .event_card {
+      position: relative;
+      border-radius: 28px;
+      padding: 50px 60px;
+      padding-left: 280px;
+      min-height: 240px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+    }
 
-.event_logo {
-  position: absolute;
-  top: 50%;
-  left: 60px;
-  transform: translateY(-50%);
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  overflow: hidden;
-  z-index: 5;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
-}
+    .event_logo {
+      position: absolute;
+      top: 50%;
+      left: 60px;
+      transform: translateY(-50%);
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      overflow: hidden;
+      z-index: 5;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+    }
 
-.event_logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+    .event_logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
 
-.event_title {
-  font-size: 2.75rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
+    .event_title {
+      font-size: 2.75rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
 
-.event_time {
-  font-size: 1.3rem;
-  font-weight: 400;
-  opacity: 0.9;
-  margin-bottom: 30px;
-}
+    .event_time {
+      font-size: 1.3rem;
+      font-weight: 400;
+      opacity: 0.9;
+      margin-bottom: 30px;
+    }
 
-.event_expectations {
-  margin-top: 12px;
-}
+    .event_expectations {
+      margin-top: 12px;
+    }
 
-.event_expectations .label {
-  font-weight: 600;
-  margin-bottom: 8px;
-  font-size: 1rem;
-}
+    .event_expectations .label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
 
-.reaction-bar {
-  background: #14131f;
-  border-radius: 16px;
-  padding: 10px 14px;
-  display: flex;
-  gap: 10px;
-}
+    .reaction-bar {
+      background: #14131f;
+      border-radius: 16px;
+      padding: 10px 14px;
+      display: flex;
+      gap: 10px;
+    }
 
-.reaction-bar button {
-  background: white;
-  border: none;
-  border-radius: 999px;
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 6px 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  color: #333;
-}
+    .reaction-bar button {
+      background: white;
+      border: none;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: #333;
+    }
 
-.reaction-bar button.reacted {
-  background: #f2c94c;
-  color: black;
-}
+    .reaction-bar button.reacted {
+      background: #f2c94c;
+      color: black;
+    }
 
-.watch-button {
-  background: #271f56;
-  color: white;
-  border-radius: 16px;
-  padding: 18px 30px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: auto;
-  margin-top: 20px;
-  transition: background 0.3s ease;
-  text-decoration: none;
-}
+    .watch-button {
+      background: #271f56;
+      color: white;
+      border-radius: 16px;
+      padding: 18px 30px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+      margin-top: 20px;
+      transition: background 0.3s ease;
+      text-decoration: none;
+    }
 
-.watch-button:hover {
-  background: #392b7a;
-}
+    .watch-button:hover {
+      background: #392b7a;
+    }
 
-@media (max-width: 768px) {
-  .event_card {
-    padding: 40px;
-    padding-top: 140px;
-  }
+    @media (max-width: 768px) {
+      .event_card {
+        padding: 40px;
+        padding-top: 140px;
+      }
 
-  .event_logo {
-    top: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 160px;
-    height: 160px;
-  }
+      .event_logo {
+        top: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 160px;
+        height: 160px;
+      }
 
-  .event_title {
-    font-size: 2rem;
-  }
+      .event_title {
+        font-size: 2rem;
+      }
 
-  .event_time {
-    font-size: 1.1rem;
-  }
-}
-
+      .event_time {
+        font-size: 1.1rem;
+      }
+    }
   </style>
 </head>
 <body>
