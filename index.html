@@ -324,15 +324,18 @@
     }
     
     function parseFrontmatter(md) {
-      const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/m.exec(md);
-      if (!match) return { attributes: {}, body: md };
-      const attributes = {};
-      match[1].split('\n').forEach(line => {
-        const [key, ...rest] = line.split(':');
-        attributes[key.trim()] = rest.join(':').trim();
-      });
-      return { attributes, body: match[2] };
-    }
+  const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/m.exec(md);
+  if (!match) return { attributes: {}, body: md };
+
+  try {
+    const attributes = jsyaml.load(match[1]); // Use js-yaml to properly parse nested objects
+    return { attributes, body: match[2] };
+  } catch (e) {
+    console.error("Failed to parse frontmatter YAML:", e);
+    return { attributes: {}, body: md };
+  }
+}
+
     
     function renderLinks(data) {
   console.log("🧠 renderLinks CALLED for:", data.title);
