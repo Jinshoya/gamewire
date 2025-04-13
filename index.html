@@ -24,10 +24,10 @@
   margin: 100px auto;
   padding: 0 20px;
 }
+
     
 .event_block {
   position: relative;
-  width: 100%;
   max-width: 960px;
   margin: 160px auto 100px;
   display: flex;
@@ -38,7 +38,7 @@
 .event_logo {
   position: absolute;
   top: -60px;
-  left: -130px; /* moves logo out but keeps block centered */
+  left: -120px;
   width: 255px;
   height: 255px;
   border-radius: 50%;
@@ -48,25 +48,24 @@
   background: #000;
 }
     
-.event_logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.event_card {
+    .event_logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    
+    .event_card {
   position: relative;
-  width: 100%;
+  width: 960px;
   height: 280px;
   border-radius: 20px;
   background-size: cover;
   background-position: center;
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-  padding-left: 300px; /* space for logo */
+  padding-left: 300px; /* accounts for logo space visually */
 }
-    
     .event_card_overlay {
       position: absolute;
       inset: 0;
@@ -87,13 +86,14 @@
     }
     
     .event_card_main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      min-width: 250px;
-      margin-top: 6px; /* pulls title closer to top */
-    }
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 250px;
+  margin-top: 0;
+  padding-top: 4px; /* raises it slightly */
+}
     
     .event_title {
       font-size: 2.2rem;
@@ -416,27 +416,29 @@
       const html = `
 <div class="event_block">
   <div class="event_logo">
-    <img src="logo-url.png" />
+    <img src="${data.logo}" alt="logo" />
   </div>
 
-  <div class="event_card" style="background-image: url('bg-image.jpg')">
+  <div class="event_card" style="background-image: url('${data.image}')">
     <div class="event_card_overlay"></div>
+
     <div class="event_card_content">
       <div class="event_card_main">
-        <h2 class="event_title">Event Name</h2>
-        <p class="event_date">June 6 • 11 PM</p>
+        <h2 class="event_title">${data.title}</h2>
+        <p class="event_date">${isSteam
+          ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
+          : date.toLocaleString()}</p>
+
         <div class="event_expectations">
           <div class="label">Your expectations</div>
-          <div class="reaction-bar">
-            <button>👍 <span>0</span></button>
-            <button>😊 <span>0</span></button>
-            <button>😲 <span>0</span></button>
-            <button>😔 <span>0</span></button>
+          <div class="reaction-bar" data-event="${slug}">
+            ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
           </div>
         </div>
       </div>
+
       <div class="event_card_action">
-        <a class="watch-button" href="#">
+        <a class="watch-button" href="${data.links?.[0]?.url || '#'}" target="_blank">
           Watch here <span class="play_icon">▶</span>
         </a>
       </div>
@@ -444,6 +446,7 @@
   </div>
 </div>
 `;
+
 
       const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
       const container = document.getElementById(target);
