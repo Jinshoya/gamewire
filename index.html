@@ -23,44 +23,41 @@
 }
 
   
-    .event_logo {
+.event_logo {
   position: absolute;
-  top: -60px;
-  left: 24px;
-  z-index: 3;
-  width: 120px;
-  height: 120px;
+  left: -100px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  z-index: 2;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
 }
 
+.event_logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
   
-    .event_logo img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 5px solid white;
-    }
-  
-    .event_card {
-      padding: 40px;
-      border-radius: 24px;
-      background-size: cover;
-      background-position: center;
-      backdrop-filter: blur(16px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 220px;
-      background-color: rgba(255,255,255,0.07);
-    }
+.event_card {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  border-radius: 28px;
+  padding: 40px 40px 30px 220px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 60px rgba(0, 0, 0, 0.4);
+  min-height: 220px;
+}
+
   
     .event_content {
       display: flex;
@@ -77,16 +74,16 @@
     }
   
     .event_title {
-      font-size: 2.5rem;
-      font-weight: 600;
-      margin: 0;
-    }
-  
-    .event_time {
-      font-size: 1.3rem;
-      opacity: 0.9;
-    }
-  
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.event_time {
+  font-size: 1.25rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
     .label {
       font-weight: 600;
       margin-bottom: 4px;
@@ -94,59 +91,52 @@
     }
   
     .reaction-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      background: #1e1e2f;
-      padding: 14px 18px;
-      border-radius: 16px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
-    }
-  
-    .reaction-bar button {
-      background: #ffffff;
-      color: #111;
-      border: none;
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 1.05rem;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-  
-    .reaction-bar button.reacted {
-      background: #f2c94c;
-      color: #000;
-    }
-  
+  background: #1a1a2d;
+  border-radius: 16px;
+  padding: 10px 14px;
+  display: flex;
+  gap: 10px;
+}
+
+.reaction-bar button {
+  background: white;
+  border: none;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #333;
+}
+
+.reaction-bar button.reacted {
+  background: #f2c94c;
+  color: black;
+}
     .event_watch {
       display: flex;
       align-items: center;
     }
   
     .watch-button {
-      background: linear-gradient(145deg, #2d2f66, #1c1e45);
-      color: white;
-      border: none;
-      border-radius: 16px;
-      padding: 14px 28px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-    }
-  
-    .watch-button:hover {
-      background: #2b2e67;
-    }
+  background: #261f55;
+  color: white;
+  border-radius: 16px;
+  padding: 16px 28px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.3s ease;
+}
+
+.watch-button:hover {
+  background: #3c3180;
+}
   
     @media (max-width: 768px) {
       .event_content {
