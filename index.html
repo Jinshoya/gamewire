@@ -145,20 +145,38 @@
 .events_upcoming {
   font-size: 1.4rem;
   font-weight: 600;
-  margin: 60px 0 20px;
-  padding-left: 10px;
+  margin: 60px auto 20px;
+  padding: 12px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: white;
-  border-left: 4px solid #ffffff22;
-  background: linear-gradient(to right, #ffffff10, transparent);
+  border-left: none;
+  text-align: center;
+  border-radius: 10px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.07) 50%,
+    transparent
+  );
 }
+
+
+
+
 
 .events_upnext.now_live {
   color: #ff5e5e;
-  border-left-color: #ff5e5e66;
-  background: linear-gradient(to right, #ff5e5e22, transparent);
+  border-left: none;
+  text-align: center;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 94, 94, 0.15) 50%,
+    transparent
+  );
 }
+
 
 
 @keyframes scroll-title-pingpong {
