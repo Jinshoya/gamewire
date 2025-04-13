@@ -340,6 +340,14 @@
       .event_links {
         justify-content: flex-start;
       }
+      .event_block.now_live .event_card {
+  box-shadow: 0 0 30px rgba(255, 80, 80, 0.35), 0 0 0 4px rgba(255, 80, 80, 0.08);
+  border: 2px solid rgba(255, 80, 80, 0.12);
+  transition: box-shadow 0.3s ease;
+}
+
+
+      
     }
     </style>
     
@@ -531,12 +539,13 @@ function renderLinks(data) {
         return parent.remove();
       }
 
-      // If the event has started
-      if (diff <= 0) {
+// If the event has started
+if (diff <= 0) {
   if (elapsed >= 3600000) {
     if (parent.parentElement.id !== 'past-events') {
       document.getElementById('past-events').appendChild(parent);
       parent.classList.add('event_past');
+      parent.classList.remove('now_live'); // remove live glow
     }
     el.innerHTML = ''; // Hide countdown for old events
   } else {
@@ -545,10 +554,13 @@ function renderLinks(data) {
     if (parent.parentElement.id !== 'live-events') {
       document.getElementById('live-events').appendChild(parent);
     }
+
+    parent.classList.add('now_live'); // ✅ Add glowing red class
   }
 
   return;
 }
+
 
 
       // Else: show countdown
