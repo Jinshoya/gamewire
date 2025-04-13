@@ -8,32 +8,52 @@
   <link rel="stylesheet" href="./styles/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    body {
-      background: linear-gradient(to bottom, #051937, #342e71);
-      font-family: 'Inter', sans-serif;
-      color: white;
-      margin: 0;
-      padding: 60px 20px;
-    }
-  
-    .event_block {
-  position: relative;
-  margin: 100px auto 60px;
-  max-width: 1100px;
+@import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
+
+body {
+  background: linear-gradient(to bottom, #041935, #241c56);
+  font-family: 'General Sans', sans-serif;
+  color: white;
+  margin: 0;
+  padding: 0;
 }
 
-  
+.content {
+  max-width: 1200px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+
+.event_block {
+  position: relative;
+  margin-bottom: 80px;
+}
+
+.event_card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 28px;
+  padding: 50px 60px;
+  padding-left: 280px;
+  min-height: 240px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  backdrop-filter: blur(24px);
+}
+
 .event_logo {
   position: absolute;
-  left: -100px;
   top: 50%;
+  left: 60px;
   transform: translateY(-50%);
-  width: 200px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
   overflow: hidden;
-  z-index: 2;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
 }
 
 .event_logo img {
@@ -42,56 +62,32 @@
   object-fit: cover;
   display: block;
 }
-  
-.event_card {
-  position: relative;
-  background-size: cover;
-  background-position: center;
-  border-radius: 28px;
-  padding: 40px 40px 30px 220px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 10px 60px rgba(0, 0, 0, 0.4);
-  min-height: 220px;
-}
 
-  
-    .event_content {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 24px;
-    }
-  
-    .event_text {
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-  
-    .event_title {
-  font-size: 2.5rem;
+.event_title {
+  font-size: 2.75rem;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .event_time {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 400;
-  opacity: 0.85;
+  opacity: 0.9;
+  margin-bottom: 30px;
 }
-    .label {
-      font-weight: 600;
-      margin-bottom: 4px;
-      font-size: 1.1rem;
-    }
-  
-    .reaction-bar {
-  background: #1a1a2d;
+
+.event_expectations {
+  margin-top: 12px;
+}
+
+.event_expectations .label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.reaction-bar {
+  background: #14131f;
   border-radius: 16px;
   padding: 10px 14px;
   display: flex;
@@ -116,45 +112,50 @@
   background: #f2c94c;
   color: black;
 }
-    .event_watch {
-      display: flex;
-      align-items: center;
-    }
-  
-    .watch-button {
-  background: #261f55;
+
+.watch-button {
+  background: #271f56;
   color: white;
   border-radius: 16px;
-  padding: 16px 28px;
+  padding: 18px 30px;
   font-size: 1.1rem;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  margin-left: auto;
+  margin-top: 20px;
   transition: background 0.3s ease;
+  text-decoration: none;
 }
 
 .watch-button:hover {
-  background: #3c3180;
+  background: #392b7a;
 }
-  
-    @media (max-width: 768px) {
-      .event_content {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-  
-      .event_watch {
-        justify-content: center;
-      }
-  
-      .event_logo {
-        left: 50%;
-        transform: translateX(-50%);
-        top: -90px;
-      }
-    }
+
+@media (max-width: 768px) {
+  .event_card {
+    padding: 40px;
+    padding-top: 140px;
+  }
+
+  .event_logo {
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    height: 160px;
+  }
+
+  .event_title {
+    font-size: 2rem;
+  }
+
+  .event_time {
+    font-size: 1.1rem;
+  }
+}
+
   </style>
 </head>
 <body>
