@@ -53,6 +53,7 @@
   display: flex;
   gap: 14px;
   align-items: center;
+  margin-top: 10px;
 }
 
 .event_links img {
@@ -66,6 +67,7 @@
 .event_links img:hover {
   transform: scale(1.1);
 }
+
 .event_block {
   position: relative;
   max-width: 840px;
@@ -350,19 +352,6 @@
   pushIfValid(data.website, 'Website', '/images/links/web_link.png');
   pushIfValid(data.steam, 'Steam', '/images/links/steam_link.png');
 
-  // Custom link list
-  if (Array.isArray(data.links)) {
-    data.links.forEach(link => {
-      if (link.url) {
-        links.push({
-          url: link.url,
-          icon: link.icon || '/images/links/web_link.png',
-          label: link.label || 'Link'
-        });
-      }
-    });
-  }
-
   return links.map(link => `
     <a href="${link.url}" target="_blank" title="${link.label}">
       <img src="${link.icon}" class="links_image" alt="${link.label}" />
@@ -507,7 +496,8 @@
       const response = await fetch(`/events/${file}`);
       const raw = await response.text();
       const { attributes: data } = parseFrontmatter(raw);
-      console.log(`[${file}]`, data);
+      console.log("renderLinks called for", data.title);
+
       const date = new Date(data.date);
       const isPast = date < now;
       const isSteam = data.type === 'steam_sale';
