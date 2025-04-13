@@ -113,6 +113,16 @@
       line-height: 1.4;
     }
     
+    .event_date span.number {
+      color: white;
+      font-weight: 600;
+    }
+    
+    .event_date span.unit {
+      color: #aaa;
+      font-weight: 500;
+    }
+    
     .countdown {
       font-size: 0.95rem;
       opacity: 0.8;
@@ -141,7 +151,6 @@
       font-size: 0.95rem;
     }
     
-    /* 👯 Wrapper for both blocks */
     .event_expectations_row {
       display: flex;
       justify-content: space-between;
@@ -150,7 +159,6 @@
       gap: 20px;
     }
     
-    /* 👍 Reactions block */
     .event_reacts {
       background: #14142b;
       border-radius: 14px;
@@ -165,7 +173,6 @@
       margin-bottom: 10px;
     }
     
-    /* 🟡 Buttons */
     .reaction-bar {
       display: flex;
       gap: 10px;
@@ -192,7 +199,6 @@
       background: #f2c94c;
     }
     
-    /* 🔗 Link block on the right */
     .event_links_block {
       background: #14142b;
       border-radius: 14px;
@@ -230,7 +236,6 @@
       transform: scale(1.1);
     }
     
-    /* 🎬 Watch button */
     .watch-button {
       background: #271e6e;
       color: white;
@@ -255,7 +260,6 @@
       font-size: 1.2rem;
     }
     
-    /* 📱 Mobile */
     @media (max-width: 768px) {
       .content,
       .event_block,
@@ -298,6 +302,7 @@
       }
     }
     </style>
+    
     
   
     
@@ -554,6 +559,31 @@ function renderLinks(data) {
 
       const backgroundStyle = data.image ? `background-image: url('${data.image}');` : 'background-color: #2e2e57;';
 
+      function formatTimeShort(date) {
+  const d = new Date(date);
+  const h = d.getHours();
+  const m = d.getMinutes().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'pm' : 'am';
+  const hour = ((h + 11) % 12 + 1);
+  return `${hour}:${m} <span class="unit">${ampm}</span>`;
+}
+
+function formatDateShort(date) {
+  const d = new Date(date);
+  const month = d.toLocaleString('default', { month: 'short' });
+  return `${month} ${d.getDate()}`;
+}
+
+function formatSingle(date) {
+  return `${formatDateShort(date)} - ${formatTimeShort(date)}`;
+}
+
+function formatRange(start, end) {
+  return `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
+}
+
+
+
       const html = `
 <div class="event_block">
   <div class="event_logo">
@@ -566,10 +596,13 @@ function renderLinks(data) {
     <div class="event_card_content">
       <div class="event_card_main">
         <h2 class="event_title">${data.title}</h2>
+
         <p class="event_date">
-          ${isSteam
-            ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
-            : date.toLocaleString()}
+          ${
+            isSteam
+              ? formatRange(data.date, data.end)
+              : formatSingle(data.date)
+          }
         </p>
 
         <div class="countdown"
@@ -584,14 +617,12 @@ function renderLinks(data) {
               ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="event_card_action">
-        <div class="event_links_block">
-          <div class="label">Check it out</div>
-          <div class="event_links">
-            ${renderLinks(data)}
+          <div class="event_links_block">
+            <div class="label">Check it out</div>
+            <div class="event_links">
+              ${renderLinks(data)}
+            </div>
           </div>
         </div>
       </div>
@@ -599,6 +630,7 @@ function renderLinks(data) {
   </div>
 </div>
 `;
+
 
       const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
       const container = document.getElementById(target);
