@@ -25,7 +25,27 @@
     }
     
     .event_block {
-      margin-bottom: 40px;
+      position: relative;
+      margin-bottom: 80px;
+    }
+    
+    .event_logo {
+      position: absolute;
+      top: -40px;
+      left: 40px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      overflow: hidden;
+      z-index: 2;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      background: #000;
+    }
+    
+    .event_logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     
     .event_card {
@@ -35,6 +55,8 @@
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      min-height: 180px;
+      padding-left: 220px; /* room for logo */
     }
     
     .event_card_overlay {
@@ -49,68 +71,34 @@
       position: relative;
       z-index: 1;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       gap: 32px;
-      padding: 32px;
+      padding: 32px 32px 32px 0;
       flex-wrap: wrap;
     }
     
-    .event_card_left {
-      flex-shrink: 0;
-    }
-    
-    .event_logo {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-      background: #000;
-    }
-    
-    .event_logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    
-    .event_card_center {
+    .event_card_main {
       flex: 1;
-      min-width: 240px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      min-width: 250px;
     }
     
     .event_title {
-      font-size: 2.1rem;
+      font-size: 2.2rem;
       font-weight: 600;
-      margin: 0;
-      line-height: 1.2;
+      margin: 0 0 8px;
     }
     
     .event_date {
       font-size: 1rem;
-      opacity: 0.85;
-      margin: 0;
+      opacity: 0.8;
+      margin: 0 0 16px;
       line-height: 1.4;
     }
     
-    .countdown {
-      font-size: 0.9rem;
-      color: #ccc;
-      opacity: 0.85;
-    }
-    
-    .event_expectations {
-      margin-top: 10px;
-    }
-    
     .event_expectations .label {
-      font-size: 1rem;
       font-weight: 600;
+      font-size: 1rem;
       margin-bottom: 8px;
     }
     
@@ -138,16 +126,11 @@
       transition: all 0.2s ease;
     }
     
-    .reaction-bar button:hover {
-      background: #f2c94c;
-    }
-    
     .reaction-bar button.reacted {
       background: #f2c94c;
-      color: black;
     }
     
-    .event_card_right {
+    .event_card_action {
       display: flex;
       align-items: center;
     }
@@ -177,20 +160,26 @@
     }
     
     @media (max-width: 768px) {
+      .event_card {
+        padding-left: 24px;
+        padding-top: 100px;
+      }
+    
+      .event_logo {
+        position: static;
+        margin: 0 auto -60px;
+        display: block;
+      }
+    
       .event_card_content {
         flex-direction: column;
         align-items: center;
         text-align: center;
+        padding: 32px 20px;
       }
     
-      .event_card_right {
-        justify-content: center;
+      .event_card_action {
         margin-top: 20px;
-      }
-    
-      .event_logo {
-        width: 100px;
-        height: 100px;
       }
     
       .event_title {
@@ -202,6 +191,7 @@
       }
     }
     </style>
+    
     
     
     
@@ -391,32 +381,34 @@
       const backgroundStyle = data.image ? `background-image: url('${data.image}');` : 'background-color: #2e2e57;';
 
       const html = `
-<div class="event_card" style="background-image: url('${data.image}')">
-  <div class="event_card_overlay"></div>
+<div class="event_block">
+  <div class="event_logo">
+    <img src="${data.logo}" alt="logo" />
+  </div>
 
-  <div class="event_card_content">
-    <div class="event_card_left">
-      <div class="event_logo"><img src="${data.logo}" alt="logo" /></div>
-    </div>
+  <div class="event_card" style="background-image: url('${data.image}')">
+    <div class="event_card_overlay"></div>
 
-    <div class="event_card_center">
-      <h2 class="event_title">${data.title}</h2>
-      <p class="event_date">${isSteam
-        ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
-        : date.toLocaleString()}</p>
+    <div class="event_card_content">
+      <div class="event_card_main">
+        <h2 class="event_title">${data.title}</h2>
+        <p class="event_date">${isSteam
+          ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
+          : date.toLocaleString()}</p>
 
-      <div class="event_expectations">
-        <div class="label">Your expectations</div>
-        <div class="reaction-bar" data-event="${slug}">
-          ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+        <div class="event_expectations">
+          <div class="label">Your expectations</div>
+          <div class="reaction-bar" data-event="${slug}">
+            ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="event_card_right">
-      <a class="watch-button" href="${data.links?.[0]?.url || '#'}" target="_blank">
-        Watch here <span class="play_icon">▶</span>
-      </a>
+      <div class="event_card_action">
+        <a class="watch-button" href="${data.links?.[0]?.url || '#'}" target="_blank">
+          Watch here <span class="play_icon">▶</span>
+        </a>
+      </div>
     </div>
   </div>
 </div>
