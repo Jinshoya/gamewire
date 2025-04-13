@@ -14,7 +14,7 @@ twitch:
   url: https://www.twitch.tv/thegameawards
 website:
   icon: /images/links/web_link.png
-  url: ""
+  url: https://www.summergamefest.com/
 steam:
   icon: /images/links/steam_link.png
 ---
