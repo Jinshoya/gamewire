@@ -197,17 +197,21 @@ function renderLinks(data) {
       await refreshReactionCounts(eventId, wrapper);
     }
     window.react = react;  
-    async function refreshReactionCounts(eventId, wrapper) {
-      window.refreshReactionCounts = refreshReactionCounts;
-      const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
-      const selected = localStorage.getItem(`reaction_${eventId}`);
-      wrapper.querySelectorAll('button').forEach(btn => {
-        const emoji = btn.getAttribute('data-emoji');
-        const found = data.find(r => r.emoji === emoji);
-        btn.querySelector('span').textContent = found?.count ?? 0;
-        btn.classList.toggle('reacted', emoji === selected);
-      });
-    }
+async function refreshReactionCounts(eventId, wrapper) {
+  const { data } = await supabase
+    .from('reactions')
+    .select('emoji, count')
+    .eq('event_id', eventId);
+
+  const selected = localStorage.getItem(`reaction_${eventId}`);
+
+  wrapper.querySelectorAll('button').forEach(btn => {
+    const emoji = btn.getAttribute('data-emoji'); // ✅ CORRECT way
+    const found = data.find(r => r.emoji === emoji);
+    btn.querySelector('span').textContent = found?.count ?? 0;
+    btn.classList.toggle('reacted', emoji === selected); // ✅ compare with stored
+  });
+}
     
     function startCountdowns() {
       setInterval(() => {
@@ -301,7 +305,7 @@ if (diff <= 0) {
   const emoji = btn.getAttribute('data-emoji'); // ✅ important
   const found = data.find(r => r.emoji === emoji);
   btn.querySelector('span').textContent = found?.count ?? 0;
-  btn.classList.toggle('reacted', emoji === selected);
+  btn.classList.toggle('reacted', emoji === userEmoji);
 });
     }
     async function loadEvents() {
