@@ -25,6 +25,10 @@
       max-width: 840px;
       margin: 100px auto;
       padding: 0 20px;
+      min-height: 100vh; /* prevents that “just background” look */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     
     .event_past {
@@ -364,6 +368,32 @@
   pointer-events: none; /* disables clicks but allows hover */
   filter: grayscale(30%);
 }
+#eventLoadingSkeletons {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 60px;
+  align-items: center;
+}
+
+.skeleton-card {
+  width: 840px;
+  height: 280px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #1c1c3b 25%, #2a2a52 50%, #1c1c3b 75%);
+  background-size: 400% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
     </style>
     
 
@@ -755,7 +785,12 @@ const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 
   await loadEvents();
   hideEmptySections();
   updateNowPlayingBar();
-  document.getElementById("eventLoadingSkeletons")?.remove();
+  const skeleton = document.getElementById("eventLoadingSkeletons");
+if (skeleton) {
+  skeleton.style.transition = 'opacity 0.5s ease';
+  skeleton.style.opacity = 0;
+  setTimeout(() => skeleton.remove(), 500);
+}
 });
 function hideEmptySections() {
   const live = document.getElementById('live-events');
