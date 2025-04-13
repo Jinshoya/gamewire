@@ -126,20 +126,29 @@
 .event_title {
   white-space: nowrap;
   display: inline-block;
-  animation: none;
+  transition: transform 0.3s ease;
   font-size: 2.2rem;
   font-weight: 600;
   margin: 0;
+  animation: none;
 }
+
+.event_title_wrapper:hover .event_title.scrolling {
+  animation: scroll-title-pingpong 10s ease-in-out infinite;
+}
+
+
+@keyframes scroll-title-pingpong {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(var(--scroll-distance)); }
+  100% { transform: translateX(0); }
+}
+
 
 .event_title.scrolling {
-  animation: scroll-title 10s linear infinite;
+  animation: scroll-title-pingpong 10s ease-in-out infinite;
 }
 
-@keyframes scroll-title {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
     
     .event_date {
       font-size: 1rem;
@@ -712,12 +721,13 @@ const html = `
   const titles = container.querySelectorAll('.event_title');
   titles.forEach(title => {
     const wrapper = title.parentElement;
-    if (title.scrollWidth > wrapper.clientWidth) {
+    const overflow = title.scrollWidth - wrapper.clientWidth;
+    if (overflow > 10) {
       title.classList.add('scrolling');
+      title.style.setProperty('--scroll-distance', `-${overflow}px`);
     }
   });
 }, 100);
-
     }
 
     startCountdowns();
