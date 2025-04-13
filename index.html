@@ -610,6 +610,10 @@ if (diff <= 0) {
   const res = await fetch('/events/index.json');
   const files = await res.json();
   const now = new Date();
+
+  const parsedEvents = [];
+
+  // 🔄 Parse all events
   for (const file of files) {
     const response = await fetch(`/events/${file}`);
     const raw = await response.text();
@@ -618,14 +622,99 @@ if (diff <= 0) {
     parsedEvents.push(data);
   }
 
-  // 🔁 Sort by scheduled event date
+  // ✅ Sort by actual event date
   parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
+  // 🧱 Render each event
+  for (const data of parsedEvents) {
+    const file = data._filename;
+    const date = new Date(data.date);
+    const isPast = date < now;
+    const isSteam = data.type === 'steam_sale';
+    const slug = data.slug || file.replace('.md', '');
 
-  // ⏱ Enable countdowns
+    function formatTimeShort(date) {
+      const d = new Date(date);
+      const h = d.getHours();
+      const m = d.getMinutes().toString().padStart(2, '0');
+      const ampm = h >= 12 ? 'pm' : 'am';
+      const hour = ((h + 11) % 12 + 1);
+      return `${hour}:${m} <span class="unit">${ampm}</span>`;
+    }
+
+    function formatDateShort(date) {
+      const d = new Date(date);
+      const month = d.toLocaleString('default', { month: 'short' });
+      return `${month} ${d.getDate()}`;
+    }
+
+    function formatSingle(date) {
+      return `${formatDateShort(date)} - ${formatTimeShort(date)}`;
+    }
+
+    function formatRange(start, end) {
+      return `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
+    }
+
+    const html = `
+<div class="event_block ${data.status === 'live' ? 'now_live' : ''}">
+  <div class="event_logo">
+    <img src="${data.logo}" alt="logo" />
+  </div>
+  <div class="event_card" style="background-image: url('${data.image}')">
+    <div class="event_card_overlay"></div>
+    <div class="event_card_content">
+      <div class="event_card_main">
+        <div class="event_title_wrapper">
+          <h2 class="event_title">${data.title}</h2>
+        </div>
+        <p class="event_date">
+          ${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}
+        </p>
+        <div class="countdown"
+             data-start-event-date="${data.date}"
+             ${data.end ? `data-end-event-date="${data.end}"` : ''}>
+        </div>
+      </div>
+      <div class="event_expectations_wrapper">
+        <div class="event_reacts">
+          <div class="label">Your expectations</div>
+          <div class="reaction-bar" data-event="${slug}">
+            ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+          </div>
+        </div>
+        <div class="event_links_block">
+          <div class="label">Check it out</div>
+          <div class="event_links">
+            ${renderLinks(data)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+    const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
+    const container = document.getElementById(target);
+    if (container) container.insertAdjacentHTML("beforeend", html);
+
+    // Scroll title on hover if too long
+    setTimeout(() => {
+      const title = container.querySelector('.event_title');
+      const wrapper = container.querySelector('.event_title_wrapper');
+      if (title && wrapper && title.scrollWidth > wrapper.clientWidth + 10) {
+        title.classList.add('scrolling');
+        const overflow = title.scrollWidth - wrapper.clientWidth;
+        title.style.setProperty('--scroll-distance', `-${overflow}px`);
+      }
+    }, 100);
+  }
+
+  // ⏱ Countdown
   startCountdowns();
 
-  // 🔄 Load emoji counts
+  // 🧠 Load reactions
   document.querySelectorAll('.reaction-bar').forEach(wrapper => {
     const eventId = wrapper.getAttribute('data-event');
     loadReactionsForEvent(wrapper, eventId);
@@ -850,7 +939,7 @@ if (overflow > 10) {
     document.addEventListener("DOMContentLoaded", async () => {
   await loadEvents();
   updateNowPlayingBar();
-  startCountdowns(); // ✅ make sure this is here
+  startCountdowns();
   document.getElementById("eventLoadingSkeletons")?.remove();
 });
 
