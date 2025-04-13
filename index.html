@@ -61,19 +61,17 @@
     }
     
     .event_logo {
-  position: absolute;
-  top: 50%;
-  left: -120px;
-  transform: translateY(-50%);
-  width: 255px;
-  height: 255px;
-  border-radius: 50%;
-  overflow: hidden;
-  z-index: 3;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-  background: #000;
-}
-
+      position: absolute;
+      top: -60px;
+      left: -120px;
+      width: 255px;
+      height: 255px;
+      border-radius: 50%;
+      overflow: hidden;
+      z-index: 3;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      background: #000;
+    }
     
     .event_logo img {
   width: 100%;
@@ -83,20 +81,17 @@
   display: block;
 }
     
-.event_card {
-  position: relative;
-  width: 100%;
-  max-width: 840px;
-  height: 280px;
-  border-radius: 20px;
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: stretch;
-}
-
+    .event_card {
+      position: relative;
+      width: 840px;
+      height: 280px;
+      border-radius: 20px;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      padding-left: 300px;
+    }
     
     .event_card_overlay {
       position: absolute;
@@ -106,36 +101,30 @@
       z-index: 0;
     }
     
-.event_card_content {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 24px 36px 24px 160px; /* 👈 Add left padding HERE */
-  gap: 16px;
-}
-
+    .event_card_content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      height: 100%;
+      padding: 24px 36px;
+      gap: 16px;
+    }
     
-.event_card_main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* ← Change from flex-start to center */
-  align-items: flex-start;
-  gap: 6px; /* ← Reduce vertical space between items */
-}
+    .event_card_main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 12px;
+    }
     
-.event_title {
-  white-space: nowrap;
-  display: inline-block;
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin: 0;
-  transform: translateX(0);
-  transition: transform 1.2s ease-in-out;
+    .event_title_wrapper {
   max-width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
 .event_title {
@@ -145,12 +134,11 @@
   font-weight: 600;
   margin: 0;
   transform: translateX(0);
-  transition: transform 1.2s ease-in-out;
-  will-change: transform;
+  transition: transform 1.2s ease-in-out; /* 👈 smooth return */
 }
 
 .event_title_wrapper:hover .event_title.scrolling {
-  transform: translateX(var(--scroll-distance));
+  transform: translateX(var(--scroll-distance)); /* 👈 smooth slide on hover */
 }
 
 .events_upnext,
@@ -234,7 +222,6 @@
       background: #14142b;
       border-radius: 14px;
       padding: 12px 16px;
-      margin-left:0px;
       display: flex;
       flex-direction: column;
       max-width: 60%;
@@ -341,6 +328,12 @@
         width: 100%;
       }
     
+      .event_logo {
+        position: static;
+        width: 200px;
+        height: 200px;
+        margin: -100px auto 20px;
+      }
     
       .event_card {
         padding-left: 24px;
