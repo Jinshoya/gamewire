@@ -666,8 +666,11 @@ if (diff <= 0) {
     const formatRange = (start, end) =>
       `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
 
-    const html = `
-<div class="event_block">
+      const hasStarted = date <= now;
+const isLive = hasStarted && (!data.end || now < new Date(data.end));
+
+const html = `
+<div class="event_block ${isLive ? 'now_live event_headliner' : ''}">
   <div class="event_logo">
     <img src="${data.logo}" alt="logo" />
   </div>
@@ -676,7 +679,7 @@ if (diff <= 0) {
     <div class="event_card_content">
       <div class="event_card_main">
         <div class="event_title_wrapper">
-          <h2 class="event_title">${data.title}</h2>
+<h2 class="event_title event_upc_title">${data.title}</h2>
         </div>
         <p class="event_date">
           ${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}
