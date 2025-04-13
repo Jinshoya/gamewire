@@ -317,12 +317,10 @@
         justify-content: flex-start;
       }
     }
-    .reaction-bar button:disabled,
-.reaction-bar button.disabled {
-  background: #555 !important;
-  color: #999 !important;
-  cursor: not-allowed;
-  opacity: 0.6;
+    .reaction-bar.reactions-disabled {
+  opacity: 0.5;
+  pointer-events: none; /* disables clicks but allows hover */
+  filter: grayscale(30%);
 }
     </style>
     
@@ -517,12 +515,11 @@ if (diff <= 0) {
     parent.classList.remove('now_live');     // 🔴 Remove live glow
     el.innerHTML = '';                       // Hide countdown
 
-    // 🚫 Disable all reaction buttons in this block
-    parent.querySelectorAll('.reaction-bar button').forEach(btn => {
-      btn.disabled = true;
-      btn.classList.add('disabled');
-      btn.setAttribute('title', 'Event has ended');
-    });
+    // ✨ Visually fade reactions and block interaction
+    const reactionBar = parent.querySelector('.reaction-bar');
+    if (reactionBar) {
+      reactionBar.classList.add('reactions-disabled');
+    }
 
   } else {
     el.innerHTML = `
@@ -536,14 +533,13 @@ if (diff <= 0) {
     }
 
     parent.classList.add('now_live');        // 🔴 Glow on live
-    parent.classList.remove('event_past');   // 👈 remove faded class if revived
+    parent.classList.remove('event_past');   // 👈 Remove old style
 
-    // ✅ Enable reactions again just in case
-    parent.querySelectorAll('.reaction-bar button').forEach(btn => {
-      btn.disabled = false;
-      btn.classList.remove('disabled');
-      btn.removeAttribute('title');
-    });
+    // ✨ Restore interactions
+    const reactionBar = parent.querySelector('.reaction-bar');
+    if (reactionBar) {
+      reactionBar.classList.remove('reactions-disabled');
+    }
   }
 
   return;
