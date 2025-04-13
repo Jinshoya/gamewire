@@ -782,7 +782,7 @@ async function loadEvents() {
     }
     
     document.addEventListener("DOMContentLoaded", async () => {
-  await loadEvents();
+  await loadEvents();});
   updateNowPlayingBar();
   startCountdowns(); // ✅ make sure this is here
   document.getElementById("eventLoadingSkeletons")?.remove();
