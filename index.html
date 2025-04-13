@@ -15,187 +15,137 @@
       margin: 0;
       padding: 40px 20px;
     }
-
-.event_card_wrap {
-  position: relative;
-  margin: 60px auto;
-  max-width: 1000px;
-}
-.event_card_wrapper {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  margin: 80px auto 40px;
-  max-width: 960px;
-}
-
-.event_logo_float {
-  position: absolute;
-  top: -40px;
-  left: -40px;
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  z-index: 2;
-  background: #1e1e2f;
-  border: 4px solid #fff;
-}
-
-.event_headliner {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.07);
-  border-radius: 24px;
-  padding: 40px;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: space-between;
-  gap: 32px;
-  flex-wrap: wrap;
-  position: relative;
-  z-index: 1;
-}
-
-.event_logo_img {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #1e1e2f;
-  border: 4px solid white;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-
-.event_logo_container {
-  position: absolute;
-  left: -80px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 5;
-}
-.event_card {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.event_img {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-  border-radius: 20px;
-}
-
-.event_content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.event_title {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin: 0;
-}
-
-.event_time {
-  font-size: 1rem;
-  opacity: 0.9;
-}
-
-.event_expectations .label {
-  font-size: 0.95rem;
-  margin-bottom: 6px;
-  font-weight: 500;
-}
-
-.reaction-bar {
-  background: #181c3a;
-  border-radius: 12px;
-  padding: 10px 14px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.reaction-bar button {
-  background: white;
-  color: black;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 6px 12px;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.reaction-bar button.reacted {
-  background: #f2c94c;
-  color: #000;
-}
-
-.watch-button {
-  background: #1f2251;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 16px;
-  font-weight: bold;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.play_icon {
-  background: white;
-  color: #1f2251;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-}
-
-
-    #nowPlayingBar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: #ff4d4d;
+  
+    .event_headliner_full {
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      margin: 60px auto;
+      max-width: 1040px;
+      background-color: rgba(255, 255, 255, 0.08);
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+  
+    .event_grid {
+      display: grid;
+      grid-template-columns: 160px 1fr auto;
+      align-items: center;
+      gap: 40px;
+    }
+  
+    .event_logo_float {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: #1e1e2f;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+  
+    .event_logo_float img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid white;
+    }
+  
+    .event_main {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    .event_title {
+      font-size: 2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  
+    .event_time {
+      font-size: 1.1rem;
+      opacity: 0.85;
+    }
+  
+    .event_watch {
+      display: flex;
+      align-items: center;
+    }
+  
+    .watch-button {
+      background: #1f2251;
       color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 12px 24px;
       font-weight: bold;
-      text-align: center;
-      padding: 6px 12px;
       font-size: 1rem;
-      z-index: 1000;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      display: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
     }
-
-    .content {
-      padding-top: 60px;
+  
+    .watch-button:hover {
+      background: #2b2e67;
     }
-
+  
+    .reaction-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #1e1e2f;
+      padding: 12px 16px;
+      border-radius: 16px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+  
+    .reaction-bar button {
+      background: #ffffff;
+      color: #111;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 1rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+  
+    .reaction-bar button.reacted {
+      background: #f2c94c;
+      color: #000;
+    }
+  
+    .label {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+  
     @media (max-width: 768px) {
-      .event_card {
-        flex-direction: column;
-        align-items: flex-start;
+      .event_grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 20px;
+        text-align: center;
       }
-      .watch-button {
+  
+      .event_logo_float {
+        margin: 0 auto;
+      }
+  
+      .event_watch {
         justify-content: center;
-        width: 100%;
       }
     }
   </style>
@@ -385,25 +335,24 @@
         const backgroundStyle = data.image ? `background-image: url('${data.image}');` : 'background-color: #2e2e57;';
 
 const html = `
-  <div class="event_card_wrapper">
-    ${data.logo ? `<div class="event_logo_container"><img src="${data.logo}" class="event_logo_img" alt="event logo" /></div>` : ""}
-    <div class="event_headliner" style="${backgroundStyle}; background-size: cover; background-position: center; --event-border-color: ${borderColor};">
-      <div class="event_card">
-        <div class="event_content">
-          <h2 class="event_title">${data.title}</h2>
-          <div class="event_time">${isSteam ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : date.toLocaleString()}</div>
-          <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div>
+  <div class="event_headliner_full" style="${backgroundStyle}; background-size: cover; background-position: center; --event-border-color: ${borderColor};">
+    <div class="event_grid">
+      ${data.logo ? `<div class="event_logo_float"><img src="${data.logo}" alt="event logo" /></div>` : ""}
 
-          <div class="event_expectations">
-            <div class="label">Your expectations</div>
-            <div class="reaction-bar" data-event="${slug}">
-              ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
-            </div>
+      <div class="event_main">
+        <h2 class="event_title">${data.title}</h2>
+        <div class="event_time">${isSteam ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : date.toLocaleString()}</div>
+        <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div>
+
+        <div class="event_expectations">
+          <div class="label">Your expectations</div>
+          <div class="reaction-bar" data-event="${slug}">
+            ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
           </div>
-
-          <div class="event_links">${renderLinks(data)}</div>
         </div>
+      </div>
 
+      <div class="event_watch">
         <a href="${data.links?.[0]?.url || '#'}" class="watch-button" target="_blank">
           Watch here <div class="play_icon">▶</div>
         </a>
