@@ -1,22 +1,22 @@
 ---
-title: Summer Game Fest 2
-date: 2025-04-13 13:20
+title: Day of the Devs
+date: 2025-06-07 02:00
 end: ""
-image: /images/uploads/2bd686ea-c3f5-4d9b-a642-9f5c873dbd51.png
+image: https://cdn.prod.website-files.com/65f20ae26ba45240543579d9/67f8a050a9b857f23b703251_day_of_devs-p-1600.webp
 logo: /images/uploads/sgf.png
 borderColor: "#ff6600"
 type: event
 youtube:
   icon: /images/links/youtube_link.png
-  url: https://www.youtube.com/watch?v=8tIgN7eICn4&list=RDGMEMYH9CUrFO7CfLJpaD7UR85w&index=3
+  url: https://www.youtube.com/@thegameawards
 twitch:
   icon: /images/links/twitch_link.png
-  url: https://www.youtube.com/watch?v=8tIgN7eICn4&list=RDGMEMYH9CUrFO7CfLJpaD7UR85w&index=3
+  url: https://www.twitch.tv/thegameawards
 website:
   icon: /images/links/web_link.png
-  url: https://www.youtube.com/watch?v=8tIgN7eICn4&list=RDGMEMYH9CUrFO7CfLJpaD7UR85w&index=3
+  url: https://www.summergamefest.com/
 steam:
   icon: /images/links/steam_link.png
-  url: https://www.youtube.com/watch?v=8tIgN7eICn4&list=RDGMEMYH9CUrFO7CfLJpaD7UR85w&index=3
+  url: ""
 links: []
 ---
