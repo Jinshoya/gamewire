@@ -753,14 +753,17 @@ function hideEmptySections() {
   const live = document.getElementById('live-events');
   const header = document.querySelector('.events_upnext.now_live');
 
-  if (live && live.children.length === 0) {
-    live.parentElement.style.display = 'none';   // hides event group
-    if (header) header.style.display = 'none';   // hides "NOW LIVE" title
-  } else {
+  const hasLiveEvent = live && live.querySelectorAll('.event_block').length > 0;
+
+  if (hasLiveEvent) {
     live.parentElement.style.display = '';
     if (header) header.style.display = '';
+  } else {
+    live.parentElement.style.display = 'none';
+    if (header) header.style.display = 'none';
   }
 }
+
 
     
     setInterval(updateNowPlayingBar, 3000);
