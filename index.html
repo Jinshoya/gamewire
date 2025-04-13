@@ -345,6 +345,11 @@
         justify-content: flex-start;
       }
     }
+/* Only animate scroll on hover of wrapper */
+.hover-scroll:hover .event_title.scrolling {
+  animation: scroll-title-pingpong 10s ease-in-out infinite;
+}
+
     .reaction-bar.reactions-disabled {
   opacity: 0.5;
   pointer-events: none; /* disables clicks but allows hover */
@@ -608,17 +613,24 @@ if (diff <= 0) {
     
     async function loadEvents() {
       const res = await fetch('/events/index.json');
-const files = await res.json();
+      const files = await res.json();
 
-// 🧠 Load and parse all events first
 const events = [];
-for (const data of events) {
-  const file = data._filename;
+
+for (const file of files) {
   const response = await fetch(`/events/${file}`);
   const raw = await response.text();
   const { attributes: data } = parseFrontmatter(raw);
-  data._filename = file; // store filename for later
+  data._filename = file;
   events.push(data);
+}
+
+// 🗂️ Sort all events by start date
+events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+for (const data of events) {
+  const file = data._filename;
+  // ⬇️ move the rest of your logic here
 }
 
 // 🗂️ Sort events by start date
@@ -723,9 +735,10 @@ const html = `
     const wrapper = title.parentElement;
     const overflow = title.scrollWidth - wrapper.clientWidth;
     if (overflow > 10) {
-      title.classList.add('scrolling');
-      title.style.setProperty('--scroll-distance', `-${overflow}px`);
-    }
+  title.classList.add('scrolling');
+  title.parentElement.classList.add('hover-scroll'); // wrapper gets class
+  title.style.setProperty('--scroll-distance', `-${overflow}px`);
+}
   });
 }, 100);
     }
