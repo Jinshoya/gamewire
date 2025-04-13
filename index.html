@@ -338,15 +338,28 @@
         const borderColor = data.borderColor || '#d9a62d';
     
         const html = `
-          <div class="event_headliner" style="--event-border-color: ${borderColor};">
-            <div class="event_head">
-<div class="event_logo" data-border-color="${borderColor}">
-  <img src="${data.image}" alt="${data.title}" style="border-color: ${borderColor};">
-  <div class="reaction-bar" data-event="${slug}">
-    ${['😂','😴','💩','😞','🔥'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+<div class="event_headliner">
+  <div class="event_card">
+    <img class="event_img" src="${data.image}" alt="${data.title}">
+
+    <div class="event_details">
+      <h2 class="event_title">${data.title}</h2>
+      <div class="event_time">${isSteam ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : date.toLocaleString()}</div>
+
+      <div class="event_expectations">
+        <div class="label">Your expectations</div>
+        <div class="reaction-bar" data-event="${slug}">
+          ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <a href="#" class="watch-button">
+      Watch here <div class="play_icon">▶️</div>
+    </a>
   </div>
 </div>
-              <div class="event_flex">
+   <div class="event_flex">
                 <div class="col-sm"><div class="event_upc_title">${data.title}</div></div>
                 <div class="col-sm"><div class="event_date">${isSteam ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}` : date.toLocaleString()}</div></div>
                 <div class="col-sm"><div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div></div>
