@@ -113,20 +113,14 @@
       line-height: 1.4;
     }
     
-    .event_date span.number {
-      color: white;
-      font-weight: 600;
-    }
-    
-    .event_date span.unit {
+    .event_date .muted {
       color: #aaa;
-      font-weight: 500;
     }
     
     .countdown {
       font-size: 0.95rem;
       opacity: 0.8;
-      margin-bottom: 16px;
+      margin-bottom: 6px;
     }
     
     .event_countdown {
@@ -151,20 +145,23 @@
       font-size: 0.95rem;
     }
     
-    .event_expectations_row {
+    /* 👉 Expectations + Links as distant blocks */
+    .event_expectations_wrapper {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-top: 10px;
-      gap: 20px;
+      align-items: flex-end;
+      margin-top: auto;
+      width: 100%;
     }
     
+    /* 👈 Your expectations */
     .event_reacts {
       background: #14142b;
       border-radius: 14px;
       padding: 12px 16px;
       display: flex;
       flex-direction: column;
+      max-width: 80%;
     }
     
     .event_reacts .label {
@@ -199,6 +196,7 @@
       background: #f2c94c;
     }
     
+    /* 👉 Check it out block */
     .event_links_block {
       background: #14142b;
       border-radius: 14px;
@@ -206,8 +204,9 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      justify-content: center;
-      min-width: 140px;
+      justify-content: space-between;
+      min-width: 150px;
+      height: 100%;
     }
     
     .event_links_block .label {
@@ -218,13 +217,13 @@
       text-align: right;
     }
     
-    .event_links_block .event_links {
+    .event_links {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
     }
     
-    .event_links_block .event_links img {
+    .event_links img {
       width: 26px;
       height: 26px;
       object-fit: contain;
@@ -232,10 +231,11 @@
       transition: transform 0.2s ease;
     }
     
-    .event_links_block .event_links img:hover {
+    .event_links img:hover {
       transform: scale(1.1);
     }
     
+    /* 🎮 Watch button */
     .watch-button {
       background: #271e6e;
       color: white;
@@ -260,6 +260,7 @@
       font-size: 1.2rem;
     }
     
+    /* 📱 Mobile tweaks */
     @media (max-width: 768px) {
       .content,
       .event_block,
@@ -286,22 +287,23 @@
         gap: 20px;
       }
     
-      .event_expectations_row {
+      .event_expectations_wrapper {
         flex-direction: column;
         align-items: flex-start;
+        gap: 12px;
       }
     
       .event_links_block {
-        justify-content: flex-start;
         align-items: flex-start;
-        margin-top: 10px;
+        justify-content: flex-start;
       }
     
-      .event_links_block .label {
-        text-align: left;
+      .event_links {
+        justify-content: flex-start;
       }
     }
     </style>
+    
     
     
   
@@ -584,7 +586,7 @@ function formatRange(start, end) {
 
 
 
-      const html = `
+const html = `
 <div class="event_block">
   <div class="event_logo">
     <img src="${data.logo}" alt="logo" />
@@ -610,7 +612,7 @@ function formatRange(start, end) {
              ${data.end ? `data-end-event-date="${data.end}"` : ''}>
         </div>
 
-        <div class="event_expectations_row">
+        <div class="event_expectations_wrapper">
           <div class="event_reacts">
             <div class="label">Your expectations</div>
             <div class="reaction-bar" data-event="${slug}">
