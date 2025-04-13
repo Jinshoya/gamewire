@@ -335,55 +335,37 @@
     function renderLinks(data) {
   const links = [];
 
-  // Add legacy "link" field
-  if (data.link) {
-    links.push({
-      url: data.link,
-      icon: '/images/links/web_link.png',
-      label: 'Official Site'
-    });
-  }
+  const pushIfValid = (entry, label, fallbackIcon) => {
+    if (entry?.url) {
+      links.push({
+        url: entry.url,
+        icon: entry.icon || fallbackIcon,
+        label
+      });
+    }
+  };
 
-  // Support CMS-style youtube/twitch/website/steam if ever used
-  if (data.youtube?.url) {
-    links.push({
-      url: data.youtube.url,
-      icon: data.youtube.icon || '/images/links/youtube_link.png',
-      label: 'YouTube'
-    });
-  }
+  pushIfValid(data.youtube, 'YouTube', '/images/links/youtube_link.png');
+  pushIfValid(data.twitch, 'Twitch', '/images/links/twitch_link.png');
+  pushIfValid(data.website, 'Website', '/images/links/web_link.png');
+  pushIfValid(data.steam, 'Steam', '/images/links/steam_link.png');
 
-  if (data.twitch?.url) {
-    links.push({
-      url: data.twitch.url,
-      icon: data.twitch.icon || '/images/links/twitch_link.png',
-      label: 'Twitch'
-    });
-  }
-
-  if (data.website?.url) {
-    links.push({
-      url: data.website.url,
-      icon: data.website.icon || '/images/links/web_link.png',
-      label: 'Website'
-    });
-  }
-
-  if (data.steam?.url) {
-    links.push({
-      url: data.steam.url,
-      icon: data.steam.icon || '/images/links/steam_link.png',
-      label: 'Steam'
-    });
-  }
-
+  // Custom link list
   if (Array.isArray(data.links)) {
-    links.push(...data.links);
+    data.links.forEach(link => {
+      if (link.url) {
+        links.push({
+          url: link.url,
+          icon: link.icon || '/images/links/web_link.png',
+          label: link.label || 'Link'
+        });
+      }
+    });
   }
 
   return links.map(link => `
-    <a href="${link.url}" target="_blank" title="${link.label || 'Watch'}">
-      <img src="${link.icon || '/images/links/default.png'}" class="links_image" alt="${link.label || 'Watch'}" />
+    <a href="${link.url}" target="_blank" title="${link.label}">
+      <img src="${link.icon}" class="links_image" alt="${link.label}" />
     </a>
   `).join('');
 }
