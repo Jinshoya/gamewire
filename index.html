@@ -644,7 +644,6 @@ if (diff <= 0) {
   for (const data of parsedEvents) {
     const date = new Date(data.date);
     const isPast = date < now;
-    const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : 'upcoming-events';
     const isSteam = data.type === 'steam_sale';
     const slug = data.slug || data._filename.replace('.md', '');
 
