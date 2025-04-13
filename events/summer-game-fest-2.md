@@ -1,7 +1,7 @@
 ---
 title: Summer Game Fest 2
 date: 2025-04-13 13:20
-end: 2025-04-13 10:53
+end: ""
 image: /images/uploads/2bd686ea-c3f5-4d9b-a642-9f5c873dbd51.png
 logo: /images/uploads/sgf.png
 borderColor: "#ff6600"
