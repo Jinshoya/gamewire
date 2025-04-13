@@ -337,24 +337,15 @@
     function renderLinks(data) {
   const links = [];
 
-  const pushIfValid = (entry, label, fallbackIcon) => {
-    if (entry?.url) {
-      links.push({
-        url: entry.url,
-        icon: entry.icon || fallbackIcon,
-        label
-      });
-    }
-  };
-
-  pushIfValid(data.youtube, 'YouTube', '/images/links/youtube_link.png');
-  pushIfValid(data.twitch, 'Twitch', '/images/links/twitch_link.png');
-  pushIfValid(data.website, 'Website', '/images/links/web_link.png');
-  pushIfValid(data.steam, 'Steam', '/images/links/steam_link.png');
+  if (data.youtube?.url) links.push(data.youtube);
+  if (data.twitch?.url) links.push(data.twitch);
+  if (data.website?.url) links.push(data.website);
+  if (data.steam?.url) links.push(data.steam);
+  if (Array.isArray(data.links)) links.push(...data.links);
 
   return links.map(link => `
-    <a href="${link.url}" target="_blank" title="${link.label}">
-      <img src="${link.icon}" class="links_image" alt="${link.label}" />
+    <a href="${link.url}" target="_blank">
+      <img src="${link.icon}" class="links_image" alt="${link.label || 'Watch'}" />
     </a>
   `).join('');
 }
@@ -517,13 +508,16 @@
     <div class="event_card_content">
       <div class="event_card_main">
         <h2 class="event_title">${data.title}</h2>
-        <p class="event_date">${isSteam
-          ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
-          : date.toLocaleString()}</p>
-<div class="countdown"
-     data-start-event-date="${data.date}"
-     ${data.end ? `data-end-event-date="${data.end}"` : ''}>
-</div>
+        <p class="event_date">
+          ${isSteam
+            ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
+            : date.toLocaleString()}
+        </p>
+
+        <div class="countdown"
+             data-start-event-date="${data.date}"
+             ${data.end ? `data-end-event-date="${data.end}"` : ''}>
+        </div>
 
         <div class="event_expectations">
           <div class="label">Your expectations</div>
@@ -533,9 +527,11 @@
         </div>
       </div>
 
-<div class="event_card_action">
-  <div class="event_links">${renderLinks(data)}</div>
-</div>
+      <div class="event_card_action">
+        <div class="event_links">
+          ${renderLinks(data)}
+        </div>
+      </div>
     </div>
   </div>
 </div>
