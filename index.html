@@ -25,50 +25,69 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       max-width: 1000px;
       display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .event_card {
+      display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 32px;
-      flex-wrap: wrap;
+      gap: 24px;
     }
 
-    .event_logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .event_logo img {
-      max-width: 140px;
+    .event_img {
+      width: 120px;
+      height: 120px;
       border-radius: 20px;
+      object-fit: contain;
     }
 
-    .event_info {
+    .event_content {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    .event_upc_title {
-      font-size: 2rem;
-      font-weight: 600;
+    .event_text {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .event_date,
+    .event_title {
+      font-size: 1.9rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .event_time,
     .countdown {
-      font-size: 1.1rem;
-      opacity: 0.85;
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .event_links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .event_reactions .label {
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+      font-weight: 500;
     }
 
     .reaction-bar {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       background: #1e1e2f;
-      padding: 12px 16px;
-      border-radius: 16px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      padding: 10px 16px;
+      border-radius: 12px;
     }
 
     .reaction-bar button {
@@ -76,13 +95,12 @@
       color: #111;
       border: none;
       border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 1rem;
-      font-weight: bold;
+      padding: 6px 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 4px;
       cursor: pointer;
     }
 
@@ -94,20 +112,25 @@
     .watch-button {
       background: #1f2251;
       color: white;
-      border: none;
+      padding: 12px 20px;
       border-radius: 16px;
-      padding: 12px 24px;
       font-weight: bold;
-      font-size: 1rem;
+      text-decoration: none;
       display: flex;
       align-items: center;
       gap: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease;
     }
 
-    .watch-button:hover {
-      background: #2b2e67;
+    .play_icon {
+      background: white;
+      color: #1f2251;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
     }
 
     #nowPlayingBar {
@@ -131,16 +154,10 @@
     }
 
     @media (max-width: 768px) {
-      .event_headliner {
+      .event_card {
         flex-direction: column;
-        text-align: center;
-        padding: 24px;
+        align-items: flex-start;
       }
-
-      .event_logo img {
-        margin: 0 auto;
-      }
-
       .watch-button {
         justify-content: center;
         width: 100%;
@@ -149,31 +166,24 @@
   </style>
 </head>
 <body>
-
   <div id="nowPlayingBar" style="display:none;"></div>
-
   <div class="section-tabs">
     <button onclick="scrollToSection('steam-sale-event')">Steam Sale</button>
     <button onclick="scrollToSection('live-events')">Now Live</button>
     <button onclick="scrollToSection('upcoming-events')">Upcoming</button>
   </div>
-
   <div id="eventLoadingSkeletons">
     <div class="skeleton-card"></div>
     <div class="skeleton-card"></div>
   </div>
-
   <div class="content" style="margin-left:auto; margin-right:auto; max-width:960px;">
     <div class="container">
       <div class="events_upnext">Next Steam Sale</div>
       <div class="events_grouped"><div class="events" id="steam-sale-event"></div></div>
-
       <div class="events_upnext">NOW LIVE</div>
       <div class="events_grouped"><div class="events" id="live-events"></div></div>
-
       <div class="events_upnext">Upcoming Events</div>
       <div class="events_grouped"><div class="events" id="upcoming-events"></div></div>
-
       <div class="events_upcoming">Old Events</div>
       <div class="events_grouped"><div class="events" id="past-events"></div></div>
     </div>
