@@ -3,6 +3,7 @@ title: nintendo
 date: 2025-04-25T19:50:36.317Z
 end: 2025-04-11T19:50:36.322Z
 image: /images/uploads/ninteno_direct-2x.png
+logo: /images/uploads/sgf.png
 borderColor: "#ff6600"
 type: event
 youtube:
