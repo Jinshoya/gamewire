@@ -2,7 +2,7 @@
 title: nintendo
 date: 2025-04-12 13:01
 end: 2025-04-12 13:01
-image: /images/uploads/ninteno_direct-2x.png
+image: /images/uploads/bg1.png
 logo: /images/uploads/sgf.png
 borderColor: "#ff6600"
 type: event
