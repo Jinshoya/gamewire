@@ -17,7 +17,11 @@
       margin: 0;
       padding: 0;
     }
-    
+    .event_past {
+  filter: grayscale(100%) brightness(0.6);
+  opacity: 0.8;
+}
+
     .content {
   width: 100%;
   max-width: 840px;
@@ -329,14 +333,21 @@
     }
     
     function renderLinks(data) {
-      const links = [];
-      if (data.youtube?.url) links.push(data.youtube);
-      if (data.twitch?.url) links.push(data.twitch);
-      if (data.website?.url) links.push(data.website);
-      if (data.steam?.url) links.push(data.steam);
-      if (Array.isArray(data.links)) links.push(...data.links);
-      return links.map(link => `<a href="${link.url}" target="_blank"><img src="${link.icon}" class="links_image" alt="${link.label}"></a>`).join('');
-    }
+  const links = [];
+
+  if (data.youtube?.url) links.push(data.youtube);
+  if (data.twitch?.url) links.push(data.twitch);
+  if (data.website?.url) links.push(data.website);
+  if (data.steam?.url) links.push(data.steam);
+  if (Array.isArray(data.links)) links.push(...data.links);
+
+  return links.map(link => `
+    <a href="${link.url}" target="_blank" title="${link.label}">
+      <img src="${link.icon}" class="links_image" alt="${link.label}">
+    </a>
+  `).join('');
+}
+
     
     async function react(button, emoji) {
       const wrapper = button.closest('.reaction-bar');
@@ -404,43 +415,45 @@
       const now = new Date();
       const diff = start - now;
       const elapsed = now - start;
-      const parent = el.closest('.event_headliner');
+      const parent = el.closest('.event_block');
       const isSteam = parent.closest('#steam-sale-event');
 
       // If the event is a Steam Sale and has ended, remove it
-      if (isSteam && end && now >= end) return parent.remove();
+      if (isSteam && end && now >= end) {
+        return parent.remove();
+      }
 
-      // If the event has started, check if it should be moved to past events
+      // If the event has started
       if (diff <= 0) {
-        el.textContent = 'Started';
+        el.innerHTML = `<div class="event_countdown"><span class="number">NOW LIVE</span></div>`;
 
-        // Only move the event to Past Events if it's been 1 hour since the start
         if (elapsed >= 3600000) {
-          // Prevent the event from being moved back to 'Now Live' after it's been moved to 'Past Events'
           if (parent.parentElement.id !== 'past-events') {
             document.getElementById('past-events').appendChild(parent);
+            parent.classList.add('event_past'); // For greying out
           }
         } else if (parent.parentElement.id !== 'live-events') {
-          // Move the event to 'Live Events' if it hasn't been moved yet
           document.getElementById('live-events').appendChild(parent);
         }
+
         return;
       }
 
-      // Update the countdown time
+      // Else: show countdown
       const totalSeconds = Math.floor(diff / 1000);
       const days = Math.floor(totalSeconds / 86400);
       const hours = Math.floor((totalSeconds % 86400) / 3600);
       const mins = Math.floor((totalSeconds % 3600) / 60);
-      el.innerHTML = `
-  <div class="event_countdown">
-    Starting in
-    <span class="number">${days}</span><span class="unit">d</span>
-    <span class="number">${hours}</span><span class="unit">h</span>
-    <span class="number">${mins}</span><span class="unit">m</span>
-    <span class="number">${Math.floor((totalSeconds % 60))}</span><span class="unit">s</span>
-  </div>`;
+      const secs = totalSeconds % 60;
 
+      el.innerHTML = `
+        <div class="event_countdown">
+          Starting in
+          <span class="number">${days}</span><span class="unit">d</span>
+          <span class="number">${hours}</span><span class="unit">h</span>
+          <span class="number">${mins}</span><span class="unit">m</span>
+          <span class="number">${secs}</span><span class="unit">s</span>
+        </div>`;
     });
   }, 1000);
 }
@@ -488,7 +501,10 @@
         <p class="event_date">${isSteam
           ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
           : date.toLocaleString()}</p>
-        <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}></div>
+<div class="countdown"
+     data-start-event-date="${data.date}"
+     ${data.end ? `data-end-event-date="${data.end}"` : ''}>
+</div>
 
         <div class="event_expectations">
           <div class="label">Your expectations</div>
@@ -498,9 +514,9 @@
         </div>
       </div>
 
-      <div class="event_card_action">
-        <div class="event_links">${renderLinks(data)}</div>
-      </div>
+<div class="event_card_action">
+  <div class="event_links">${renderLinks(data)}</div>
+</div>
     </div>
   </div>
 </div>
@@ -532,10 +548,12 @@
     }
     
     document.addEventListener("DOMContentLoaded", async () => {
-      await loadEvents();
-      updateNowPlayingBar();
-      document.getElementById("eventLoadingSkeletons")?.remove();
-    });
+  await loadEvents();
+  updateNowPlayingBar();
+  startCountdowns(); // ✅ make sure this is here
+  document.getElementById("eventLoadingSkeletons")?.remove();
+});
+
     
     setInterval(updateNowPlayingBar, 3000);
     </script>
