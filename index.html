@@ -137,6 +137,26 @@
   transform: translateX(var(--scroll-distance)); /* 👈 smooth slide on hover */
 }
 
+.events_upnext,
+.events_upcoming {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 60px 0 20px;
+  padding-left: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  border-left: 4px solid #ffffff22;
+  background: linear-gradient(to right, #ffffff10, transparent);
+}
+
+.events_upnext.now_live {
+  color: #ff5e5e;
+  border-left-color: #ff5e5e66;
+  background: linear-gradient(to right, #ff5e5e22, transparent);
+}
+
+
 @keyframes scroll-title-pingpong {
   0%   { transform: translateX(0); }
   50%  { transform: translateX(var(--scroll-distance)); }
@@ -364,12 +384,16 @@
     <div class="container">
       <div class="events_upnext">Next Steam Sale</div>
       <div class="events_grouped"><div class="events" id="steam-sale-event"></div></div>
-      <div class="events_upnext">NOW LIVE</div>
+      
+      <div class="events_upnext now_live">NOW LIVE</div>
       <div class="events_grouped"><div class="events" id="live-events"></div></div>
+      
       <div class="events_upnext">Upcoming Events</div>
       <div class="events_grouped"><div class="events" id="upcoming-events"></div></div>
+      
       <div class="events_upcoming">Old Events</div>
       <div class="events_grouped"><div class="events" id="past-events"></div></div>
+      
     </div>
   </div>
 
