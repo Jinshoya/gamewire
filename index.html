@@ -335,33 +335,25 @@
     function renderLinks(data) {
   const links = [];
 
-  if (data.youtube) {
-    links.push(typeof data.youtube === 'string'
-      ? { url: data.youtube, icon: '/icons/youtube.png', label: 'YouTube' }
-      : data.youtube);
-  }
+  // Normalize each supported service
+  const normalize = (entry, label, iconPath) => {
+    if (!entry) return null;
+    if (typeof entry === 'string') {
+      return { url: entry, icon: iconPath, label };
+    }
+    return entry;
+  };
 
-  if (data.twitch) {
-    links.push(typeof data.twitch === 'string'
-      ? { url: data.twitch, icon: '/icons/twitch.png', label: 'Twitch' }
-      : data.twitch);
-  }
+  const yt = normalize(data.youtube, 'YouTube', '/icons/youtube.png');
+  const tw = normalize(data.twitch, 'Twitch', '/icons/twitch.png');
+  const site = normalize(data.website, 'Website', '/icons/website.png');
+  const steam = normalize(data.steam, 'Steam', '/icons/steam.png');
 
-  if (data.website) {
-    links.push(typeof data.website === 'string'
-      ? { url: data.website, icon: '/icons/website.png', label: 'Website' }
-      : data.website);
-  }
-
-  if (data.steam) {
-    links.push(typeof data.steam === 'string'
-      ? { url: data.steam, icon: '/icons/steam.png', label: 'Steam' }
-      : data.steam);
-  }
-
-  if (Array.isArray(data.links)) {
-    links.push(...data.links);
-  }
+  if (yt) links.push(yt);
+  if (tw) links.push(tw);
+  if (site) links.push(site);
+  if (steam) links.push(steam);
+  if (Array.isArray(data.links)) links.push(...data.links);
 
   return links.map(link => `
     <a href="${link.url}" target="_blank" title="${link.label || 'Watch'}">
@@ -369,6 +361,7 @@
     </a>
   `).join('');
 }
+
 
 
 
