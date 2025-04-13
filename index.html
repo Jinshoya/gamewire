@@ -621,6 +621,91 @@ if (diff <= 0) {
     parsedEvents.push(data);
   }
 
+  // 🔁 Sort by event date
+  parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  for (const data of parsedEvents) {
+    const date = new Date(data.date);
+    const isPast = date < now;
+    const isSteam = data.type === 'steam_sale';
+    const slug = data.slug || data._filename.replace('.md', '');
+
+    const html = `
+<div class="event_block ${data.status === 'live' ? 'now_live' : ''}">
+  <div class="event_logo">
+    <img src="${data.logo}" alt="logo" />
+  </div>
+
+  <div class="event_card" style="background-image: url('${data.image}')">
+    <div class="event_card_overlay"></div>
+    <div class="event_card_content">
+      <div class="event_card_main">
+        <div class="event_title_wrapper">
+          <h2 class="event_title">${data.title}</h2>
+        </div>
+        <p class="event_date">
+          ${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}
+        </p>
+        <div class="countdown"
+             data-start-event-date="${data.date}"
+             ${data.end ? `data-end-event-date="${data.end}"` : ''}>
+        </div>
+      </div>
+
+      <div class="event_expectations_wrapper">
+        <div class="event_reacts">
+          <div class="label">Your expectations</div>
+          <div class="reaction-bar" data-event="${slug}">
+            ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
+          </div>
+        </div>
+
+        <div class="event_links_block">
+          <div class="label">Check it out</div>
+          <div class="event_links">
+            ${renderLinks(data)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+    const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
+    const container = document.getElementById(target);
+    if (container) container.insertAdjacentHTML("beforeend", html);
+
+    // 🌟 Enable scrolling title if overflow
+    setTimeout(() => {
+      const titles = container.querySelectorAll('.event_title');
+      titles.forEach(title => {
+        const wrapper = title.parentElement;
+        const overflow = title.scrollWidth - wrapper.clientWidth;
+        if (overflow > 10) {
+          title.classList.add('scrolling');
+          title.parentElement.classList.add('hover-scroll');
+          title.style.setProperty('--scroll-distance', `-${overflow}px`);
+        }
+      });
+    }, 100);
+  }
+}
+
+  const res = await fetch('/events/index.json');
+  const files = await res.json();
+  const now = new Date();
+
+  const parsedEvents = [];
+
+  for (const file of files) {
+    const response = await fetch(`/events/${file}`);
+    const raw = await response.text();
+    const { attributes: data } = parseFrontmatter(raw);
+    data._filename = file;
+    parsedEvents.push(data);
+  }
+
   // Sort events by their actual event date
   parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
