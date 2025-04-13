@@ -317,6 +317,13 @@
         justify-content: flex-start;
       }
     }
+    .reaction-bar button:disabled,
+.reaction-bar button.disabled {
+  background: #555 !important;
+  color: #999 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
     </style>
     
 
@@ -499,33 +506,48 @@ function renderLinks(data) {
       return parent.remove();
     }
 
-    // If the event has already started
-    if (diff <= 0) {
-      if (elapsed >= 3600000) {
-        if (parent.parentElement.id !== 'past-events') {
-          document.getElementById('past-events').appendChild(parent);
-        }
-
-        parent.classList.add('event_past');      // 🩶 Gray it out
-        parent.classList.remove('now_live');     // 🔴 Remove live glow
-        el.innerHTML = '';                       // Hide countdown
-      } else {
-        el.innerHTML = `
-          <div class="event_countdown">
-            <span class="number">NOW LIVE</span>
-          </div>
-        `;
-
-        if (parent.parentElement.id !== 'live-events') {
-          document.getElementById('live-events').appendChild(parent);
-        }
-
-        parent.classList.add('now_live');        // 🔴 Glow on live
-        parent.classList.remove('event_past');   // 👈 remove faded class if revived
-      }
-
-      return;
+// If the event has already started
+if (diff <= 0) {
+  if (elapsed >= 3600000) {
+    if (parent.parentElement.id !== 'past-events') {
+      document.getElementById('past-events').appendChild(parent);
     }
+
+    parent.classList.add('event_past');      // 🩶 Gray it out
+    parent.classList.remove('now_live');     // 🔴 Remove live glow
+    el.innerHTML = '';                       // Hide countdown
+
+    // 🚫 Disable all reaction buttons in this block
+    parent.querySelectorAll('.reaction-bar button').forEach(btn => {
+      btn.disabled = true;
+      btn.classList.add('disabled');
+      btn.setAttribute('title', 'Event has ended');
+    });
+
+  } else {
+    el.innerHTML = `
+      <div class="event_countdown">
+        <span class="number">NOW LIVE</span>
+      </div>
+    `;
+
+    if (parent.parentElement.id !== 'live-events') {
+      document.getElementById('live-events').appendChild(parent);
+    }
+
+    parent.classList.add('now_live');        // 🔴 Glow on live
+    parent.classList.remove('event_past');   // 👈 remove faded class if revived
+
+    // ✅ Enable reactions again just in case
+    parent.querySelectorAll('.reaction-bar button').forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove('disabled');
+      btn.removeAttribute('title');
+    });
+  }
+
+  return;
+}
 
     // Else: show countdown for upcoming event
     const totalSeconds = Math.floor(diff / 1000);
