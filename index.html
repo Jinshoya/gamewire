@@ -31,45 +31,32 @@
     
     .event_card {
       position: relative;
-      display: flex;
-      align-items: center;
-      padding: 20px 32px 20px 160px;
-      border-radius: 20px;
       background-size: cover;
       background-position: center;
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      padding: 32px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      background-color: rgba(0,0,0,0.3);
       overflow: hidden;
-      min-height: 140px;
-      backdrop-filter: blur(18px);
-      background-color: rgba(0, 0, 0, 0.25);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      color: white;
     }
     
-    .event_card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(10, 25, 75, 0.4);
-      z-index: 0;
-      backdrop-filter: blur(12px);
-    }
-    
-    .event_card > * {
-      position: relative;
-      z-index: 1;
+    .event_card_inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
     }
     
     .event_logo {
-      position: absolute;
-      top: 50%;
-      left: 20px;
-      transform: translateY(-50%);
-      width: 110px;
-      height: 110px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
       overflow: hidden;
       flex-shrink: 0;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
-      background: #000;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     }
     
     .event_logo img {
@@ -79,23 +66,25 @@
       display: block;
     }
     
-    .event_content {
+    .event_details {
+      flex: 1;
+      min-width: 260px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      flex: 1;
+      gap: 12px;
     }
     
     .event_title {
-      font-size: 1.75rem;
+      font-size: 2.1rem;
       font-weight: 600;
       margin: 0;
     }
     
-    .event_time {
+    .event_date {
       font-size: 1rem;
       opacity: 0.85;
-      margin-top: 2px;
+      line-height: 1.5;
+      margin: 0;
     }
     
     .countdown {
@@ -104,38 +93,37 @@
       opacity: 0.85;
     }
     
-    .event_expectations {
-      margin-top: 10px;
+    .expectations_block {
+      background: #14142b;
+      padding: 14px;
+      border-radius: 14px;
+      max-width: fit-content;
     }
     
-    .event_expectations .label {
+    .expectations_block .label {
+      font-size: 1rem;
       font-weight: 600;
-      margin-bottom: 6px;
-      font-size: 0.95rem;
+      margin-bottom: 10px;
     }
     
     .reaction-bar {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 8px 12px;
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      width: fit-content;
     }
     
     .reaction-bar button {
       background: white;
-      border: none;
-      border-radius: 999px;
-      font-size: 0.9rem;
+      color: black;
       font-weight: 600;
-      padding: 4px 12px;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.95rem;
+      border: none;
       display: flex;
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      color: #333;
       transition: all 0.2s ease;
     }
     
@@ -150,17 +138,17 @@
     
     .watch-button {
       background: #271e6e;
-      border-radius: 14px;
-      padding: 10px 18px;
-      font-size: 1rem;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
       color: white;
       text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      border-radius: 16px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
       transition: all 0.2s ease;
-      margin-top: 12px;
     }
     
     .watch-button:hover {
@@ -173,34 +161,32 @@
     }
     
     @media (max-width: 768px) {
-      .event_card {
+      .event_card_inner {
         flex-direction: column;
-        padding: 100px 20px 30px;
         align-items: center;
         text-align: center;
       }
     
       .event_logo {
-        left: 50%;
-        top: -40px;
-        transform: translateX(-50%);
         width: 100px;
         height: 100px;
       }
     
-      .event_title {
-        font-size: 1.5rem;
-      }
-    
-      .event_time {
-        font-size: 0.95rem;
-      }
-    
       .watch-button {
+        margin-top: 20px;
         justify-content: center;
+      }
+    
+      .event_title {
+        font-size: 1.8rem;
+      }
+    
+      .event_date {
+        font-size: 0.95rem;
       }
     }
     </style>
+    
     
     
 </head>
@@ -388,30 +374,32 @@
       const backgroundStyle = data.image ? `background-image: url('${data.image}');` : 'background-color: #2e2e57;';
 
       const html = `
-<div class="event_block">
-  <div class="event_card" style="${backgroundStyle};">
-    ${data.logo ? `<div class="event_logo"><img src="${data.logo}" alt="logo" /></div>` : ""}
-    <div class="event_content">
+<div class="event_card" style="background-image: url('${data.image}')">
+  <div class="event_card_inner">
+    <div class="event_logo">
+      <img src="${data.logo}" alt="logo" />
+    </div>
+    <div class="event_details">
       <h2 class="event_title">${data.title}</h2>
-      <div class="event_time">
-        ${isSteam
-          ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
-          : date.toLocaleString()}
-      </div>
-      <div class="countdown" data-start-event-date="${data.date}" ${data.end ? `data-end-event-date="${data.end}"` : ''}>...</div>
+      <p class="event_date">${isSteam
+        ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
+        : date.toLocaleString()}
+      </p>
 
-      <div class="event_expectations">
+      <div class="expectations_block">
         <div class="label">Your expectations</div>
         <div class="reaction-bar" data-event="${slug}">
           ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
         </div>
       </div>
-
-      <a href="${data.links?.[0]?.url || '#'}" class="watch-button" target="_blank">
-        Watch here <div class="play_icon">▶</div>
-      </a>
     </div>
+
+    <a class="watch-button" href="${data.links?.[0]?.url || '#'}" target="_blank">
+      Watch here <span class="play_icon">▶</span>
+    </a>
   </div>
+</div>
+
 </div>`;
 
       const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
