@@ -335,25 +335,35 @@
     function renderLinks(data) {
   const links = [];
 
-  // Normalize each supported service
-  const normalize = (entry, label, iconPath) => {
-    if (!entry) return null;
-    if (typeof entry === 'string') {
-      return { url: entry, icon: iconPath, label };
-    }
-    return entry;
-  };
+  // Handle CMS object structure for each known source
+  if (data.youtube?.url) links.push({
+    url: data.youtube.url,
+    icon: data.youtube.icon || '/images/links/youtube_link.png',
+    label: 'YouTube'
+  });
 
-  const yt = normalize(data.youtube, 'YouTube', '/icons/youtube.png');
-  const tw = normalize(data.twitch, 'Twitch', '/icons/twitch.png');
-  const site = normalize(data.website, 'Website', '/icons/website.png');
-  const steam = normalize(data.steam, 'Steam', '/icons/steam.png');
+  if (data.twitch?.url) links.push({
+    url: data.twitch.url,
+    icon: data.twitch.icon || '/images/links/twitch_link.png',
+    label: 'Twitch'
+  });
 
-  if (yt) links.push(yt);
-  if (tw) links.push(tw);
-  if (site) links.push(site);
-  if (steam) links.push(steam);
-  if (Array.isArray(data.links)) links.push(...data.links);
+  if (data.website?.url) links.push({
+    url: data.website.url,
+    icon: data.website.icon || '/images/links/web_link.png',
+    label: 'Website'
+  });
+
+  if (data.steam?.url) links.push({
+    url: data.steam.url,
+    icon: data.steam.icon || '/images/links/steam_link.png',
+    label: 'Steam'
+  });
+
+  // Handle custom links
+  if (Array.isArray(data.links)) {
+    links.push(...data.links);
+  }
 
   return links.map(link => `
     <a href="${link.url}" target="_blank" title="${link.label || 'Watch'}">
@@ -361,7 +371,6 @@
     </a>
   `).join('');
 }
-
 
 
 
