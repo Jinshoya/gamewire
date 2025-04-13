@@ -19,48 +19,53 @@
     }
     
     .content {
-      width: 1070px;
-      margin: 100px auto;
-      padding: 0 20px;
-    }
+  width: 100%;
+  max-width: 960px;
+  margin: 100px auto;
+  padding: 0 20px;
+}
     
-    .event_block {
-      position: relative;
-      width: 1070px;
-      margin: 140px auto 100px;
-    }
+.event_block {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 160px auto 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
     
-    .event_logo {
-      position: absolute;
-      top: -60px;
-      left: -80px;
-      width: 255px;
-      height: 255px;
-      border-radius: 50%;
-      overflow: hidden;
-      z-index: 3;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-      background: #000;
-    }
+.event_logo {
+  position: absolute;
+  top: -60px;
+  left: -130px; /* moves logo out but keeps block centered */
+  width: 255px;
+  height: 255px;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 3;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  background: #000;
+}
     
-    .event_logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    
-    .event_card {
-      position: relative;
-      width: 1070px;
-      height: 280px;
-      border-radius: 20px;
-      background-size: cover;
-      background-position: center;
-      overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      padding-left: 300px; /* Leaves space for 255px logo + gap */
-    }
+.event_logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.event_card {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  border-radius: 20px;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  padding-left: 300px; /* space for logo */
+}
     
     .event_card_overlay {
       position: absolute;
