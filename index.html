@@ -127,11 +127,15 @@
   gap: 6px; /* ← Reduce vertical space between items */
 }
     
-    .event_title_wrapper {
-  width: 100%;
-  max-width: calc(100% - 24px); /* leave room for padding */
-  overflow: hidden;
-  position: relative;
+.event_title {
+  white-space: nowrap;
+  display: inline-block;
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin: 0;
+  transform: translateX(0);
+  transition: transform 1.2s ease-in-out;
+  max-width: 100%;
 }
 
 .event_title {
