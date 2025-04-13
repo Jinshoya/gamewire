@@ -117,13 +117,28 @@
       gap: 12px;
     }
     
-    .event_title {
-  font-size: clamp(1.6rem, 4vw, 2.2rem); /* Auto-adjusting font size */
+    .event_title_wrapper {
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.event_title {
+  white-space: nowrap;
+  display: inline-block;
+  animation: none;
+  font-size: 2.2rem;
   font-weight: 600;
   margin: 0;
-  line-height: 1.2;
-  max-width: 100%;
-  word-break: break-word;
+}
+
+.event_title.scrolling {
+  animation: scroll-title 10s linear infinite;
+}
+
+@keyframes scroll-title {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
     
     .event_date {
@@ -651,7 +666,10 @@ const html = `
 
     <div class="event_card_content">
       <div class="event_card_main">
-        <h2 class="event_title">${data.title}</h2>
+        <div class="event_title_wrapper">
+          <h2 class="event_title">${data.title}</h2>
+        </div>
+
         <p class="event_date">
           ${
             isSteam
@@ -659,6 +677,7 @@ const html = `
               : formatSingle(data.date)
           }
         </p>
+
         <div class="countdown"
              data-start-event-date="${data.date}"
              ${data.end ? `data-end-event-date="${data.end}"` : ''}>
@@ -687,10 +706,24 @@ const html = `
 
 
 
-      const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
-      const container = document.getElementById(target);
-      if (container) container.insertAdjacentHTML("beforeend", html);
+const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
+const container = document.getElementById(target);
+
+if (container) {
+  container.insertAdjacentHTML("beforeend", html);
+
+  // 🔁 Find the newly inserted .event_block
+  const blocks = container.querySelectorAll('.event_block');
+  const latest = blocks[blocks.length - 1];
+
+  setTimeout(() => {
+    const title = latest.querySelector('.event_title');
+    const wrapper = latest.querySelector('.event_title_wrapper');
+    if (title && wrapper && title.scrollWidth > wrapper.clientWidth) {
+      title.classList.add('scrolling');
     }
+  }, 100);
+}
 
     startCountdowns();
 
