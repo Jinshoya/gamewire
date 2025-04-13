@@ -338,7 +338,7 @@
 }
 
     
-    function renderLinks(data) {
+function renderLinks(data) {
   console.log("🧠 renderLinks CALLED for:", data.title);
 
   const links = [];
@@ -354,21 +354,17 @@
     }
   };
 
-// After — add null check safety (defensive fallback):
-try {
   tryPush(data.youtube, 'YouTube', '/images/links/youtube_link.png');
   tryPush(data.twitch, 'Twitch', '/images/links/twitch_link.png');
   tryPush(data.website, 'Website', '/images/links/web_link.png');
-} catch (e) {
-  console.warn(`🔧 Failed pushing links for ${data.title}:`, e);
-}
 
+  if (data.type === 'steam_sale') {
+    tryPush(data.steam, 'Steam', '/images/links/steam_link.png');
+  }
 
-  // Additional custom links
   if (Array.isArray(data.links)) {
     data.links.forEach((link, i) => {
       if (link.url) {
-        console.log(`✅ Custom Link [${i}]:`, link.url);
         links.push({
           url: link.url,
           icon: link.icon || '/images/links/web_link.png',
@@ -380,7 +376,7 @@ try {
 
   if (links.length === 0) {
     console.warn(`🚫 No valid links found for ${data.title}`);
-    return '';
+    return `<div class="event_links"><img src="/images/links/lock_icon.png" title="Links not available yet" style="opacity: 0.5;" /></div>`;
   }
 
   return `
@@ -569,7 +565,9 @@ try {
           </div>
         </div>
 
-        ${renderLinks(data)} <!-- 🚀 Add links directly below main content -->
+        <div class="event_card_action">
+  ${renderLinks(data)}
+</div>
       </div>
     </div>
   </div>
