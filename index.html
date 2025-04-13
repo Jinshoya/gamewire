@@ -342,11 +342,13 @@
   if (Array.isArray(data.links)) links.push(...data.links);
 
   return links.map(link => `
-    <a href="${link.url}" target="_blank" title="${link.label}">
-      <img src="${link.icon}" class="links_image" alt="${link.label}">
+    <a href="${link.url}" target="_blank" title="${link.label || 'Watch'}">
+      <img src="${link.icon || '/icons/default.png'}" class="links_image" alt="${link.label || 'Watch'}" />
     </a>
   `).join('');
 }
+
+
 
     
     async function react(button, emoji) {
