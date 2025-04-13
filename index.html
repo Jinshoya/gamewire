@@ -636,45 +636,6 @@ function formatRange(start, end) {
 async function loadEvents() {
   const res = await fetch('/events/index.json');
   const files = await res.json();
-  const now = new Date();
-  const parsedEvents = [];
-
-  for (const file of files) {
-    const response = await fetch(`/events/${file}`);
-    const raw = await response.text();
-    const { attributes: data } = parseFrontmatter(raw);
-    const date = new Date(data.date);
-    const isSteam = data.type === 'steam_sale';
-    const slug = data.slug || file.replace('.md', '');
-    const html = renderEventHTML(data, date, isSteam, slug);
-
-    parsedEvents.push({ data, date, isSteam, slug, html });
-  }
-
-  // ✅ Sort by event start date
-  parsedEvents.sort((a, b) => new Date(a.data.date) - new Date(b.data.date));
-
-  // ✅ Clear containers
-  ['past-events', 'steam-sale-event', 'live-events', 'upcoming-events'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = '';
-  });
-
-  // ✅ Insert into DOM
-  for (const event of parsedEvents) {
-    const target = event.isSteam ? 'steam-sale-event'
-                  : new Date(event.data.date) < now ? 'past-events'
-                  : 'upcoming-events';
-
-    const container = document.getElementById(target);
-    if (container) container.insertAdjacentHTML('beforeend', event.html);
-  }
-
-  startCountdowns();
-}
-
-  const res = await fetch('/events/index.json');
-  const files = await res.json();
 
   const parsedEvents = [];
 
