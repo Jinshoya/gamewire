@@ -183,7 +183,7 @@ function renderLinks(data) {
     
       localStorage.setItem(storageKey, emoji);
       wrapper.querySelectorAll('button').forEach(btn => {
-  const e = btn.textContent.trim().split(' ')[0];
+        const e = btn.getAttribute('data-emoji');
   btn.classList.toggle('reacted', e === emoji);
 
   if (e === emoji) {
@@ -298,11 +298,11 @@ if (diff <= 0) {
       const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
       const userEmoji = localStorage.getItem(`reaction_${eventId}`);
       wrapper.querySelectorAll('button').forEach(btn => {
-        const emoji = btn.textContent.trim().split(' ')[0];
-        const reaction = data.find(r => r.emoji === emoji);
-        btn.querySelector('span').textContent = reaction?.count || 0;
-        btn.classList.toggle('reacted', emoji === userEmoji);
-      });
+  const emoji = btn.getAttribute('data-emoji'); // ✅ important
+  const found = data.find(r => r.emoji === emoji);
+  btn.querySelector('span').textContent = found?.count ?? 0;
+  btn.classList.toggle('reacted', emoji === selected);
+});
     }
     async function loadEvents() {
   const res = await fetch('/events/index.json');
