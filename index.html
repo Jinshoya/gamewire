@@ -509,6 +509,7 @@
       const response = await fetch(`/events/${file}`);
       const raw = await response.text();
       const { attributes: data } = parseFrontmatter(raw);
+      console.log(`[${file}]`, data);
       const date = new Date(data.date);
       const isPast = date < now;
       const isSteam = data.type === 'steam_sale';
