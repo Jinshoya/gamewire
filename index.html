@@ -126,16 +126,16 @@
 .event_title {
   white-space: nowrap;
   display: inline-block;
-  transition: transform 0.3s ease;
   font-size: 2.2rem;
   font-weight: 600;
   margin: 0;
+  transform: translateX(0);
+  transition: transform 1.2s ease-in-out; /* 👈 smooth return */
 }
 
 .event_title_wrapper:hover .event_title.scrolling {
-  animation: scroll-title-pingpong 10s ease-in-out infinite;
+  transform: translateX(var(--scroll-distance)); /* 👈 smooth slide on hover */
 }
-
 
 @keyframes scroll-title-pingpong {
   0%   { transform: translateX(0); }
