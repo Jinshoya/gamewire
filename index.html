@@ -25,8 +25,7 @@
     }
     
     .event_block {
-      position: relative;
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
     
     .event_card {
@@ -34,20 +33,31 @@
       background-size: cover;
       background-position: center;
       border-radius: 20px;
-      backdrop-filter: blur(20px);
-      padding: 32px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      background-color: rgba(0,0,0,0.3);
       overflow: hidden;
-      color: white;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
     }
     
-    .event_card_inner {
+    .event_card_overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 20, 40, 0.5);
+      backdrop-filter: blur(18px);
+      z-index: 0;
+    }
+    
+    .event_card_content {
+      position: relative;
+      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 32px;
+      padding: 32px;
       flex-wrap: wrap;
+    }
+    
+    .event_card_left {
+      flex-shrink: 0;
     }
     
     .event_logo {
@@ -55,8 +65,8 @@
       height: 140px;
       border-radius: 50%;
       overflow: hidden;
-      flex-shrink: 0;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      background: #000;
     }
     
     .event_logo img {
@@ -66,9 +76,9 @@
       display: block;
     }
     
-    .event_details {
+    .event_card_center {
       flex: 1;
-      min-width: 260px;
+      min-width: 240px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -78,13 +88,14 @@
       font-size: 2.1rem;
       font-weight: 600;
       margin: 0;
+      line-height: 1.2;
     }
     
     .event_date {
       font-size: 1rem;
       opacity: 0.85;
-      line-height: 1.5;
       margin: 0;
+      line-height: 1.4;
     }
     
     .countdown {
@@ -93,20 +104,20 @@
       opacity: 0.85;
     }
     
-    .expectations_block {
-      background: #14142b;
-      padding: 14px;
-      border-radius: 14px;
-      max-width: fit-content;
+    .event_expectations {
+      margin-top: 10px;
     }
     
-    .expectations_block .label {
+    .event_expectations .label {
       font-size: 1rem;
       font-weight: 600;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     
     .reaction-bar {
+      background: #14142b;
+      border-radius: 14px;
+      padding: 10px 14px;
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
@@ -136,6 +147,11 @@
       color: black;
     }
     
+    .event_card_right {
+      display: flex;
+      align-items: center;
+    }
+    
     .watch-button {
       background: #271e6e;
       color: white;
@@ -161,20 +177,20 @@
     }
     
     @media (max-width: 768px) {
-      .event_card_inner {
+      .event_card_content {
         flex-direction: column;
         align-items: center;
         text-align: center;
       }
     
+      .event_card_right {
+        justify-content: center;
+        margin-top: 20px;
+      }
+    
       .event_logo {
         width: 100px;
         height: 100px;
-      }
-    
-      .watch-button {
-        margin-top: 20px;
-        justify-content: center;
       }
     
       .event_title {
@@ -186,6 +202,7 @@
       }
     }
     </style>
+    
     
     
     
@@ -375,18 +392,20 @@
 
       const html = `
 <div class="event_card" style="background-image: url('${data.image}')">
-  <div class="event_card_inner">
-    <div class="event_logo">
-      <img src="${data.logo}" alt="logo" />
+  <div class="event_card_overlay"></div>
+
+  <div class="event_card_content">
+    <div class="event_card_left">
+      <div class="event_logo"><img src="${data.logo}" alt="logo" /></div>
     </div>
-    <div class="event_details">
+
+    <div class="event_card_center">
       <h2 class="event_title">${data.title}</h2>
       <p class="event_date">${isSteam
         ? `Starts: ${date.toLocaleString()}<br>Ends: ${new Date(data.end).toLocaleString()}`
-        : date.toLocaleString()}
-      </p>
+        : date.toLocaleString()}</p>
 
-      <div class="expectations_block">
+      <div class="event_expectations">
         <div class="label">Your expectations</div>
         <div class="reaction-bar" data-event="${slug}">
           ${['👍','😊','😲','😔'].map(e => `<button onclick="react(this, '${e}')">${e} <span>0</span></button>`).join('')}
@@ -394,13 +413,14 @@
       </div>
     </div>
 
-    <a class="watch-button" href="${data.links?.[0]?.url || '#'}" target="_blank">
-      Watch here <span class="play_icon">▶</span>
-    </a>
+    <div class="event_card_right">
+      <a class="watch-button" href="${data.links?.[0]?.url || '#'}" target="_blank">
+        Watch here <span class="play_icon">▶</span>
+      </a>
+    </div>
   </div>
 </div>
-
-</div>`;
+`;
 
       const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
       const container = document.getElementById(target);
