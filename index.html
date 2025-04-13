@@ -702,8 +702,7 @@ async function loadEvents() {
     const isSteam = data.type === 'steam_sale';
     const slug = data.slug || file.replace('.md', '');
 
-    function renderEventHTML(data, date, isSteam, slug) {
-  return `
+    const html = `
 <div class="event_block ${data.status === 'live' ? 'now_live' : ''}">
   <div class="event_logo">
     <img src="${data.logo}" alt="logo" />
@@ -714,9 +713,9 @@ async function loadEvents() {
 
     <div class="event_card_content">
       <div class="event_card_main">
-        <h2 class="event_title_wrapper">
-          <span class="event_title">${data.title}</span>
-        </h2>
+        <div class="event_title_wrapper hover-scroll">
+          <h2 class="event_title">${data.title}</h2>
+        </div>
 
         <p class="event_date">
           ${
@@ -749,9 +748,7 @@ async function loadEvents() {
     </div>
   </div>
 </div>
-`;
-}
-
+    `;
 
     const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
     const container = document.getElementById(target);
