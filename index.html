@@ -18,8 +18,8 @@
       padding: 0;
     }
     .event_past {
-  filter: grayscale(100%) brightness(0.6);
-  opacity: 0.8;
+  filter: grayscale(100%) brightness(0.7);
+  opacity: 0.85;
 }
 
     .content {
@@ -430,10 +430,12 @@
         el.innerHTML = `<div class="event_countdown"><span class="number">NOW LIVE</span></div>`;
 
         if (elapsed >= 3600000) {
-          if (parent.parentElement.id !== 'past-events') {
-            document.getElementById('past-events').appendChild(parent);
-            parent.classList.add('event_past'); // For greying out
-          }
+  if (parent.parentElement.id !== 'past-events') {
+    document.getElementById('past-events').appendChild(parent);
+    parent.classList.add('event_past');
+  }
+  el.innerHTML = ''; // ❌ remove countdown entirely
+}
         } else if (parent.parentElement.id !== 'live-events') {
           document.getElementById('live-events').appendChild(parent);
         }
