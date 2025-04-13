@@ -610,6 +610,28 @@ if (diff <= 0) {
         btn.classList.toggle('reacted', emoji === userEmoji);
       });
     }
+    function formatTimeShort(date) {
+  const d = new Date(date);
+  const h = d.getHours();
+  const m = d.getMinutes().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'pm' : 'am';
+  const hour = ((h + 11) % 12 + 1);
+  return `${hour}:${m} <span class="unit">${ampm}</span>`;
+}
+
+function formatDateShort(date) {
+  const d = new Date(date);
+  const month = d.toLocaleString('default', { month: 'short' });
+  return `${month} ${d.getDate()}`;
+}
+
+function formatSingle(date) {
+  return `${formatDateShort(date)} - ${formatTimeShort(date)}`;
+}
+
+function formatRange(start, end) {
+  return `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
+}
     
 async function loadEvents() {
   const res = await fetch('/events/index.json');
@@ -627,7 +649,10 @@ async function loadEvents() {
   }
 
   // ✅ Sort by event date
-  parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+  ["past-events", "steam-sale-event", "live-events", "upcoming-events"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = '';
+});
 
   const now = new Date();
 
