@@ -81,17 +81,20 @@
   display: block;
 }
     
-    .event_card {
-      position: relative;
-      width: 840px;
-      height: 280px;
-      border-radius: 20px;
-      background-size: cover;
-      background-position: center;
-      overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-      padding-left: 300px;
-    }
+.event_card {
+  position: relative;
+  width: 100%;
+  max-width: 840px;
+  height: 280px;
+  border-radius: 20px;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: stretch;
+}
+
     
     .event_card_overlay {
       position: absolute;
@@ -101,16 +104,17 @@
       z-index: 0;
     }
     
-    .event_card_content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      height: 100%;
-      padding: 24px 36px;
-      gap: 16px;
-    }
+.event_card_content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 24px 36px 24px 300px; /* 👈 Add left padding HERE */
+  gap: 16px;
+}
+
     
     .event_card_main {
       flex: 1;
