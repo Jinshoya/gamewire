@@ -576,8 +576,10 @@ if (diff <= 0) {
     `;
 
     if (parent.parentElement.id !== 'live-events') {
-      document.getElementById('live-events').appendChild(parent);
-    }
+  document.getElementById('live-events').appendChild(parent);
+  hideEmptySections(); // ✅ Move it here so "NOW LIVE" title shows up
+}
+
 
     parent.classList.add('now_live');        // 🔴 Glow on live
     parent.classList.remove('event_past');   // 👈 Remove old style
@@ -706,7 +708,7 @@ const html = `
 </div>
 `;
 
-    const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : 'upcoming-events';
+const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 'live-events' : 'upcoming-events';
     const container = document.getElementById(target);
     if (container) container.insertAdjacentHTML("beforeend", html);
 
@@ -725,6 +727,7 @@ const html = `
   }
 
   startCountdowns();
+
 
   document.querySelectorAll('.reaction-bar').forEach(wrapper => {
     const eventId = wrapper.getAttribute('data-event');
@@ -749,17 +752,15 @@ const html = `
   await loadEvents();
   hideEmptySections();
   updateNowPlayingBar();
-  startCountdowns();
   document.getElementById("eventLoadingSkeletons")?.remove();
 });
 function hideEmptySections() {
   const live = document.getElementById('live-events');
   const header = document.querySelector('.events_upnext.now_live');
 
-  const blocks = live?.querySelectorAll('.event_block') || [];
-  const hasVisibleLive = blocks.length > 0;
+  const hasLiveEvent = live?.querySelector('.event_block.now_live');
 
-  if (hasVisibleLive) {
+  if (hasLiveEvent) {
     live.parentElement.style.display = '';
     if (header) header.style.display = '';
   } else {
