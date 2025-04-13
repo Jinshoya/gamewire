@@ -667,8 +667,8 @@ const html = `
     <div class="event_card_content">
       <div class="event_card_main">
         <div class="event_title_wrapper">
-          <h2 class="event_title">${data.title}</h2>
-        </div>
+  <h2 class="event_title">${data.title}</h2>
+</div>
 
         <p class="event_date">
           ${
@@ -677,7 +677,6 @@ const html = `
               : formatSingle(data.date)
           }
         </p>
-
         <div class="countdown"
              data-start-event-date="${data.date}"
              ${data.end ? `data-end-event-date="${data.end}"` : ''}>
@@ -706,24 +705,20 @@ const html = `
 
 
 
-const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
-const container = document.getElementById(target);
-
-if (container) {
-  container.insertAdjacentHTML("beforeend", html);
-
-  // 🔁 Find the newly inserted .event_block
-  const blocks = container.querySelectorAll('.event_block');
-  const latest = blocks[blocks.length - 1];
-
-  setTimeout(() => {
-    const title = latest.querySelector('.event_title');
-    const wrapper = latest.querySelector('.event_title_wrapper');
-    if (title && wrapper && title.scrollWidth > wrapper.clientWidth) {
+      const target = isPast ? "past-events" : isSteam ? "steam-sale-event" : "upcoming-events";
+      const container = document.getElementById(target);
+      if (container) container.insertAdjacentHTML("beforeend", html);
+      setTimeout(() => {
+  const titles = container.querySelectorAll('.event_title');
+  titles.forEach(title => {
+    const wrapper = title.parentElement;
+    if (title.scrollWidth > wrapper.clientWidth) {
       title.classList.add('scrolling');
     }
-  }, 100);
-}
+  });
+}, 100);
+
+    }
 
     startCountdowns();
 
