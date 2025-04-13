@@ -1,6 +1,6 @@
 ---
-title: Summer sale
-date: 2025-05-02T18:15:37.947Z
+title: Summer Sale 2025
+date: 2025-06-26 20:00
 end: 2025-05-22T19:00:20.601Z
 image: /images/uploads/steam_2-2x.png
 link: https://store.steampowered.com/
