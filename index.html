@@ -303,17 +303,25 @@ function startCountdowns() {
       `;
     });
 
-    // 🔁 Set page title
-    if (nowLiveTitle) {
-      document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
-    } else if (soonestTimeLeft < Infinity) {
-      const totalSeconds = Math.floor(soonestTimeLeft / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      document.title = `⏳ ${hours}h ${minutes}m – ${soonestEventTitle}`;
-    } else {
-      document.title = 'ggPause';
-    }
+// 🔁 Set page title
+if (nowLiveTitle) {
+  document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
+} else if (soonestTimeLeft < Infinity) {
+  const totalSeconds = Math.floor(soonestTimeLeft / 1000);
+
+  if (totalSeconds < 3600) {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    document.title = `⏳ ${mins}m ${secs}s – ${soonestEventTitle}`;
+  } else {
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    document.title = `⏳ ${days}d ${hours}h – ${soonestEventTitle}`;
+  }
+} else {
+  document.title = 'ggPause';
+}
+
   }, 1000);
 }
 
