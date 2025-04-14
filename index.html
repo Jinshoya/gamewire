@@ -350,8 +350,9 @@ function startCountdowns() {
     const date = new Date(data.date);
     const isPast = date < now;
     const isSteam = data.type === 'steam_sale';
-    const slug = data.slug || data._filename.replace('.md', '');
+    
 
+    const slug = data.slug || data._filename.replace('.md', '');
     const formatTimeShort = d => {
       const dt = new Date(d);
       const h = dt.getHours();
@@ -380,9 +381,21 @@ const formatDateUTC = d => {
   return dt.toUTCString().split(' ').slice(0, 4).join(' '); // "Day, DD Mon YYYY"
 };
 
-const formatSingleUTC = d => `${formatDateUTC(d)} - ${formatTimeUTC(d)} UTC`;
+const formatSingleUTC = d => {
+  const dt = new Date(d);
+  return dt.toUTCString().replace(' GMT', '').replace(/:\d{2}$/, '') + ' UTC';
+};
+
 const formatRangeUTC = (start, end) =>
   `${formatDateUTC(start)} - ${formatTimeUTC(start)} / ${formatDateUTC(end)} - ${formatTimeUTC(end)} UTC`;
+
+      const localDateStr = isSteam
+  ? formatRange(data.date, data.end)
+  : formatSingle(data.date);
+
+const utcDateStr = isSteam
+  ? formatRangeUTC(data.date, data.end)
+  : formatSingleUTC(data.date);
 
       const hasStarted = date <= now;
 const isLive = hasStarted && (!data.end || now < new Date(data.end));
@@ -401,9 +414,9 @@ const html = `
         </div>
 <p class="event_date">
   <span class="toggle-date"
-        data-local="${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}"
-        data-utc="${isSteam ? formatRangeUTC(data.date, data.end) : formatSingleUTC(data.date)}">
-    ${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}
+        data-local="${localDateStr}"
+        data-utc="${utcDateStr}">
+    ${localDateStr}
   </span>
 </p>
 
@@ -500,15 +513,14 @@ const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 
   hideEmptySections();
   updateNowPlayingBar();
 });
-document.addEventListener("click", (e) => {
-  const target = e.target.closest(".toggle-date");
+document.addEventListener('click', function (e) {
+  const target = e.target.closest('.toggle-date');
   if (!target) return;
-  
-  const isLocal = target.getAttribute("data-local") === target.textContent.trim();
-  target.textContent = isLocal 
-    ? target.getAttribute("data-utc") 
-    : target.getAttribute("data-local");
+
+  const isLocal = target.textContent.trim() === target.dataset.local.trim();
+  target.textContent = isLocal ? target.dataset.utc : target.dataset.local;
 });
+
 function hideEmptySections() {
   // NOW LIVE section
   const live = document.getElementById('live-events');

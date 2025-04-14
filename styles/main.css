@@ -8,13 +8,19 @@ body {
   padding: 0;
 }
 .toggle-date {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
-  user-select: none;
-  transition: color 0.3s ease;
-  text-decoration: underline dotted;
+  transition: opacity 0.3s ease;
+  color: white;
 }
+
 .toggle-date:hover {
-  color: #ff5e5e;
+  opacity: 0.8;
+  text-decoration: underline;
 }
 .live-banner {
   position: sticky;
