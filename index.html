@@ -67,7 +67,21 @@
       "https://eiapztxuvodtiqgsuicf.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpYXB6dHh1dm9kdGlxZ3N1aWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MzQ5MTQsImV4cCI6MjA2MDAxMDkxNH0.QH8wxJeLGsP2ny1j-sA1t1FiiU0Y-0PWh2FmbGb9ni4"
     );
-    
+    async function trackPageView() {
+  const path = window.location.pathname;
+  const visitorId = localStorage.getItem('ggp_visitor_id') || null;
+
+  const { error } = await supabase.from('page_views').insert([
+    { path, visitor_id: visitorId } // only if you added that column
+  ]);
+
+  if (error) {
+    console.error('❌ Page view track failed:', error);
+  } else {
+    console.log('📈 Page view recorded:', path);
+  }
+}
+
     async function trackVisitor() {
   let visitorId = localStorage.getItem('ggp_visitor_id');
 
@@ -551,6 +565,7 @@ const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 
   }
 }
 document.addEventListener("DOMContentLoaded", async () => {
+  await trackPageView();
   await trackVisitor(); // 👈 move this here
   await loadEvents();
   hideEmptySections();
