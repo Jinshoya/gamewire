@@ -90,6 +90,7 @@
 }
 
 
+
     function scrollToSection(id) {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -537,8 +538,8 @@ const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 
     banner.style.display = "none";
   }
 }
- 
-    document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await trackVisitor(); // 👈 move this here
   await loadEvents();
   hideEmptySections();
   updateNowPlayingBar();
