@@ -212,17 +212,21 @@ async function refreshReactionCounts(eventId, wrapper) {
     
 function startCountdowns() {
   setInterval(() => {
+    const now = new Date();
     let soonestTimeLeft = Infinity;
     let soonestEventTitle = '';
+    let nowLiveTitle = '';
 
     document.querySelectorAll('.countdown').forEach(el => {
       const start = new Date(el.getAttribute('data-start-event-date'));
       const endStr = el.getAttribute('data-end-event-date');
       const end = endStr ? new Date(endStr) : null;
-      const now = new Date();
       const diff = start - now;
+      const elapsed = now - start;
+      const parent = el.closest('.event_block');
+      const isSteam = parent.closest('#steam-sale-event');
 
-      // Track shortest future time
+      // Track soonest upcoming event
       if (diff > 0 && diff < soonestTimeLeft) {
         soonestTimeLeft = diff;
         const block = el.closest('.event_block');
@@ -236,49 +240,51 @@ function startCountdowns() {
         el.classList.remove("glowing");
       }
 
-      const elapsed = now - start;
-      const parent = el.closest('.event_block');
-      const isSteam = parent.closest('#steam-sale-event');
-
-      // Steam sale removal logic
+      // Steam sale removal if ended
       if (isSteam && end && now >= end) {
         return parent.remove();
       }
 
-      // If the event has already started
+      // If already started
       if (diff <= 0) {
         if (elapsed >= 3600000) {
+          // Move to past
           if (parent.parentElement.id !== 'past-events') {
             document.getElementById('past-events').appendChild(parent);
           }
+
           parent.classList.add('event_past');
           parent.classList.remove('now_live');
           el.innerHTML = '';
+
           const reactionBar = parent.querySelector('.reaction-bar');
-          if (reactionBar) {
-            reactionBar.classList.add('reactions-disabled');
-          }
+          if (reactionBar) reactionBar.classList.add('reactions-disabled');
         } else {
+          // It's LIVE
           el.innerHTML = `
             <div class="event_countdown">
               <span class="number">NOW LIVE</span>
             </div>
           `;
+
           if (parent.parentElement.id !== 'live-events') {
             document.getElementById('live-events').appendChild(parent);
             setTimeout(() => hideEmptySections(), 10);
           }
+
           parent.classList.add('now_live');
           parent.classList.remove('event_past');
+
           const reactionBar = parent.querySelector('.reaction-bar');
-          if (reactionBar) {
-            reactionBar.classList.remove('reactions-disabled');
-          }
+          if (reactionBar) reactionBar.classList.remove('reactions-disabled');
+
+          const block = el.closest('.event_block');
+          nowLiveTitle = block?.querySelector('.event_upc_title')?.textContent || 'Now Live';
         }
         return;
       }
 
-      // Show countdown for upcoming event
+      // Show countdown
       const totalSeconds = Math.floor(diff / 1000);
       const days = Math.floor(totalSeconds / 86400);
       const hours = Math.floor((totalSeconds % 86400) / 3600);
@@ -296,8 +302,10 @@ function startCountdowns() {
       `;
     });
 
-    // ✅ This part must be inside the interval function!
-    if (soonestTimeLeft < Infinity) {
+    // 🔁 Set page title
+    if (nowLiveTitle) {
+      document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
+    } else if (soonestTimeLeft < Infinity) {
       const totalSeconds = Math.floor(soonestTimeLeft / 1000);
       const hours = Math.floor(totalSeconds / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -305,8 +313,7 @@ function startCountdowns() {
     } else {
       document.title = 'ggPause';
     }
-
-  }, 1000); // end of setInterval
+  }, 1000);
 }
 
 
