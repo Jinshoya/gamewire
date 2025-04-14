@@ -7,6 +7,14 @@ body {
   margin: 0;
   padding: 0;
 }
+.toggle-date {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+.toggle-date:hover {
+  color: #ff5e5e;
+}
 .live-banner {
   position: sticky;
   top: 0;

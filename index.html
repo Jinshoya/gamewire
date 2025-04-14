@@ -370,6 +370,19 @@ function startCountdowns() {
     const formatSingle = d => `${formatDateShort(d)} - ${formatTimeShort(d)}`;
     const formatRange = (start, end) =>
       `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
+      const formatTimeUTC = d => {
+  const dt = new Date(d);
+  return dt.toUTCString().split(' ')[4]; // "HH:MM:SS"
+};
+
+const formatDateUTC = d => {
+  const dt = new Date(d);
+  return dt.toUTCString().split(' ').slice(0, 4).join(' '); // "Day, DD Mon YYYY"
+};
+
+const formatSingleUTC = d => `${formatDateUTC(d)} - ${formatTimeUTC(d)} UTC`;
+const formatRangeUTC = (start, end) =>
+  `${formatDateUTC(start)} - ${formatTimeUTC(start)} / ${formatDateUTC(end)} - ${formatTimeUTC(end)} UTC`;
 
       const hasStarted = date <= now;
 const isLive = hasStarted && (!data.end || now < new Date(data.end));
@@ -386,9 +399,11 @@ const html = `
         <div class="event_title_wrapper">
 <h2 class="event_title event_upc_title">${data.title}</h2>
         </div>
-        <p class="event_date">
-          ${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}
-        </p>
+<p class="event_date toggle-date" 
+   data-local="${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}"
+   data-utc="${isSteam ? formatRangeUTC(data.date, data.end) : formatSingleUTC(data.date)}">
+   ${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}
+</p>
         <div class="countdown"
              data-start-event-date="${data.date}"
              ${data.end ? `data-end-event-date="${data.end}"` : ''}>
@@ -533,7 +548,15 @@ function hideEmptySections() {
       console.warn('Menu not found!');
     }
   }
+  document.addEventListener("click", (e) => {
+  const target = e.target.closest(".toggle-date");
+  if (!target) return;
   
+  const isLocal = target.getAttribute("data-local") === target.textContent.trim();
+  target.textContent = isLocal 
+    ? target.getAttribute("data-utc") 
+    : target.getAttribute("data-local");
+});
 </script>
 </body>
 </html>

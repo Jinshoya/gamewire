@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 - You Paused Too Hard</title>
+  <style>
+    body {
+      margin: 0;
+      background: #05020a;
+      font-family: 'General Sans', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .glitch-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('/images/bg-glitch.gif') repeat;
+      opacity: 0.03;
+      mix-blend-mode: screen;
+      z-index: 0;
+    }
+
+    .error-container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .error-logo {
+      width: 540px;
+      height: auto;
+
+      animation: glitch 1.2s infinite;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      margin: 20px 0 10px;
+    }
+
+    p {
+      font-size: 1.3rem;
+      opacity: 0.75;
+    }
+
+    a.back-home {
+      margin-top: 30px;
+      display: inline-block;
+      background: #ff2a2a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(255, 42, 42, 0.5);
+      transition: background 0.2s ease;
+    }
+
+    a.back-home:hover {
+      background: #e11e1e;
+    }
+
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(2px, -1px); }
+      60% { transform: translate(-1px, -2px); }
+      80% { transform: translate(1px, 2px); }
+      100% { transform: translate(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="glitch-bg"></div>
+  <div class="error-container">
+    <img src="/images/404.png" alt="GG Logo Frown" class="error-logo" />
+    <p>The page you're looking for doesn't exist.<br />Try not to break the timeline again.</p>
+    <a class="back-home" href="/">Return to Main Lobby</a>
+  </div>
+</body>
+</html>
