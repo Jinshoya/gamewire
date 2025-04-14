@@ -22,6 +22,7 @@
 
 </head>
 <body>
+  <div id="liveStickyBanner" class="live-banner" style="display:none;"></div>
 <!-- 🔹 GGPAUSE NAVIGATION BAR -->
 <nav class="gg-navbar">
   <div class="nav-logo">
@@ -217,6 +218,12 @@ async function refreshReactionCounts(eventId, wrapper) {
     const end = endStr ? new Date(endStr) : null;
     const now = new Date();
     const diff = start - now;
+    // Glow if less than 1 hour
+if (diff > 0 && diff < 3600000) {
+  el.classList.add("glowing");
+} else {
+  el.classList.remove("glowing");
+}
     const elapsed = now - start;
     const parent = el.closest('.event_block');
     const isSteam = parent.closest('#steam-sale-event');
@@ -438,17 +445,24 @@ const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 
         bar.style.display = "none";
       }
     }
-    
+    function updateLiveStickyBanner() {
+  const live = document.querySelector("#live-events .event_headliner");
+  const banner = document.getElementById("liveStickyBanner");
+
+  if (live) {
+    const title = live.querySelector(".event_upc_title")?.textContent || "LIVE EVENT";
+    const url = live.querySelector(".event_links a")?.getAttribute("href") || "#";
+    banner.innerHTML = `🔴 <strong>[LIVE]</strong> ${title} — <a href="${url}" style="color:white; text-decoration:underline;">Watch Now</a>`;
+    banner.style.display = "block";
+  } else {
+    banner.style.display = "none";
+  }
+}
+ 
     document.addEventListener("DOMContentLoaded", async () => {
   await loadEvents();
   hideEmptySections();
   updateNowPlayingBar();
-  const skeleton = document.getElementById("eventLoadingSkeletons");
-if (skeleton) {
-  skeleton.style.transition = 'opacity 0.5s ease';
-  skeleton.style.opacity = 0;
-  setTimeout(() => skeleton.remove(), 500);
-}
 });
 function hideEmptySections() {
   // NOW LIVE section
@@ -501,6 +515,7 @@ function hideEmptySections() {
       console.warn('Menu not found!');
     }
   }
+  
 </script>
 </body>
 </html>

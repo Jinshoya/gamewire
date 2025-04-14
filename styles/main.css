@@ -7,6 +7,36 @@ body {
   margin: 0;
   padding: 0;
 }
+.live-banner {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+  background: linear-gradient(to right, #ff2e4e, #ff5e6e);
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 12px 0;
+  font-size: 1rem;
+  box-shadow: 0 0 20px rgba(255, 50, 70, 0.5);
+  animation: pulse-banner 2s ease-in-out infinite;
+}
+
+@keyframes pulse-banner {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.countdown.glowing {
+  animation: glow-countdown 1.5s ease-in-out infinite;
+}
+
+@keyframes glow-countdown {
+  0% { color: white; text-shadow: 0 0 6px #ff3d68; }
+  50% { color: #ff3d68; text-shadow: 0 0 12px #ff3d68; }
+  100% { color: white; text-shadow: 0 0 6px #ff3d68; }
+}
+
 
 .content {
   width: 100%;
