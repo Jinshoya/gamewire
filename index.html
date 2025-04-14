@@ -210,95 +210,105 @@ async function refreshReactionCounts(eventId, wrapper) {
   });
 }
     
-    function startCountdowns() {
-      setInterval(() => {
-  document.querySelectorAll('.countdown').forEach(el => {
-    const start = new Date(el.getAttribute('data-start-event-date'));
-    const endStr = el.getAttribute('data-end-event-date');
-    const end = endStr ? new Date(endStr) : null;
-    const now = new Date();
-    const diff = start - now;
-    // Glow if less than 1 hour
-if (diff > 0 && diff < 3600000) {
-  el.classList.add("glowing");
-} else {
-  el.classList.remove("glowing");
-}
-    const elapsed = now - start;
-    const parent = el.closest('.event_block');
-    const isSteam = parent.closest('#steam-sale-event');
+function startCountdowns() {
+  setInterval(() => {
+    let soonestTimeLeft = Infinity;
+    let soonestEventTitle = '';
 
-    // Steam sale removal logic
-    if (isSteam && end && now >= end) {
-      return parent.remove();
+    document.querySelectorAll('.countdown').forEach(el => {
+      const start = new Date(el.getAttribute('data-start-event-date'));
+      const endStr = el.getAttribute('data-end-event-date');
+      const end = endStr ? new Date(endStr) : null;
+      const now = new Date();
+      const diff = start - now;
+
+      // Track shortest future time
+      if (diff > 0 && diff < soonestTimeLeft) {
+        soonestTimeLeft = diff;
+        const block = el.closest('.event_block');
+        soonestEventTitle = block?.querySelector('.event_upc_title')?.textContent || 'Upcoming Event';
+      }
+
+      // Glow if less than 1 hour
+      if (diff > 0 && diff < 3600000) {
+        el.classList.add("glowing");
+      } else {
+        el.classList.remove("glowing");
+      }
+
+      const elapsed = now - start;
+      const parent = el.closest('.event_block');
+      const isSteam = parent.closest('#steam-sale-event');
+
+      // Steam sale removal logic
+      if (isSteam && end && now >= end) {
+        return parent.remove();
+      }
+
+      // If the event has already started
+      if (diff <= 0) {
+        if (elapsed >= 3600000) {
+          if (parent.parentElement.id !== 'past-events') {
+            document.getElementById('past-events').appendChild(parent);
+          }
+          parent.classList.add('event_past');
+          parent.classList.remove('now_live');
+          el.innerHTML = '';
+          const reactionBar = parent.querySelector('.reaction-bar');
+          if (reactionBar) {
+            reactionBar.classList.add('reactions-disabled');
+          }
+        } else {
+          el.innerHTML = `
+            <div class="event_countdown">
+              <span class="number">NOW LIVE</span>
+            </div>
+          `;
+          if (parent.parentElement.id !== 'live-events') {
+            document.getElementById('live-events').appendChild(parent);
+            setTimeout(() => hideEmptySections(), 10);
+          }
+          parent.classList.add('now_live');
+          parent.classList.remove('event_past');
+          const reactionBar = parent.querySelector('.reaction-bar');
+          if (reactionBar) {
+            reactionBar.classList.remove('reactions-disabled');
+          }
+        }
+        return;
+      }
+
+      // Show countdown for upcoming event
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
+
+      el.innerHTML = `
+        <div class="event_countdown">
+          Starting in
+          <span class="number">${days}</span><span class="unit">d</span>
+          <span class="number">${hours}</span><span class="unit">h</span>
+          <span class="number">${mins}</span><span class="unit">m</span>
+          <span class="number">${secs}</span><span class="unit">s</span>
+        </div>
+      `;
+    });
+
+    // ✅ This part must be inside the interval function!
+    if (soonestTimeLeft < Infinity) {
+      const totalSeconds = Math.floor(soonestTimeLeft / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      document.title = `⏳ ${hours}h ${minutes}m – ${soonestEventTitle}`;
+    } else {
+      document.title = 'ggPause';
     }
 
-// If the event has already started
-if (diff <= 0) {
-  if (elapsed >= 3600000) {
-    if (parent.parentElement.id !== 'past-events') {
-      document.getElementById('past-events').appendChild(parent);
-    }
-
-    parent.classList.add('event_past');      // 🩶 Gray it out
-    parent.classList.remove('now_live');     // 🔴 Remove live glow
-    el.innerHTML = '';                       // Hide countdown
-
-    // ✨ Visually fade reactions and block interaction
-    const reactionBar = parent.querySelector('.reaction-bar');
-    if (reactionBar) {
-      reactionBar.classList.add('reactions-disabled');
-    }
-
-  } else {
-    el.innerHTML = `
-      <div class="event_countdown">
-        <span class="number">NOW LIVE</span>
-      </div>
-    `;
-
-    if (parent.parentElement.id !== 'live-events') {
-  document.getElementById('live-events').appendChild(parent);
-
-  // ⏱ Fix timing issue with a slight delay
-  setTimeout(() => hideEmptySections(), 10);
+  }, 1000); // end of setInterval
 }
 
-
-
-    parent.classList.add('now_live');        // 🔴 Glow on live
-    parent.classList.remove('event_past');   // 👈 Remove old style
-
-    // ✨ Restore interactions
-    const reactionBar = parent.querySelector('.reaction-bar');
-    if (reactionBar) {
-      reactionBar.classList.remove('reactions-disabled');
-    }
-  }
-
-  return;
-}
-
-    // Else: show countdown for upcoming event
-    const totalSeconds = Math.floor(diff / 1000);
-    const days = Math.floor(totalSeconds / 86400);
-    const hours = Math.floor((totalSeconds % 86400) / 3600);
-    const mins = Math.floor((totalSeconds % 3600) / 60);
-    const secs = totalSeconds % 60;
-
-    el.innerHTML = `
-      <div class="event_countdown">
-        Starting in
-        <span class="number">${days}</span><span class="unit">d</span>
-        <span class="number">${hours}</span><span class="unit">h</span>
-        <span class="number">${mins}</span><span class="unit">m</span>
-        <span class="number">${secs}</span><span class="unit">s</span>
-      </div>
-    `;
-  });
-}, 1000);
-
-}
 
 
     async function loadReactionsForEvent(wrapper, eventId) {
