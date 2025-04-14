@@ -404,12 +404,12 @@ flex-wrap: wrap;
   transform: translateY(-6px);
 }
 
-.event_logo {
-  transition: transform 0.3s ease;
+.event_block:hover .event_logo {
+  transform: translateY(-10px) scale(1.05) rotate(-1deg);
 }
 
-.event_block:hover .event_logo {
-  transform: translateY(-6px);
+.event_logo {
+  transition: transform 0.3s ease;
 }
 
 .event_links img:hover {
