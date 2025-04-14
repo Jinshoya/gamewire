@@ -373,21 +373,24 @@ function startCountdowns() {
       `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
       const formatTimeUTC = d => {
   const dt = new Date(d);
-  return dt.toUTCString().split(' ')[4]; // "HH:MM:SS"
+  const h = dt.getUTCHours();
+  const m = dt.getUTCMinutes().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'pm' : 'am';
+  const hour = ((h + 11) % 12 + 1);
+  return `${hour}:${m} <span class="unit">UTC</span>`;
 };
+
 
 const formatDateUTC = d => {
   const dt = new Date(d);
-  return dt.toUTCString().split(' ').slice(0, 4).join(' '); // "Day, DD Mon YYYY"
+  const month = dt.toLocaleString('default', { month: 'short' });
+  return `${month} ${dt.getUTCDate()}`;
 };
 
-const formatSingleUTC = d => {
-  const dt = new Date(d);
-  return dt.toUTCString().replace(' GMT', '').replace(/:\d{2}$/, '') + ' UTC';
-};
+const formatSingleUTC = d => `${formatDateUTC(d)} - ${formatTimeUTC(d)}`;
 
 const formatRangeUTC = (start, end) =>
-  `${formatDateUTC(start)} - ${formatTimeUTC(start)} / ${formatDateUTC(end)} - ${formatTimeUTC(end)} UTC`;
+  `${formatDateUTC(start)} - ${formatTimeUTC(start)} / ${formatDateUTC(end)} - ${formatTimeUTC(end)}`;
 
       const localDateStr = isSteam
   ? formatRange(data.date, data.end)
