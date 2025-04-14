@@ -82,12 +82,23 @@
     if (error) {
       console.error('❌ Visitor insert failed:', error);
     } else {
-      console.log('✅ Visitor tracked:', visitorId);
+      console.log('✅ New visitor tracked:', visitorId);
     }
   } else {
     console.log('🧠 Returning visitor:', visitorId);
+
+    // 👇 Update last_seen timestamp
+    const { error } = await supabase
+      .from('visitors')
+      .update({ last_seen: new Date().toISOString() })
+      .eq('id', visitorId);
+
+    if (error) {
+      console.error('⚠️ Failed to update last_seen:', error);
+    }
   }
 }
+
 
 
 
