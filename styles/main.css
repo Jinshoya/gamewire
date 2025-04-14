@@ -11,6 +11,7 @@ body {
   cursor: pointer;
   user-select: none;
   transition: color 0.3s ease;
+  text-decoration: underline dotted;
 }
 .toggle-date:hover {
   color: #ff5e5e;

@@ -399,11 +399,14 @@ const html = `
         <div class="event_title_wrapper">
 <h2 class="event_title event_upc_title">${data.title}</h2>
         </div>
-<p class="event_date toggle-date" 
-   data-local="${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}"
-   data-utc="${isSteam ? formatRangeUTC(data.date, data.end) : formatSingleUTC(data.date)}">
-   ${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}
+<p class="event_date">
+  <span class="toggle-date"
+        data-local="${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}"
+        data-utc="${isSteam ? formatRangeUTC(data.date, data.end) : formatSingleUTC(data.date)}">
+    ${isSteam ? formatRange(data.date, data.end) : formatSingle(data.date)}
+  </span>
 </p>
+
         <div class="countdown"
              data-start-event-date="${data.date}"
              ${data.end ? `data-end-event-date="${data.end}"` : ''}>
