@@ -262,10 +262,11 @@ function startCountdowns() {
         } else {
           // It's LIVE
           el.innerHTML = `
-            <div class="event_countdown">
-              <span class="number">NOW LIVE</span>
-            </div>
-          `;
+  <div class="event_countdown live-tag">
+    <span class="live-dot"></span>
+    <span class="live-text">NOW LIVE</span>
+  </div>
+`;
 
           if (parent.parentElement.id !== 'live-events') {
             document.getElementById('live-events').appendChild(parent);
