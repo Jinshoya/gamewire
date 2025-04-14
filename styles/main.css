@@ -432,22 +432,8 @@ opacity: 0.5;
 pointer-events: none; /* disables clicks but allows hover */
 filter: grayscale(30%);
 }
-#eventLoadingSkeletons {
-display: flex;
-flex-direction: column;
-gap: 30px;
-margin-top: 60px;
-align-items: center;
-}
 
-.skeleton-card {
-width: 840px;
-height: 280px;
-border-radius: 20px;
-background: linear-gradient(90deg, #1c1c3b 25%, #2a2a52 50%, #1c1c3b 75%);
-background-size: 400% 100%;
-animation: shimmer 2s infinite;
-}
+
 @media (max-width: 768px) {
 .event_block,
 .event_card,
@@ -456,14 +442,7 @@ margin-left: auto;
 margin-right: auto;
 }
 }
-@keyframes shimmer {
-0% {
-background-position: -400px 0;
-}
-100% {
-background-position: 400px 0;
-}
-}
+
 #loadingScreen {
 position: fixed;
 inset: 0;
