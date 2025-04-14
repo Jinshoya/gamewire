@@ -7,6 +7,9 @@
   font-weight: normal;
   font-style: normal;
 }
+body.contra-mode {
+  font-family: 'Contra', sans-serif !important;
+}
 body {
   background: linear-gradient(to bottom, #041935, #241c56);
   font-family: 'General Sans', sans-serif;
@@ -28,7 +31,16 @@ body {
   display: none;
 }
 
-
+#contraRunner {
+  position: fixed;
+  bottom: 10px;
+  left: -150px;
+  height: 100px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: none;
+}
 .live-banner {
   position: sticky;
   top: 0;

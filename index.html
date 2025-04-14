@@ -585,60 +585,68 @@ function hideEmptySections() {
     }
   }
 
-  const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // ↑↑↓↓←→←→BA
-  let konamiIndex = 0;
+  const konamiCode = [38,38,40,40,37,39,37,39,66,65];
+let konamiIndex = 0;
 
-  const konamiSound = new Audio('/sounds/konami.mp3'); // Change path if needed
-
-  document.addEventListener('keydown', function (e) {
-    if (e.keyCode === konamiCode[konamiIndex]) {
-      konamiIndex++;
-      if (konamiIndex === konamiCode.length) {
-        activateKonamiFont();
-        konamiIndex = 0;
-      }
-    } else {
+document.addEventListener('keydown', function(e) {
+  if (e.keyCode === konamiCode[konamiIndex]) {
+    konamiIndex++;
+    if (konamiIndex === konamiCode.length) {
+      activateKonamiEffect();
       konamiIndex = 0;
     }
+  } else {
+    konamiIndex = 0;
+  }
+});
+
+function activateKonamiEffect() {
+  playKonamiSound();
+  runContraAcrossScreen();
+  switchFontToContra();
+}
+
+function playKonamiSound() {
+  const audio = new Audio('/sounds/konami.mp3');
+  audio.volume = 0.5;
+  audio.play();
+}
+
+function switchFontToContra() {
+  document.body.classList.add('contra-mode');
+
+  setTimeout(() => {
+    document.body.classList.remove('contra-mode');
+  }, 10000);
+}
+
+function runContraAcrossScreen() {
+  const runner = document.getElementById('contraRunner');
+  if (!runner) return;
+
+  runner.style.display = 'block';
+  runner.style.opacity = 1;
+  runner.style.position = 'fixed';
+  runner.style.left = '-150px';
+  runner.style.bottom = '20px';
+  runner.style.height = '100px';
+  runner.style.zIndex = '9999';
+  runner.style.pointerEvents = 'none';
+
+  runner.animate([
+    { left: '-150px', opacity: 1 },
+    { left: '110vw', opacity: 1 }
+  ], {
+    duration: 4000,
+    easing: 'ease-in-out'
   });
 
-  function activateKonamiFont() {
-    konamiSound.currentTime = 0;
-    konamiSound.play().catch(e => console.warn('🔇 Autoplay blocked', e));
-
-    document.body.style.fontFamily = 'Contra, sans-serif';
-
-    const overlay = document.createElement('div');
-    overlay.textContent = "🕹 Retro Mode Activated!";
-    overlay.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2rem;
-      color: white;
-      background: rgba(0,0,0,0.7);
-      padding: 20px 30px;
-      border-radius: 12px;
-      z-index: 9999;
-      font-family: 'Contra', sans-serif;
-      animation: fadeOut 1s ease 3s forwards;
-    `;
-    document.body.appendChild(overlay);
-
-    setTimeout(() => {
-      document.body.style.fontFamily = ''; // Revert
-    }, 10000);
-  }
-
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes fadeOut {
-      to { opacity: 0; transform: translate(-50%, -40%); }
-    }
-  `;
-  document.head.appendChild(style);
+  setTimeout(() => {
+    runner.style.opacity = 0;
+  }, 4000);
+}
 
 </script>
+<img id="contraRunner" src="/images/contra-run.gif" alt="Contra Running" />
 </body>
 </html>
