@@ -3,7 +3,7 @@ title: Day of the Devs
 date: 2025-06-07 02:00
 end: ""
 image: https://cdn.prod.website-files.com/65f20ae26ba45240543579d9/67f8a050a9b857f23b703251_day_of_devs-p-1600.webp
-logo: /images/uploads/sgf.png
+logo: /images/uploads/dotd.png
 borderColor: "#ff6600"
 type: event
 youtube:
