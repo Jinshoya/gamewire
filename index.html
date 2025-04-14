@@ -87,7 +87,6 @@
   } else {
     console.log('🧠 Returning visitor:', visitorId);
 
-    // 👇 Update last_seen timestamp
     const { error } = await supabase
       .from('visitors')
       .update({ last_seen: new Date().toISOString() })
@@ -95,6 +94,8 @@
 
     if (error) {
       console.error('⚠️ Failed to update last_seen:', error);
+    } else {
+      console.log('✅ last_seen updated');
     }
   }
 }
