@@ -497,6 +497,15 @@ const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 
   hideEmptySections();
   updateNowPlayingBar();
 });
+document.addEventListener("click", (e) => {
+  const target = e.target.closest(".toggle-date");
+  if (!target) return;
+  
+  const isLocal = target.getAttribute("data-local") === target.textContent.trim();
+  target.textContent = isLocal 
+    ? target.getAttribute("data-utc") 
+    : target.getAttribute("data-local");
+});
 function hideEmptySections() {
   // NOW LIVE section
   const live = document.getElementById('live-events');
@@ -548,15 +557,7 @@ function hideEmptySections() {
       console.warn('Menu not found!');
     }
   }
-  document.addEventListener("click", (e) => {
-  const target = e.target.closest(".toggle-date");
-  if (!target) return;
-  
-  const isLocal = target.getAttribute("data-local") === target.textContent.trim();
-  target.textContent = isLocal 
-    ? target.getAttribute("data-utc") 
-    : target.getAttribute("data-local");
-});
+
 </script>
 </body>
 </html>
