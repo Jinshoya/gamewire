@@ -396,6 +396,21 @@ flex-wrap: wrap;
   border-radius: 6px;
   transition: transform 0.2s ease;
 }
+.event_block {
+  transition: transform 0.3s ease;
+}
+
+.event_block:hover {
+  transform: translateY(-6px);
+}
+
+.event_logo {
+  transition: transform 0.3s ease;
+}
+
+.event_block:hover .event_logo {
+  transform: translateY(-6px);
+}
 
 .event_links img:hover {
   transform: scale(1.1);
