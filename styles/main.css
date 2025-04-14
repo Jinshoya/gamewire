@@ -7,20 +7,18 @@ body {
   margin: 0;
   padding: 0;
 }
-.toggle-date {
-  display: inline-block;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-  color: white;
+.toggle-utc {
+  display: none;
 }
-
-.toggle-date:hover {
-  opacity: 0.8;
-  text-decoration: underline;
+.toggle-utc.active {
+  display: inline;
+}
+.toggle-local.active {
+  display: inline;
+}
+.toggle-local:not(.active),
+.toggle-utc:not(.active) {
+  display: none;
 }
 .live-banner {
   position: sticky;

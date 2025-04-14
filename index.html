@@ -413,11 +413,8 @@ const html = `
 <h2 class="event_title event_upc_title">${data.title}</h2>
         </div>
 <p class="event_date">
-  <span class="toggle-date"
-        data-local="${localDateStr}"
-        data-utc="${utcDateStr}">
-    ${localDateStr}
-  </span>
+  <span class="toggle-date toggle-local active">${localDateStr}</span>
+  <span class="toggle-date toggle-utc">${utcDateStr}</span>
 </p>
 
         <div class="countdown"
@@ -514,11 +511,15 @@ const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 
   updateNowPlayingBar();
 });
 document.addEventListener('click', function (e) {
-  const target = e.target.closest('.toggle-date');
-  if (!target) return;
+  const wrapper = e.target.closest('.event_date');
+  if (!wrapper) return;
 
-  const isLocal = target.textContent.trim() === target.dataset.local.trim();
-  target.textContent = isLocal ? target.dataset.utc : target.dataset.local;
+  const localEl = wrapper.querySelector('.toggle-local');
+  const utcEl = wrapper.querySelector('.toggle-utc');
+  if (!localEl || !utcEl) return;
+
+  localEl.classList.toggle('active');
+  utcEl.classList.toggle('active');
 });
 
 function hideEmptySections() {
