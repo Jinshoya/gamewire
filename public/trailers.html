@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 🌐 Open Graph / Discord Embed -->
+  <meta property="og:title" content="ggPause – Watch Game & Movie Trailers" />
+  <meta property="og:description" content="Browse trailers from upcoming gaming events and new movie releases on ggPause." />
+  <meta property="og:image" content="https://ggpause.com/images/social-banner.png" />
+  <meta property="og:url" content="https://ggpause.com/trailers.html" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Embed -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ggPause – Watch Game & Movie Trailers" />
+  <meta name="twitter:description" content="Catch trailers from gaming events and movie releases." />
+  <meta name="twitter:image" content="https://ggpause.com/images/social-banner.png" />
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.8" />
+  <title>Trailers – ggPause.com</title>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="/styles/main.css" />
+  <link rel="stylesheet" href="/styles/trailers.css" />
+</head>
+<body>
+
+  <!-- 🔹 GGPAUSE NAVIGATION BAR -->
+  <nav class="gg-navbar">
+    <div class="nav-logo">
+      <a href="/"><img src="/images/logo.png" alt="ggPause Logo" /></a>
+    </div>
+    <ul class="nav-menu">
+      <li><a href="/">Home</a></li>
+      <li><a href="/trailers.html" class="selected">Trailers</a></li>
+    </ul>
+  </nav>
+
+  <main class="trailer-page">
+    <h1 class="page-title">Trailers</h1>
+
+    <div class="trailer-header">
+      <div class="filter-buttons">
+        <button onclick="setFilter('game')">🎮 Game</button>
+        <button onclick="setFilter('movie')">🎬 Movie</button>
+        <button onclick="setFilter('russian')">🎬 на Русском</button>
+        <button onclick="setFilter('all')">🎲 All</button>
+      </div>
+      <input id="searchInput" type="text" placeholder="Search title..." />
+    </div>
+
+    <div id="trailerList" class="trailer-list"></div>
+    <div id="pagination" class="pagination-controls"></div>
+  </main>
+
+  <!-- Modal -->
+  <div id="trailerModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <button id="closeModal">❌ Close</button>
+      <h2 id="modalTitle">Now Playing</h2>
+      <iframe
+        id="modalFrame"
+        width="560"
+        height="315"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <!-- Trailer functionality -->
+  <script type="module" src="/src/trailers.js"></script>
+</body>
+</html>
