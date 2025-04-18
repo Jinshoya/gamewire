@@ -57,6 +57,10 @@
   </div>
 
   <!-- Trailer functionality -->
-<script type="module" src="/src/main.js"></script>
+  <script type="module">
+    if (window.location.pathname.includes('trailers')) {
+      import('/src/main.js');  // Dynamically import main.js in the trailers page
+    }
+  </script>
 </body>
 </html>
