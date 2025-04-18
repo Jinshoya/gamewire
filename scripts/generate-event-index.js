@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 // Point to the public events folder
 const eventsDir = path.join(__dirname, '..', 'events');
-const outputFile = path.join(eventsDir, 'index.json');
+const outputFile = path.join(__dirname, '..', 'public', 'index.json');
 
 // Read .md files and write index.json
 fs.readdir(eventsDir, (err, files) => {
