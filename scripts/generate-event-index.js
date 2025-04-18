@@ -1,9 +1,16 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const eventsDir = path.join(__dirname, '..', 'events');
+// Re-create __dirname for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Point to the public events folder
+const eventsDir = path.join(__dirname, '..', 'public', 'events');
 const outputFile = path.join(eventsDir, 'index.json');
 
+// Read .md files and write index.json
 fs.readdir(eventsDir, (err, files) => {
   if (err) throw err;
 
