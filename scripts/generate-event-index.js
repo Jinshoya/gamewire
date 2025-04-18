@@ -5,35 +5,34 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Read from /events
+// 📁 Source: /events (Git-tracked markdown files)
 const eventsDir = path.join(__dirname, '..', 'events');
 
-// Write to /public/events/index.json
-const outputDir = path.join(__dirname, '..', 'public', 'events');
-const outputFile = path.join(outputDir, 'index.json');
+// 📁 Destination: /public/events
+const publicEventsDir = path.join(__dirname, '..', 'public', 'events');
+const indexOutputPath = path.join(publicEventsDir, 'index.json');
 
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir, { recursive: true });
+// 🛠 Ensure /public/events/ exists
+if (!fs.existsSync(publicEventsDir)) {
+  fs.mkdirSync(publicEventsDir, { recursive: true });
 }
 
+// 📦 Read all .md files in /events
 fs.readdir(eventsDir, (err, files) => {
   if (err) throw err;
 
-  const markdownFiles = files
-    .filter(file => file.endsWith('.md'))
-    .map(file => file);
+  const markdownFiles = files.filter(file => file.endsWith('.md'));
 
-  fs.writeFileSync(outputFile, JSON.stringify(markdownFiles, null, 2));
-  console.log(`✅ Wrote ${markdownFiles.length} events to public/events/index.json`);
+  // ✅ Write index.json with the filenames
+  fs.writeFileSync(indexOutputPath, JSON.stringify(markdownFiles, null, 2));
+  console.log(`✅ Wrote ${markdownFiles.length} entries to /public/events/index.json`);
 
-  // ✅ Copy to dist/events/ to ensure Netlify sees it
-  const distEventsDir = path.join(__dirname, '..', 'dist', 'events');
-  const distOutputFile = path.join(distEventsDir, 'index.json');
+  // ✅ Copy each .md file to /public/events/
+  markdownFiles.forEach((file) => {
+    const src = path.join(eventsDir, file);
+    const dest = path.join(publicEventsDir, file);
+    fs.copyFileSync(src, dest);
+  });
 
-  if (!fs.existsSync(distEventsDir)) {
-    fs.mkdirSync(distEventsDir, { recursive: true });
-  }
-
-  fs.copyFileSync(outputFile, distOutputFile);
-  console.log(`✅ Copied index.json to dist/events/index.json`);
+  console.log(`✅ Copied ${markdownFiles.length} .md files to /public/events/`);
 });
