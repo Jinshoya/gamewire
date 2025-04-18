@@ -5,8 +5,6 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
-import './style.css'
-
 
 
 async function trackPageView() {
