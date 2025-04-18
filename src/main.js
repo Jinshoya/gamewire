@@ -7,7 +7,9 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
+import { injectNavbar } from './components/navbar.js';
 
+injectNavbar(); // adds it to every page
 
 async function trackPageView() {
 const path = window.location.pathname;
