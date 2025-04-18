@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-const distFolder = path.join(__dirname, 'dist');
+const distFolder = path.join(process.cwd(), 'dist');
 const trailersHtmlPath = path.join(distFolder, 'trailers.html');
 
 // Get the list of files in the dist/assets directory
