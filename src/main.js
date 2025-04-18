@@ -1,3 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
+
 import './style.css'
 import javascriptLogo from './javascript.svg'
 import viteLogo from '/vite.svg'
@@ -23,11 +30,6 @@ document.querySelector('#app').innerHTML = `
 
 setupCounter(document.querySelector('#counter'))
 
-
-const supabase = window.supabase.createClient(
-import.meta.env.VITE_SUPABASE_URL,
-import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 async function trackPageView() {
 const path = window.location.pathname;
 const visitorId = localStorage.getItem('ggp_visitor_id') || null;
