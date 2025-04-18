@@ -59,7 +59,7 @@
   <!-- Trailer functionality -->
   <script type="module">
     if (window.location.pathname.includes('trailers')) {
-      import('/src/main.js');  // Dynamically import main.js in the trailers page
+      import('/assets/index-[hash].js'); // Reference the correct bundled file path
     }
   </script>
 </body>
