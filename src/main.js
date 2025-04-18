@@ -327,7 +327,7 @@ btn.classList.toggle('reacted', emoji === userEmoji);
 });
 }
 async function loadEvents() {
-const res = await fetch('/index.json')
+  const res = await fetch('/events/index.json');
 const files = await res.json();
 const now = new Date();
 const parsedEvents = [];
