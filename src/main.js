@@ -1,11 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
+import { supabase } from './supabaseClient.js';
 if (window.location.pathname.includes("trailers")) {
   import('./trailers.js');
 }
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 import { injectNavbar } from './components/navbar.js';
 
