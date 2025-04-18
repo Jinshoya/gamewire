@@ -3,19 +3,23 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   build: {
     rollupOptions: {
-      input: 'index.html', // Ensure your main entry point (could be trailers.html)
+      input: 'index.html', // Or trailers.html if you are using that as your entry point
     },
   },
   plugins: [
-    // If you want more advanced HTML handling, use this plugin
     {
-      name: 'inject-main-js',
+      name: 'html-inject',
       transformIndexHtml(html) {
-        // This will dynamically insert the correct bundled script tag into your trailers.html
-        return html.replace(
-          /<\/body>/,
-          `<script type="module" src="/assets/[hashed-main-js-file].js"></script></body>`
-        );
+        // Check if the current HTML file is trailers.html
+        if (html.includes('trailers.html')) {
+          // Dynamically insert the script tag pointing to the correct bundled file
+          return html.replace(
+            /<\/body>/,
+            `<script type="module" src="/assets/index-xxxx.js"></script></body>` // Replace `index-xxxx.js` with your dynamically generated filename
+          );
+        }
+
+        return html;
       },
     },
   ],
