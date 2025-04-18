@@ -2,10 +2,10 @@
   command = "node scripts/generate-event-index.js && npm run build"
   publish = "dist"
 
-[[functions]]
+[functions]
   directory = "netlify/functions"
 
 [[scheduled]]
   name = "sync-trailers"
   path = "/.netlify/functions/sync-trailers"
-  schedule = "*/15 * * * *" # Every 15 minutes
+  schedule = "*/15 * * * *"
