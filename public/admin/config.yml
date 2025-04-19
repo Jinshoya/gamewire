@@ -12,7 +12,7 @@ collections:
     create: true
     slug: "{{slug}}"
     preview_path: "events/{{slug}}"
-    identifier_field: title  # ✅ Moved here
+    identifier_field: title
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD HH:mm", time_format: "HH:mm" }
