@@ -148,20 +148,6 @@ async function loadTrailers() {
     console.error("❌ Failed to load trailer data from Supabase", err);
   }
 }
-// Add to render() near the end
-const footerTime = document.getElementById("lastUpdatedTime");
-if (footerTime) {
-  const { data } = await supabase
-    .from('trailers')
-    .select('fetched_at')
-    .order('fetched_at', { ascending: false })
-    .limit(1);
-  
-  if (data?.[0]?.fetched_at) {
-    const date = new Date(data[0].fetched_at);
-    footerTime.innerText = `Last updated: ${date.toLocaleString()}`;
-  }
-}
 
 // 🚀 Initialize
 loadTrailers();
@@ -169,3 +155,29 @@ setFilter("game");
 window.setFilter = setFilter;
 window.nextPage = nextPage;
 window.prevPage = prevPage;
+// ⏱️ Show last updated trailer time
+async function loadLastUpdatedTime() {
+  const footerTime = document.getElementById("lastUpdatedTime");
+  if (footerTime) {
+    try {
+      const { data, error } = await supabase
+        .from('trailers')
+        .select('fetched_at')
+        .order('fetched_at', { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+
+      const lastTime = data?.[0]?.fetched_at;
+      if (lastTime) {
+        const date = new Date(lastTime);
+        footerTime.textContent = `🕒 Last updated: ${date.toLocaleString()}`;
+      } else {
+        footerTime.textContent = `🕒 Last updated: unknown`;
+      }
+    } catch (err) {
+      console.error("❌ Failed to load last updated time:", err);
+    }
+  }
+}
+loadLastUpdatedTime();
