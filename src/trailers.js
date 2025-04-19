@@ -157,12 +157,13 @@ function renderNextBatch() {
       group.appendChild(card);
       requestAnimationFrame(() => card.classList.add("show"));
     });
-    
+    trackFloatingHeader();
   }
 }
 
 function updateLoadMoreButton() {
   let btn = document.getElementById("loadMoreBtn");
+
   if (visibleCount >= filteredData.length) {
     btn?.remove();
     return;
@@ -177,12 +178,13 @@ function updateLoadMoreButton() {
       visibleCount += ITEMS_PER_SCROLL;
       renderNextBatch();
       updateLoadMoreButton();
-      enableInfiniteScroll();
-      
     });
-    container.appendChild(btn);
+    container.parentElement.appendChild(btn); // <-- attach to container's parent, not inside trailer groups
+  } else {
+    container.parentElement.appendChild(btn); // <-- move to bottom
   }
 }
+
 
 function enableInfiniteScroll() {
   if (infiniteScrollEnabled) return;
@@ -205,29 +207,31 @@ function trackFloatingHeader() {
   const headers = [...document.querySelectorAll(".timeline-date")];
 
   function updateFloatingDate() {
-    let current = null;
+    let lastVisible = null;
 
     for (const header of headers) {
       const rect = header.getBoundingClientRect();
-      if (rect.top <= 80) {
-        current = header;
-      } else {
-        break; // all further headers are lower, stop here
+      if (rect.top < 80) {
+        lastVisible = header;
       }
     }
 
-    if (current) {
-      floatingDate.textContent = `🕒 ${current.textContent}`;
+    if (lastVisible) {
+      floatingDate.textContent = `🕒 ${lastVisible.textContent}`;
       floatingDate.style.display = "block";
     } else {
       floatingDate.style.display = "none";
     }
   }
 
-  window.removeEventListener("scroll", updateFloatingDate); // avoid stacking
+  // Remove previous listener and add a new one
+  window.removeEventListener("scroll", updateFloatingDate);
   window.addEventListener("scroll", updateFloatingDate);
-  updateFloatingDate(); // trigger once immediately
+
+  // Call it once immediately
+  updateFloatingDate();
 }
+
 
 
 async function loadTrailers() {
@@ -249,7 +253,7 @@ async function loadTrailers() {
     });
 
     filterAndRender();
-    setTimeout(trackFloatingHeader, 100); // allow DOM to update first
+    trackFloatingHeader();
   } catch (err) {
     console.error("❌ Failed to load trailers", err);
   }
