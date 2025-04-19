@@ -69,10 +69,20 @@ function filterAndRender() {
     item.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  container.innerHTML = ""; // Clear container before rendering
+
+  if (filteredData.length === 0) {
+    container.innerHTML = `<div class="no-results">😕 No trailers found</div>`;
+    updateLoadMoreButton(); // Hide the button if needed
+    floatingDate.style.display = "none";
+    return;
+  }
+
   renderNextBatch();
   updateLoadMoreButton();
   trackFloatingHeader();
 }
+
 
 function groupByDate(data) {
   const grouped = {};
