@@ -168,6 +168,33 @@ async function loadLastUpdatedTime() {
     }
   }
 }
+async function updateLastUpdatedTime() {
+  const footerTime = document.getElementById("lastUpdatedTime");
+  if (!footerTime) return;
+
+  const { data, error } = await supabase
+    .from("meta")
+    .select("value")
+    .eq("key", "last_trailer_sync")
+    .single();
+
+  if (error || !data?.value) {
+    console.error("❌ Failed to load last updated time:", error);
+    footerTime.textContent = "⚠️ Error checking updates";
+    return;
+  }
+
+  const date = new Date(data.value);
+  const formatted = date.toLocaleString("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+
+  footerTime.textContent = `🕒 Last updated: ${formatted}`;
+}
+
+updateLastUpdatedTime();
+
 
 // 🚀 Initialize
 loadTrailers();
