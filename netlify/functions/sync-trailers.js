@@ -1,9 +1,5 @@
 // netlify/functions/sync-trailers.js
 import { createClient } from '@supabase/supabase-js';
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
@@ -12,9 +8,11 @@ const supabase = createClient(
 
 const apiKey = process.env.VITE_YOUTUBE_API_KEY;
 
-const gameChannelId = 'UCJx5KP-pCUmL9eZUv-mIcNw';
-const movieChannelId = 'UCi8e0iOVk1fEOogdfu4YgfA';
-const russianMovieChannelId = 'UC6A-Z0jDKemh9-CwGbj5yog';
+const channels = [
+  { id: 'UCJx5KP-pCUmL9eZUv-mIcNw', type: 'game' },
+  { id: 'UCi8e0iOVk1fEOogdfu4YgfA', type: 'movie' },
+  { id: 'UC6A-Z0jDKemh9-CwGbj5yog', type: 'russian' }
+];
 
 async function getUploadsPlaylist(channelId) {
   const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${apiKey}`);
@@ -22,12 +20,11 @@ async function getUploadsPlaylist(channelId) {
   return data?.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
 }
 
-async function fetchVideosFromChannel(channelId, type) {
+async function fetchVideos(channelId, type) {
   const playlistId = await getUploadsPlaylist(channelId);
   if (!playlistId) return [];
 
-  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=20&playlistId=${playlistId}&key=${apiKey}`;
-  const res = await fetch(url);
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=20&playlistId=${playlistId}&key=${apiKey}`);
   const data = await res.json();
 
   return (data.items || []).map(item => ({
@@ -35,35 +32,38 @@ async function fetchVideosFromChannel(channelId, type) {
     youtube_id: item.snippet.resourceId.videoId,
     thumbnail: item.snippet.thumbnails.medium.url,
     type,
-    created_at: item.snippet.publishedAt,
+    created_at: item.snippet.publishedAt
   }));
 }
 
-async function syncTrailers() {
-  const gameTrailers = await fetchVideosFromChannel(gameChannelId, 'game');
-  const movieTrailers = await fetchVideosFromChannel(movieChannelId, 'movie');
-  const russianTrailers = await fetchVideosFromChannel(russianMovieChannelId, 'russian');
+export const handler = async () => {
+  console.log("🟢 Scheduled trailer sync running");
 
-  const allTrailers = [...gameTrailers, ...movieTrailers, ...russianTrailers];
+  let allVideos = [];
+
+  for (const channel of channels) {
+    const videos = await fetchVideos(channel.id, channel.type);
+    allVideos.push(...videos);
+  }
 
   const { data: existing } = await supabase.from('trailers').select('youtube_id');
-  const existingIds = new Set((existing || []).map(tr => tr.youtube_id));
-  const newEntries = allTrailers.filter(trailer => !existingIds.has(trailer.youtube_id));
+  const existingIds = new Set((existing || []).map(v => v.youtube_id));
 
-  if (newEntries.length > 0) {
-    const { error } = await supabase.from('trailers').insert(newEntries);
-    if (error) console.error("❌ Insert error:", error);
-    else console.log(`✅ Inserted ${newEntries.length} new trailers.`);
+  const newVideos = allVideos.filter(video => !existingIds.has(video.youtube_id));
+
+  if (newVideos.length > 0) {
+    const { error } = await supabase.from('trailers').insert(newVideos);
+    if (error) {
+      console.error("❌ Supabase insert error:", error);
+    } else {
+      console.log(`✅ Inserted ${newVideos.length} new trailers`);
+    }
   } else {
-    console.log("📭 No new trailers.");
+    console.log("📭 No new trailers to insert");
   }
-}
 
-export const handler = async () => {
-  console.log("🕒 Running scheduled trailer sync...");
-  await syncTrailers();
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "Trailers synced successfully." })
+    body: JSON.stringify({ message: "Sync complete" })
   };
 };
