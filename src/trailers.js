@@ -163,29 +163,27 @@ async function loadTrailers() {
 }
 
 async function loadLastUpdatedTime() {
-  const footerTime = document.getElementById("lastUpdatedTime");
-  if (footerTime) {
-    try {
-      const { data, error } = await supabase
-        .from('trailers')
-        .select('fetched_at')
-        .order('fetched_at', { ascending: false })
-        .limit(1);
+  const { data, error } = await supabase
+    .from("meta")
+    .select("value")
+    .eq("key", "last_trailer_sync")
+    .single();
 
-      if (error) throw error;
-
-      const lastTime = data?.[0]?.fetched_at;
-      if (lastTime) {
-        const date = new Date(lastTime);
-        footerTime.textContent = `🕒 Last updated: ${date.toLocaleString()}`;
-      } else {
-        footerTime.textContent = `🕒 Last updated: unknown`;
-      }
-    } catch (err) {
-      console.error("❌ Failed to load last updated time:", err);
-    }
+  if (error || !data) {
+    console.error("❌ Failed to load last updated time:", error);
+    document.getElementById("lastUpdatedTime").textContent = "unknown";
+    return;
   }
+
+  const date = new Date(data.value);
+  const formatted = date.toLocaleString("en-US", {
+    dateStyle: "long",
+    timeStyle: "short",
+  });
+
+  document.getElementById("lastUpdatedTime").textContent = formatted;
 }
+
 async function updateLastUpdatedTime() {
   const footerTime = document.getElementById("lastUpdatedTime");
   if (!footerTime) return;

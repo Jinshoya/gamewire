@@ -46,12 +46,11 @@
             ]);
           };
 
-          CMS.registerPreviewTemplate("events", EventPreview);
-
-          CMS.registerPreviewTemplate("sync_trailers", () => {
+CMS.registerPreviewTemplate("sync_trailers", () => {
   const h = window.h;
+  const React = window.React;
 
-  class SyncTrailers extends window.React.Component {
+  class SyncTrailers extends React.Component {
     constructor(props) {
       super(props);
       this.state = { status: "" };
@@ -81,6 +80,7 @@
 
   return h(SyncTrailers);
 });
+
 
           CMS.init();
         }
