@@ -2,136 +2,39 @@ import { supabase } from './supabaseClient.js';
 
 let trailerData = [];
 let filteredData = [];
-let currentPage = 1;
-let currentFilter = "game"; // Default to "game"
+let currentFilter = "all";
 let searchQuery = "";
+let visibleCount = 20;
+let infiniteScrollEnabled = false;
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_SCROLL = 20;
 
 const container = document.getElementById("trailerList");
-const pagination = document.getElementById("pagination");
+const floatingDate = document.getElementById("floatingDate");
 const modal = document.getElementById("trailerModal");
 const modalFrame = document.getElementById("modalFrame");
 const modalTitle = document.getElementById("modalTitle");
 
-function filterData() {
-  filteredData = trailerData.filter(item =>
-    (currentFilter === "all" || item.type === currentFilter) &&
-    item.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  currentPage = 1;
-  render();
-}
-
-function render() {
-  container.innerHTML = "";
-
-  if (filteredData.length === 0) {
-    container.innerHTML = `
-      <div class="trailer-card no-results-card">
-        <div class="title-wrapper">
-          <span class="trailer-title">😕 No trailers found.</span>
-        </div>
-      </div>
-    `;
-    pagination.innerHTML = "";
-    return;
-  }
-
-  const start = (currentPage - 1) * ITEMS_PER_PAGE;
-  const pageItems = filteredData.slice(start, start + ITEMS_PER_PAGE);
-
-  pageItems.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "trailer-card";
-    card.innerHTML = `
-      <img src="${item.thumbnail}" class="thumb" />
-      <div class="title-wrapper">
-        <span class="trailer-title">${item.title}</span>
-      </div>
-      <button class="watch-btn" data-id="${item.youtube_id}" data-title="${item.title}" tabindex="-1" aria-label="Watch Trailer">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8 5v14l11-7z" fill="currentColor"/>
-  </svg>
-</button>
-
-    `;
-    container.appendChild(card);
-
-    card.addEventListener("click", () => {
-      modal.style.display = "flex";
-      modalTitle.textContent = item.title;
-      modalFrame.src = `https://www.youtube.com/embed/${item.youtube_id}`;
-    });
-  });
-
-  pagination.innerHTML = `
-    <button onclick="prevPage()">◀ Prev</button>
-    Page ${currentPage} of ${Math.ceil(filteredData.length / ITEMS_PER_PAGE)}
-    <button onclick="nextPage()">Next ▶</button>
-  `;
-
-  setupTitleScrollReveal();
-}
-
-function setupTitleScrollReveal() {
-  document.querySelectorAll(".title-wrapper").forEach(wrapper => {
-    const title = wrapper.querySelector(".trailer-title");
-
-    wrapper.addEventListener("mouseenter", () => {
-      const scrollAmount = title.scrollWidth - wrapper.clientWidth;
-      if (scrollAmount > 0) {
-        title.style.transition = "transform 1.5s ease-in-out";
-        title.style.transform = `translateX(-${scrollAmount}px)`;
-
-        setTimeout(() => {
-          title.style.transform = `translateX(0)`;
-        }, 2500);
-      }
-    });
-
-    wrapper.addEventListener("mouseleave", () => {
-      title.style.transition = "transform 0.5s ease-out";
-      title.style.transform = `translateX(0)`;
-    });
-  });
-}
-
-function nextPage() {
-  if ((currentPage * ITEMS_PER_PAGE) < filteredData.length) {
-    currentPage++;
-    render();
-  }
-}
-
-function prevPage() {
-  if (currentPage > 1) {
-    currentPage--;
-    render();
-  }
-}
-
 function setFilter(filter) {
   currentFilter = filter;
+  document.querySelectorAll(".filter-buttons button").forEach(btn =>
+    btn.classList.remove("active")
+  );
+  const btn = document.querySelector(`.filter-buttons button[onclick="setFilter('${filter}')"]`);
+  if (btn) btn.classList.add("active");
 
-  // 🔄 Remove 'active' class from all filter buttons
-  document.querySelectorAll(".filter-buttons button").forEach(btn => {
-    btn.classList.remove("active");
-  });
-
-  // ✅ Add 'active' class to the selected button
-  const selectedButton = document.querySelector(`.filter-buttons button[onclick="setFilter('${filter}')"]`);
-  if (selectedButton) {
-    selectedButton.classList.add("active");
-  }
-
-  filterData();
+  visibleCount = ITEMS_PER_SCROLL;
+  infiniteScrollEnabled = false;
+  container.innerHTML = "";
+  filterAndRender();
 }
-
 
 document.getElementById("searchInput").addEventListener("input", (e) => {
   searchQuery = e.target.value;
-  filterData();
+  visibleCount = ITEMS_PER_SCROLL;
+  infiniteScrollEnabled = false;
+  container.innerHTML = "";
+  filterAndRender();
 });
 
 document.getElementById("closeModal").addEventListener("click", () => {
@@ -146,48 +49,163 @@ modal.addEventListener("click", (e) => {
   }
 });
 
+function filterAndRender() {
+  filteredData = trailerData.filter(item =>
+    (currentFilter === "all" || item.type === currentFilter) &&
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  renderNextBatch();
+  updateLoadMoreButton();
+}
+
+function groupByDate(data) {
+  const grouped = {};
+  data.forEach(item => {
+    const date = new Date(item.created_at).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+    if (!grouped[date]) grouped[date] = [];
+    grouped[date].push(item);
+  });
+  return grouped;
+}
+
+function renderNextBatch() {
+  const sliced = filteredData.slice(0, visibleCount);
+  const grouped = groupByDate(sliced);
+
+  for (const [date, items] of Object.entries(grouped)) {
+    let group = container.querySelector(`[data-date="${date}"]`);
+
+    if (!group) {
+      group = document.createElement("div");
+      group.className = "timeline-group";
+      group.setAttribute("data-date", date);
+
+      const header = document.createElement("div");
+      header.className = "timeline-date";
+      header.textContent = date;
+      group.appendChild(header);
+
+      container.appendChild(group);
+    }
+
+    items.forEach(item => {
+      // Skip rendering if already rendered (prevents duplicates)
+      if (group.querySelector(`[data-id="${item.youtube_id}"]`)) return;
+
+      const card = document.createElement("div");
+      card.className = "trailer-card";
+      card.setAttribute("data-id", item.youtube_id);
+      if (item.isNew) card.classList.add("new");
+
+      card.innerHTML = `
+        <img src="${item.thumbnail}" class="thumb" />
+        <div class="title-wrapper">
+          <span class="trailer-title">${item.title}</span>
+        </div>
+        <button class="watch-btn" data-id="${item.youtube_id}" data-title="${item.title}" tabindex="-1" aria-label="Watch Trailer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      `;
+
+      card.addEventListener("click", () => {
+        modal.style.display = "flex";
+        modalTitle.textContent = item.title;
+        modalFrame.src = `https://www.youtube.com/embed/${item.youtube_id}`;
+      });
+
+      group.appendChild(card);
+      requestAnimationFrame(() => card.classList.add("show"));
+    });
+  }
+}
+
+
+function updateLoadMoreButton() {
+  let btn = document.getElementById("loadMoreBtn");
+  if (visibleCount >= filteredData.length) {
+    btn?.remove();
+    return;
+  }
+
+  if (!btn) {
+    btn = document.createElement("button");
+    btn.id = "loadMoreBtn";
+    btn.className = "load-more-btn";
+    btn.textContent = "⬇ Load More";
+    btn.addEventListener("click", () => {
+      visibleCount += ITEMS_PER_SCROLL;
+      renderNextBatch();
+      updateLoadMoreButton();
+      enableInfiniteScroll();
+    });
+    container.appendChild(btn);
+  }
+}
+
+function enableInfiniteScroll() {
+  if (infiniteScrollEnabled) return;
+  infiniteScrollEnabled = true;
+
+  window.addEventListener("scroll", () => {
+    if (
+      window.innerHeight + window.scrollY >= document.body.offsetHeight - 300 &&
+      visibleCount < filteredData.length
+    ) {
+      visibleCount += ITEMS_PER_SCROLL;
+      renderNextBatch();
+      updateLoadMoreButton();
+    }
+  });
+}
+
+function trackFloatingHeader() {
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        const date = entry.target.textContent;
+        floatingDate.textContent = `🕒 ${date}`;
+        floatingDate.style.display = "block";
+        break;
+      }
+    }
+  }, { rootMargin: "-56px 0px 0px 0px", threshold: 0 });
+
+  const headers = document.querySelectorAll(".timeline-date");
+  headers.forEach(header => observer.observe(header));
+}
+
 async function loadTrailers() {
   try {
     const { data, error } = await supabase
-      .from('trailers')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(200);
+      .from("trailers")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1000);
 
     if (error) throw error;
-    trailerData = data || [];
-    filterData();
+
+    trailerData = (data || []).map(item => {
+      const created = new Date(item.created_at);
+      const now = new Date();
+      const diff = (now - created) / (1000 * 60 * 60);
+      item.isNew = diff < 48;
+      return item;
+    });
+
+    filterAndRender();
+    trackFloatingHeader();
   } catch (err) {
-    console.error("❌ Failed to load trailer data from Supabase", err);
+    console.error("❌ Failed to load trailers", err);
   }
 }
 
 async function loadLastUpdatedTime() {
-  const { data, error } = await supabase
-    .from("meta")
-    .select("value")
-    .eq("key", "last_trailer_sync")
-    .single();
-
-  if (error || !data) {
-    console.error("❌ Failed to load last updated time:", error);
-    document.getElementById("lastUpdatedTime").textContent = "unknown";
-    return;
-  }
-
-  const date = new Date(data.value);
-  const formatted = date.toLocaleString("en-US", {
-    dateStyle: "long",
-    timeStyle: "short",
-  });
-
-  document.getElementById("lastUpdatedTime").textContent = formatted;
-}
-
-async function updateLastUpdatedTime() {
   const footerTime = document.getElementById("lastUpdatedTime");
-  if (!footerTime) return;
-
   const { data, error } = await supabase
     .from("meta")
     .select("value")
@@ -209,13 +227,8 @@ async function updateLastUpdatedTime() {
   footerTime.textContent = `🕒 Last updated: ${formatted}`;
 }
 
-updateLastUpdatedTime();
-
-
-// 🚀 Initialize
+// 🚀 LET IT RIP
 loadTrailers();
 loadLastUpdatedTime();
 window.setFilter = setFilter;
 setFilter("game");
-window.nextPage = nextPage;
-window.prevPage = prevPage;

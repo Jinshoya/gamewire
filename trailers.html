@@ -20,10 +20,46 @@
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="/styles/main.css" />
   <link rel="stylesheet" href="/styles/trailers.css" />
+
+  <style>
+    .filter-buttons button.active {
+      background: #1e1e1e;
+      color: #fff;
+      border: 2px solid #555;
+    }
+    .date-header {
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 12px 0 6px;
+      border-bottom: 1px solid #333;
+      margin-bottom: 8px;
+    }
+    .floating-date {
+      position: sticky;
+      top: 56px;
+      background: #1a1a1a;
+      z-index: 10;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #444;
+      text-transform: uppercase;
+      color: #aaa;
+    }
+    .trailer-card.new {
+      border: 2px solid #6af7ff;
+      animation: glowBorder 2s ease-in-out infinite;
+    }
+    @keyframes glowBorder {
+      0% { box-shadow: 0 0 5px #6af7ff; }
+      50% { box-shadow: 0 0 15px #6af7ff; }
+      100% { box-shadow: 0 0 5px #6af7ff; }
+    }
+  </style>
 </head>
 <body>
 
-  <main class="trailer-page">
+<main class="trailer-page">
+  <div class="trailer-content">
     <h1 class="page-title">Trailers</h1>
 
     <div class="trailer-header">
@@ -31,41 +67,45 @@
         <button onclick="setFilter('game')">🎮 Games</button>
         <button onclick="setFilter('movie')">🎬 Cinema</button>
         <button onclick="setFilter('russian')">🎬 на Русском</button>
-        <button onclick="setFilter('all')">🎲 All</button>
+        <button onclick="setFilter('all')" class="active">🎲 All</button>
       </div>
       <input id="searchInput" type="text" placeholder="Search title..." />
     </div>
 
-    <div id="trailerList" class="trailer-list"></div>
-    <div id="pagination" class="pagination-controls"></div>
-    <div style="text-align:center; padding:20px; font-size:0.9em;">
-      <div id="lastUpdatedBox">
-        <span id="lastUpdatedTime">⏳ Checking for updates...</span>
-      </div>
-  </main>
+    <div id="floatingDate" class="floating-date" style="display:none;">Loading...</div>
 
-  <!-- Modal -->
-  <div id="trailerModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <button id="closeModal" class="close-modal-btn" onclick="closeModal()" aria-label="Close">
-        <svg viewBox="0 0 24 24" class="close-icon" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18M6 6l12 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </button>
-      <h2 id="modalTitle">Now Playing</h2>
-      <iframe
-        id="modalFrame"
-        width="560"
-        height="315"
-        frameborder="0"
-        allow="autoplay; encrypted-media"
-        allowfullscreen>
-      </iframe>
+    <div id="trailerList" class="trailer-list timeline-container"></div>
+
+    <button id="loadMoreBtn" class="load-more-btn">Load More</button>
+
+    <div id="pagination" class="pagination-controls"></div>
+
+    <div id="lastUpdatedBox" style="text-align:center; padding:20px; font-size:0.9em;">
+      <span id="lastUpdatedTime">⏳ Checking for updates...</span>
     </div>
   </div>
-  
+</main>
 
-  <script type="module" src="/src/main.js"></script>
+<!-- Modal -->
+<div id="trailerModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <button id="closeModal" class="close-modal-btn" onclick="closeModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" class="close-icon" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6l12 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <h2 id="modalTitle">Now Playing</h2>
+    <iframe
+      id="modalFrame"
+      width="560"
+      height="315"
+      frameborder="0"
+      allow="autoplay; encrypted-media"
+      allowfullscreen>
+    </iframe>
+  </div>
+</div>
+
+<script type="module" src="/src/main.js"></script>
 </body>
-
 </html>
