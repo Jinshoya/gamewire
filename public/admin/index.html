@@ -49,29 +49,38 @@
           CMS.registerPreviewTemplate("events", EventPreview);
 
           CMS.registerPreviewTemplate("sync_trailers", () => {
-            const el = document.createElement("div");
-            el.innerHTML = `
-              <h2>🔄 Manual Trailer Sync</h2>
-              <button id="syncTrailersBtn">Run Sync Now</button>
-              <p id="syncStatus" style="margin-top: 10px; color: #ccc;"></p>
-            `;
-            setTimeout(() => {
-              const btn = el.querySelector("#syncTrailersBtn");
-              const status = el.querySelector("#syncStatus");
-              btn.onclick = async () => {
-                status.innerText = "⏳ Syncing...";
-                try {
-                  const res = await fetch("/.netlify/functions/sync-trailers");
-                  const text = await res.text();
-                  status.innerText = `✅ Synced at ${new Date().toLocaleTimeString()}`;
-                } catch (err) {
-                  console.error(err);
-                  status.innerText = "❌ Sync failed";
-                }
-              };
-            }, 100);
-            return el;
-          });
+  const h = window.h;
+
+  class SyncTrailers extends window.React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { status: "" };
+      this.runSync = this.runSync.bind(this);
+    }
+
+    async runSync() {
+      this.setState({ status: "⏳ Syncing..." });
+      try {
+        const res = await fetch("/.netlify/functions/sync-trailers");
+        const text = await res.text();
+        this.setState({ status: `✅ Synced at ${new Date().toLocaleTimeString()}` });
+      } catch (err) {
+        console.error(err);
+        this.setState({ status: "❌ Sync failed" });
+      }
+    }
+
+    render() {
+      return h("div", { style: { padding: "2rem", color: "#ccc" } }, [
+        h("h2", {}, "🔄 Manual Trailer Sync"),
+        h("button", { onClick: this.runSync }, "Run Sync Now"),
+        h("p", { style: { marginTop: "1rem" } }, this.state.status)
+      ]);
+    }
+  }
+
+  return h(SyncTrailers);
+});
 
           CMS.init();
         }
