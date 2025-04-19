@@ -113,8 +113,9 @@
   border-left: 4px solid #e63946;
 }
 .trailer-card.new {
-  border-color: #00e1ff;
-  box-shadow: 0 0 10px #00e1ff88;
+  background: rgba(255, 225, 255, 0.05)!important;
+  border: none!important;
+  box-shadow: none !important;
 }
 
 /* Thumbnail */
