@@ -10,6 +10,8 @@
     <script src="https://unpkg.com/netlify-cms@2.10.192/dist/netlify-cms.js" defer></script>
   </head>
   <body>
+    <button id="syncTrailersBtn" style="margin: 2rem; font-size: 16px;">🔁 Sync Trailers Now</button>
+<div id="syncStatus" style="margin: 0 2rem 2rem; color: gray;"></div>
     <div id="nc-root"></div>
 
     <script>
@@ -51,5 +53,32 @@
         }
       });
     </script>
+    
+    <script>
+      window.CMS.registerPreviewTemplate("sync_button", () => {
+        const el = document.createElement("div");
+        el.innerHTML = `
+          <h2>🔄 Manual Trailer Sync</h2>
+          <button id="syncTrailersBtn">Run Sync Now</button>
+          <p id="syncStatus"></p>
+        `;
+        setTimeout(() => {
+          const btn = document.getElementById("syncTrailersBtn");
+          const status = document.getElementById("syncStatus");
+          btn.onclick = async () => {
+            status.innerText = "⏳ Syncing...";
+            try {
+              const res = await fetch("/.netlify/functions/sync-trailers");
+              const text = await res.text();
+              status.innerText = `✅ Synced at ${new Date().toLocaleTimeString()}`;
+            } catch (err) {
+              console.error(err);
+              status.innerText = "❌ Sync failed";
+            }
+          };
+        }, 100);
+        return el;
+      });
+    </script>    
   </body>
 </html>

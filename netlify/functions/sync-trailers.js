@@ -61,9 +61,13 @@ export const handler = async () => {
   } else {
     console.log("📭 No new trailers to insert");
   }
-
+  await supabase.from('meta').upsert({
+    key: 'last_trailer_sync',
+    value: new Date().toISOString()
+  }, { onConflict: 'key' });
   return {
     statusCode: 200,
     body: JSON.stringify({ message: "Sync complete" })
   };
 };
+

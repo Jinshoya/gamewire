@@ -148,6 +148,20 @@ async function loadTrailers() {
     console.error("❌ Failed to load trailer data from Supabase", err);
   }
 }
+// Add to render() near the end
+const footerTime = document.getElementById("lastUpdatedTime");
+if (footerTime) {
+  const { data } = await supabase
+    .from('trailers')
+    .select('fetched_at')
+    .order('fetched_at', { ascending: false })
+    .limit(1);
+  
+  if (data?.[0]?.fetched_at) {
+    const date = new Date(data[0].fetched_at);
+    footerTime.innerText = `Last updated: ${date.toLocaleString()}`;
+  }
+}
 
 // 🚀 Initialize
 loadTrailers();

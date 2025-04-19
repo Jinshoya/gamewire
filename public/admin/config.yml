@@ -64,3 +64,14 @@ collections:
           - { label: "Label", name: "label", widget: "string" }
           - { label: "URL", name: "url", widget: "string" }
           - { label: "Icon Image", name: "icon", widget: "image" }
+  - name: "sync"
+    label: "⚙️ Sync Trailers"
+    files:
+      - label: "Manual Sync Trigger"
+        name: "sync"
+        file: "admin/sync-trigger.md"
+        fields:
+          - label: "Trigger"
+            name: "trigger"
+            widget: "hidden"
+            default: "true"
