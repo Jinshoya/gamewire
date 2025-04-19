@@ -428,13 +428,13 @@ const html = `
       <div class="label">Your expectations</div>
       <div class="reaction-bar" data-event="${slug}">
         ${[
-{ emoji: '🔥', icon: 'https://cdn.7tv.app/emote/01JDBDSNMQCZ7Z89PRZ712RM5N/4x.avif' },
-{ emoji: '😮', icon: 'https://cdn.7tv.app/emote/01G8TM6XNG000836WX1T1D503Y/3x.avif' },
-{ emoji: '😱', icon: 'https://cdn.7tv.app/emote/01GT61CD6R000DY5BPCJX9D3EB/3x.avif' },
-{ emoji: '😴', icon: 'https://cdn.7tv.app/emote/01FA5S9KGR0003RPW78DX3QB0Z/3x.avif' },
-{ emoji: '🤡', icon: 'https://cdn.7tv.app/emote/01HMBMJPV0000D32KQCYBK4S1D/4x.avif' },
-{ emoji: '🥶', icon: 'https://cdn.7tv.app/emote/01FZ6223S8000B4AWRZNMVN918/3x.avif' },
-{ emoji: '😂', icon: 'https://cdn.7tv.app/emote/01F9KXJ9AG00005C1KM5Y0PY1D/4x.avif' }
+{ emoji: '🔥', icon: 'https://cdn.7tv.app/emote/01JDBDSNMQCZ7Z89PRZ712RM5N/4x.gif' },
+{ emoji: '😮', icon: 'https://cdn.7tv.app/emote/01G8TM6XNG000836WX1T1D503Y/3x.gif' },
+{ emoji: '😱', icon: 'https://cdn.7tv.app/emote/01GT61CD6R000DY5BPCJX9D3EB/3x.gif' },
+{ emoji: '😴', icon: 'https://cdn.7tv.app/emote/01FA5S9KGR0003RPW78DX3QB0Z/3x.png' },
+{ emoji: '🤡', icon: 'https://cdn.7tv.app/emote/01HMBMJPV0000D32KQCYBK4S1D/4x.png' },
+{ emoji: '🥶', icon: 'https://cdn.7tv.app/emote/01FZ6223S8000B4AWRZNMVN918/3x.gif' },
+{ emoji: '😂', icon: 'https://cdn.7tv.app/emote/01F9KXJ9AG00005C1KM5Y0PY1D/4x.gif' }
 ].map(r => `
 <button onclick="react(this, '${r.emoji}')" data-emoji="${r.emoji}">
 <img src="${r.icon}" class="reaction-icon" alt="${r.emoji}" />
