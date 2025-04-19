@@ -483,6 +483,8 @@ loadReactionsForEvent(wrapper, eventId);
 function updateNowPlayingBar() {
   const live = document.querySelector("#live-events .event_headliner");
   const bar = document.getElementById("nowPlayingBar");
+  if (!bar) return; // 🛡 prevent crashing
+
   if (live) {
     const title = live.querySelector(".event_upc_title")?.textContent || "LIVE EVENT";
     const url = live.querySelector(".event_links a")?.getAttribute("href") || "#";
@@ -492,6 +494,7 @@ function updateNowPlayingBar() {
     bar.style.display = "none";
   }
 }
+
 function updateLiveStickyBanner() {
 const live = document.querySelector("#live-events .event_headliner");
 const banner = document.getElementById("liveStickyBanner");
@@ -509,7 +512,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   await trackPageView();
   await trackVisitor();
 
-  if (!window.location.pathname.includes('trailers')) {
+  const isTrailers = window.location.pathname.includes('trailers');
+
+  if (!isTrailers) {
     await loadEvents();
     hideEmptySections();
     updateNowPlayingBar();
@@ -522,13 +527,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     setInterval(updateNowPlayingBar, 3000);
     startCountdowns();
   }
-
-await trackPageView();
-await trackVisitor(); // 👈 move this here
-await loadEvents();
-hideEmptySections();
-updateNowPlayingBar();
 });
+
 document.addEventListener('click', function (e) {
 const wrapper = e.target.closest('.event_date');
 if (!wrapper) return;
