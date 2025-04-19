@@ -11,7 +11,6 @@ const apiKey = process.env.VITE_YOUTUBE_API_KEY;
 const channels = [
   { id: 'UCJx5KP-pCUmL9eZUv-mIcNw', type: 'game' },
   { id: 'UCi8e0iOVk1fEOogdfu4YgfA', type: 'movie' },
-  { id: 'UC6A-Z0jDKemh9-CwGbj5yog', type: 'russian' },
   { id: 'UCEScTo5Hk1YXsCqGW1zgQEw', type: 'russian' }
 ];
 
