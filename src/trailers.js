@@ -17,6 +17,8 @@ const modalTitle = document.getElementById("modalTitle");
 
 function setFilter(filter) {
   currentFilter = filter;
+  localStorage.setItem("trailerFilter", filter); // ✅ Save it
+
   document.querySelectorAll(".filter-buttons button").forEach(btn =>
     btn.classList.remove("active")
   );
@@ -28,6 +30,7 @@ function setFilter(filter) {
   container.innerHTML = "";
   filterAndRender();
 }
+
 
 document.getElementById("searchInput").addEventListener("input", (e) => {
   searchQuery = e.target.value;
@@ -286,4 +289,11 @@ async function loadLastUpdatedTime() {
 loadTrailers();
 loadLastUpdatedTime();
 window.setFilter = setFilter;
-setFilter("game");
+// 🚀 LET IT RIP
+loadTrailers();
+loadLastUpdatedTime();
+
+// ✅ Restore saved filter (or default to "game")
+const savedFilter = localStorage.getItem("trailerFilter") || "game";
+window.setFilter = setFilter;
+setFilter(savedFilter);
