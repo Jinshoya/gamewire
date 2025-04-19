@@ -3,7 +3,7 @@ import { supabase } from './supabaseClient.js';
 let trailerData = [];
 let filteredData = [];
 let currentPage = 1;
-let currentFilter = "all";
+let currentFilter = "game"; // Default to "game"
 let searchQuery = "";
 
 const ITEMS_PER_PAGE = 20;
@@ -52,6 +52,12 @@ function render() {
       <button class="watch-btn" data-id="${item.youtube_id}" data-title="${item.title}" tabindex="-1">▶</button>
     `;
     container.appendChild(card);
+
+    card.addEventListener("click", () => {
+      modal.style.display = "flex";
+      modalTitle.textContent = item.title;
+      modalFrame.src = `https://www.youtube.com/embed/${item.youtube_id}`;
+    });
   });
 
   pagination.innerHTML = `
@@ -60,17 +66,6 @@ function render() {
     <button onclick="nextPage()">Next ▶</button>
   `;
 
-  document.querySelectorAll(".trailer-card").forEach(card => {
-    const button = card.querySelector(".watch-btn");
-    card.addEventListener("click", () => {
-      const id = button.dataset.id;
-      const title = button.dataset.title;
-      modal.style.display = "flex";
-      modalTitle.textContent = title;
-      modalFrame.src = `https://www.youtube.com/embed/${id}`;
-    });
-  });
-  
   setupTitleScrollReveal();
 }
 
@@ -149,13 +144,6 @@ async function loadTrailers() {
   }
 }
 
-// 🚀 Initialize
-loadTrailers();
-setFilter("game");
-window.setFilter = setFilter;
-window.nextPage = nextPage;
-window.prevPage = prevPage;
-// ⏱️ Show last updated trailer time
 async function loadLastUpdatedTime() {
   const footerTime = document.getElementById("lastUpdatedTime");
   if (footerTime) {
@@ -180,4 +168,10 @@ async function loadLastUpdatedTime() {
     }
   }
 }
+
+// 🚀 Initialize
+loadTrailers();
 loadLastUpdatedTime();
+window.setFilter = setFilter;
+window.nextPage = nextPage;
+window.prevPage = prevPage;
