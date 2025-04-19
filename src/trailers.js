@@ -49,6 +49,17 @@ modal.addEventListener("click", (e) => {
   }
 });
 
+function markWatched(id) {
+  const watched = new Set(JSON.parse(localStorage.getItem("watchedTrailers") || "[]"));
+  watched.add(id);
+  localStorage.setItem("watchedTrailers", JSON.stringify([...watched]));
+}
+
+function isWatched(id) {
+  const watched = new Set(JSON.parse(localStorage.getItem("watchedTrailers") || "[]"));
+  return watched.has(id);
+}
+
 function filterAndRender() {
   filteredData = trailerData.filter(item =>
     (currentFilter === "all" || item.type === currentFilter) &&
@@ -92,38 +103,62 @@ function renderNextBatch() {
 
       container.appendChild(group);
     }
+    let watched = JSON.parse(localStorage.getItem("watchedTrailers") || "[]");
 
+    function isWatched(id) {
+      return watched.includes(id);
+    }
+    
+    function markWatched(id) {
+      if (!watched.includes(id)) {
+        watched.push(id);
+        localStorage.setItem("watchedTrailers", JSON.stringify(watched));
+      }
+    }
     items.forEach(item => {
-      // Skip rendering if already rendered (prevents duplicates)
       if (group.querySelector(`[data-id="${item.youtube_id}"]`)) return;
-
+    
       const card = document.createElement("div");
       card.className = "trailer-card";
       card.setAttribute("data-id", item.youtube_id);
+    
+      const watchedNow = isWatched(item.youtube_id);
+    
       if (item.isNew) card.classList.add("new");
-
+      if (watchedNow) card.classList.add("watched");
+    
+      const iconSVG = watchedNow
+        ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>`
+        : `<svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>`;
+    
       card.innerHTML = `
         <img src="${item.thumbnail}" class="thumb" />
         <div class="title-wrapper">
           <span class="trailer-title">${item.title}</span>
         </div>
         <button class="watch-btn" data-id="${item.youtube_id}" data-title="${item.title}" tabindex="-1" aria-label="Watch Trailer">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+          ${iconSVG}
         </button>
       `;
-
+    
       card.addEventListener("click", () => {
+        markWatched(item.youtube_id);
+        card.classList.add("watched");
+    
+        const btn = card.querySelector(".watch-btn");
+        btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>`;
+    
         modal.style.display = "flex";
         modalTitle.textContent = item.title;
         modalFrame.src = `https://www.youtube.com/embed/${item.youtube_id}`;
       });
-
+    
       group.appendChild(card);
       requestAnimationFrame(() => card.classList.add("show"));
     });
+    
   }
 }
-
 
 function updateLoadMoreButton() {
   let btn = document.getElementById("loadMoreBtn");
