@@ -68,6 +68,7 @@ function filterAndRender() {
 
   renderNextBatch();
   updateLoadMoreButton();
+  trackFloatingHeader();
 }
 
 function groupByDate(data) {
@@ -177,6 +178,7 @@ function updateLoadMoreButton() {
       renderNextBatch();
       updateLoadMoreButton();
       enableInfiniteScroll();
+      
     });
     container.appendChild(btn);
   }
@@ -194,25 +196,39 @@ function enableInfiniteScroll() {
       visibleCount += ITEMS_PER_SCROLL;
       renderNextBatch();
       updateLoadMoreButton();
+      
     }
   });
 }
 
 function trackFloatingHeader() {
-  const observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        const date = entry.target.textContent;
-        floatingDate.textContent = `🕒 ${date}`;
-        floatingDate.style.display = "block";
-        break;
+  const headers = [...document.querySelectorAll(".timeline-date")];
+
+  function updateFloatingDate() {
+    let current = null;
+
+    for (const header of headers) {
+      const rect = header.getBoundingClientRect();
+      if (rect.top <= 80) {
+        current = header;
+      } else {
+        break; // all further headers are lower, stop here
       }
     }
-  }, { rootMargin: "-56px 0px 0px 0px", threshold: 0 });
 
-  const headers = document.querySelectorAll(".timeline-date");
-  headers.forEach(header => observer.observe(header));
+    if (current) {
+      floatingDate.textContent = `🕒 ${current.textContent}`;
+      floatingDate.style.display = "block";
+    } else {
+      floatingDate.style.display = "none";
+    }
+  }
+
+  window.removeEventListener("scroll", updateFloatingDate); // avoid stacking
+  window.addEventListener("scroll", updateFloatingDate);
+  updateFloatingDate(); // trigger once immediately
 }
+
 
 async function loadTrailers() {
   try {
@@ -233,7 +249,7 @@ async function loadTrailers() {
     });
 
     filterAndRender();
-    trackFloatingHeader();
+    setTimeout(trackFloatingHeader, 100); // allow DOM to update first
   } catch (err) {
     console.error("❌ Failed to load trailers", err);
   }
