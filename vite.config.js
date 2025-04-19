@@ -1,27 +1,14 @@
-// vite.config.js
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 export default defineConfig({
   build: {
-    // Define the output directory for the build assets
-    outDir: 'public', // All assets (main.js, CSS, etc.) will be built here
-
-    // Input configuration for multiple HTML files
+    outDir: 'dist',
     rollupOptions: {
       input: {
-        main: './index.html', // Main page
-        trailers: './trailers.html', // Trailers page
+        main: resolve(__dirname, 'index.html'),
+        trailers: resolve(__dirname, 'trailers.html'),
       },
     },
   },
-
-  // Ensure Vite serves assets properly
-  server: {
-    // Serve the public folder (for local development)
-    fs: {
-      allow: ['.'], // Allow access to the root directory for the public folder
-    },
-  },
-
-  // Optionally, add any other Vite plugins you need here
 });
