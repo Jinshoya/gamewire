@@ -11,8 +11,8 @@ collections:
     folder: "events"
     create: true
     slug: "{{slug}}"
+    identifier_field: title  # ✅ Ensures entries show by title in CMS sidebar
     preview_path: "events/{{slug}}"
-    identifier_field: title
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD HH:mm", time_format: "HH:mm" }
@@ -64,15 +64,3 @@ collections:
           - { label: "Label", name: "label", widget: "string" }
           - { label: "URL", name: "url", widget: "string" }
           - { label: "Icon Image", name: "icon", widget: "image" }
-
-  - name: actions
-    label: Tools
-    files:
-      - label: Sync Trailers
-        name: sync_trailers
-        file: admin/sync.md
-        fields:
-          - label: Trigger
-            name: trigger
-            widget: hidden
-            default: "true"
