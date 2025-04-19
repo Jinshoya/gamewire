@@ -13,78 +13,101 @@
     <div id="nc-root"></div>
 
     <script>
-      window.CMS_MANUAL_INIT = true;
+window.CMS_MANUAL_INIT = true;
 
-      window.addEventListener('load', function () {
-        if (window.CMS) {
-          const h = window.h;
+window.addEventListener('load', function () {
+  const wait = setInterval(() => {
+    if (window.CMS && window.React && window.h) {
+      clearInterval(wait);
 
-          const EventPreview = ({ entry }) => {
-            const data = entry.getIn(['data']).toJS();
+      const h = window.h;
+      const React = window.React;
 
-            return h("div", { style: { background: "#121212", color: "white", padding: "20px", borderRadius: "10px", fontFamily: "sans-serif" } }, [
-              h("h2", {}, data.title || "Untitled Event"),
-              h("p", {}, `Date: ${data.date || "TBD"}`),
-              data.end ? h("p", {}, `Ends: ${data.end}`) : null,
-              data.logo ? h("img", {
-                src: data.logo,
-                alt: `${data.title} logo`,
-                style: { width: "72px", height: "72px", borderRadius: "8px", background: "#fff1", padding: "6px", marginBottom: "10px" }
-              }) : null,
-              h("img", {
-                src: data.image || "",
-                alt: data.title || "",
-                style: { maxWidth: "100%", borderRadius: "8px", marginTop: "10px" }
-              }),
-              h("div", { style: { marginTop: "12px" } }, (data.links || []).map(link =>
-                h("a", {
-                  href: link.url,
-                  target: "_blank",
-                  style: { color: "#90caf9", display: "inline-block", marginRight: "10px" }
-                }, link.label)
-              ))
-            ]);
-          };
+      const EventPreview = ({ entry }) => {
+        const data = entry.getIn(['data']).toJS();
 
-CMS.registerPreviewTemplate("sync_trailers", () => {
-  const h = window.h;
-  const React = window.React;
+        return h("div", {
+          style: {
+            background: "#121212",
+            color: "white",
+            padding: "20px",
+            borderRadius: "10px",
+            fontFamily: "sans-serif"
+          }
+        }, [
+          h("h2", {}, data.title || "Untitled Event"),
+          h("p", {}, `Date: ${data.date || "TBD"}`),
+          data.end ? h("p", {}, `Ends: ${data.end}`) : null,
+          data.logo ? h("img", {
+            src: data.logo,
+            alt: `${data.title} logo`,
+            style: {
+              width: "72px",
+              height: "72px",
+              borderRadius: "8px",
+              background: "#fff1",
+              padding: "6px",
+              marginBottom: "10px"
+            }
+          }) : null,
+          h("img", {
+            src: data.image || "",
+            alt: data.title || "",
+            style: {
+              maxWidth: "100%",
+              borderRadius: "8px",
+              marginTop: "10px"
+            }
+          }),
+          h("div", { style: { marginTop: "12px" } }, (data.links || []).map(link =>
+            h("a", {
+              href: link.url,
+              target: "_blank",
+              style: {
+                color: "#90caf9",
+                display: "inline-block",
+                marginRight: "10px"
+              }
+            }, link.label)
+          ))
+        ]);
+      };
 
-  class SyncTrailers extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = { status: "" };
-      this.runSync = this.runSync.bind(this);
-    }
-
-    async runSync() {
-      this.setState({ status: "⏳ Syncing..." });
-      try {
-        const res = await fetch("/.netlify/functions/sync-trailers");
-        const text = await res.text();
-        this.setState({ status: `✅ Synced at ${new Date().toLocaleTimeString()}` });
-      } catch (err) {
-        console.error(err);
-        this.setState({ status: "❌ Sync failed" });
-      }
-    }
-
-    render() {
-      return h("div", { style: { padding: "2rem", color: "#ccc" } }, [
-        h("h2", {}, "🔄 Manual Trailer Sync"),
-        h("button", { onClick: this.runSync }, "Run Sync Now"),
-        h("p", { style: { marginTop: "1rem" } }, this.state.status)
-      ]);
-    }
-  }
-
-  return h(SyncTrailers);
-});
-
-
-          CMS.init();
+      class SyncTrailers extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = { status: "" };
+          this.runSync = this.runSync.bind(this);
         }
-      });
+
+        async runSync() {
+          this.setState({ status: "⏳ Syncing..." });
+          try {
+            const res = await fetch("/.netlify/functions/sync-trailers");
+            const text = await res.text();
+            this.setState({ status: `✅ Synced at ${new Date().toLocaleTimeString()}` });
+          } catch (err) {
+            console.error(err);
+            this.setState({ status: "❌ Sync failed" });
+          }
+        }
+
+        render() {
+          return h("div", { style: { padding: "2rem", color: "#ccc" } }, [
+            h("h2", {}, "🔄 Manual Trailer Sync"),
+            h("button", { onClick: this.runSync }, "Run Sync Now"),
+            h("p", { style: { marginTop: "1rem" } }, this.state.status)
+          ]);
+        }
+      }
+
+      CMS.registerPreviewTemplate("events", EventPreview);
+      CMS.registerPreviewTemplate("sync_trailers", () => h(SyncTrailers));
+
+      CMS.init();
+    }
+  }, 100);
+});
     </script>
   </body>
 </html>
