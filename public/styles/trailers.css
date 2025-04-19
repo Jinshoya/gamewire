@@ -128,25 +128,61 @@
   }
   
   /* Buttons */
+  .close-modal-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-icon {
+  width: 20px;
+  height: 20px;
+  stroke: white;
+}
+
+.close-modal-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.1);
+}
+
   .watch-btn {
-    background: #e34343;
-    border: none;
-    color: white;
-    font-size: 1.1rem;
-    padding: 0.3rem 0.7rem;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: background 0.2s ease;
-    flex-shrink: 0;
-    width: 44px;
-    height: 44px;
-    font-size: 1.2rem;
-    margin-left: 12px;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+  }
+  
+  .watch-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: white;
+    pointer-events: none;
   }
   
   .watch-btn:hover {
-    background: #ff5555;
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
   }
+  
   
   /* Pagination */
   .pagination-controls {

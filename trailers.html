@@ -47,7 +47,11 @@
   <!-- Modal -->
   <div id="trailerModal" class="modal" style="display:none;">
     <div class="modal-content">
-      <button id="closeModal">❌ Close</button>
+      <button id="closeModal" class="close-modal-btn" onclick="closeModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" class="close-icon" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6l12 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
       <h2 id="modalTitle">Now Playing</h2>
       <iframe
         id="modalFrame"
@@ -59,6 +63,7 @@
       </iframe>
     </div>
   </div>
+  
 
   <script type="module" src="/src/main.js"></script>
 </body>

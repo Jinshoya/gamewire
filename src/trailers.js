@@ -49,7 +49,12 @@ function render() {
       <div class="title-wrapper">
         <span class="trailer-title">${item.title}</span>
       </div>
-      <button class="watch-btn" data-id="${item.youtube_id}" data-title="${item.title}" tabindex="-1">▶</button>
+      <button class="watch-btn" data-id="${item.youtube_id}" data-title="${item.title}" tabindex="-1" aria-label="Watch Trailer">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 5v14l11-7z" fill="currentColor"/>
+  </svg>
+</button>
+
     `;
     container.appendChild(card);
 
