@@ -8,7 +8,7 @@ export function injectNavbar() {
         </div>
         <ul class="nav-menu">
           <li><a href="/" class="${currentPath === '/' ? 'selected' : ''}">Home</a></li>
-          <li><a href="/trailers.html" class="${currentPath === '/trailers.html' ? 'selected' : ''}">Trailers</a></li>
+          <li><a href="/trailers" class="${currentPath === '/trailers' ? 'selected' : ''}">Trailers</a></li>
         </ul>
       </nav>
     `;
