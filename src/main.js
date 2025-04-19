@@ -506,6 +506,23 @@ banner.style.display = "none";
 }
 }
 document.addEventListener("DOMContentLoaded", async () => {
+  await trackPageView();
+  await trackVisitor();
+
+  if (!window.location.pathname.includes('trailers')) {
+    await loadEvents();
+    hideEmptySections();
+    updateNowPlayingBar();
+
+    document.querySelectorAll('.reaction-bar').forEach(wrapper => {
+      const eventId = wrapper.getAttribute('data-event');
+      loadReactionsForEvent(wrapper, eventId);
+    });
+
+    setInterval(updateNowPlayingBar, 3000);
+    startCountdowns();
+  }
+
 await trackPageView();
 await trackVisitor(); // 👈 move this here
 await loadEvents();
