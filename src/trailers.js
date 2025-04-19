@@ -108,8 +108,21 @@ function prevPage() {
 
 function setFilter(filter) {
   currentFilter = filter;
+
+  // 🔄 Remove 'active' class from all filter buttons
+  document.querySelectorAll(".filter-buttons button").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  // ✅ Add 'active' class to the selected button
+  const selectedButton = document.querySelector(`.filter-buttons button[onclick="setFilter('${filter}')"]`);
+  if (selectedButton) {
+    selectedButton.classList.add("active");
+  }
+
   filterData();
 }
+
 
 document.getElementById("searchInput").addEventListener("input", (e) => {
   searchQuery = e.target.value;
@@ -200,5 +213,6 @@ updateLastUpdatedTime();
 loadTrailers();
 loadLastUpdatedTime();
 window.setFilter = setFilter;
+setFilter("game");
 window.nextPage = nextPage;
 window.prevPage = prevPage;

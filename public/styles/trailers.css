@@ -45,6 +45,12 @@
   .filter-buttons button:hover {
     background-color: #444466;
   }
+  .filter-buttons button.active {
+    background-color: #444;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #888;
+  }
   
   #searchInput {
     padding: 0.5rem 1rem;
