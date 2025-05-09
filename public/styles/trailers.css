@@ -6,6 +6,35 @@
   min-height: 100vh;
   box-sizing: border-box;
 }
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.modal-btn {
+  background-color: #2e2e40; /* Dark button to match site */
+  border: 1px solid #444;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  border-radius: 8px;
+}
+
+.modal-btn:hover {
+  background-color: #444466;
+  transform: scale(1.05);
+}
+
+.logo-btn {
+  height: 20px; /* Ensures consistent height */
+  width: auto; /* Allows natural scaling */
+  max-width: 150px; /* Keeps Kinopoisk wide enough */
+  display: block;
+}
+
+
 
 /* Centered content wrapper */
 .trailer-content {

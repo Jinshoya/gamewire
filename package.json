@@ -12,8 +12,13 @@
     "vite": "^6.3.1"
   },
   "dependencies": {
+    "@donation-alerts/api": "^4.0.0",
+    "@donation-alerts/events": "^4.0.0",
     "@supabase/supabase-js": "^2.49.4",
+    "arctic": "^3.6.0",
     "dotenv": "^16.5.0",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   }
 }

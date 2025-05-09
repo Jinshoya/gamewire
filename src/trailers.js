@@ -158,14 +158,65 @@ function renderNextBatch() {
       card.addEventListener("click", () => {
         markWatched(item.youtube_id);
         card.classList.add("watched");
-    
-        const btn = card.querySelector(".watch-btn");
-        btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>`;
-    
+      
         modal.style.display = "flex";
         modalTitle.textContent = item.title;
         modalFrame.src = `https://www.youtube.com/embed/${item.youtube_id}`;
+      
+        // ✅ Clean movie title for better search accuracy
+        const cleanTitle = item.title
+        .replace(/\(\s*\d*\s?(season|сезон)\s*\)/gi, "") // ✅ Removes "(3 сезон)", "(Season 2)"
+        .replace(/\b(season|сезон|\d+\s?сезон|Season\s?\d+)\b/gi, "") // ✅ Removes season-related words
+        .replace(/(trailer|teaser trailer|русский трейлер|трейлер|—).*$/gi, "") // ✅ Removes trailer-related words
+        .replace(/\(\s*\)/g, "") // ✅ Removes any leftover empty brackets
+        .trim();
+      
+      
+      
+        let modalLinks = "";
+      
+        // ✅ Movies (English) → IMDb + Kinopoisk
+        if (item.type === "movie") {
+          const imdbSearchUrl = `https://www.imdb.com/find?q=${encodeURIComponent(cleanTitle)}`;
+          const kinopoiskSearchUrl = `https://www.kinopoisk.ru/index.php?kp_query=${encodeURIComponent(cleanTitle)}`;
+      
+          modalLinks = `
+            <button class="modal-btn" onclick="window.open('${imdbSearchUrl}', '_blank')">
+              <img src="/images/links/IMDB.png" alt="IMDb" class="logo-btn">
+            </button>
+            <button class="modal-btn" onclick="window.open('${kinopoiskSearchUrl}', '_blank')">
+              <img src="/images/links/kinopoisk.png" alt="Kinopoisk" class="logo-btn">
+            </button>
+          `;
+        } 
+      
+        // ✅ Russian movies → Only Kinopoisk
+        else if (item.type === "russian") {
+          const kinopoiskSearchUrl = `https://www.kinopoisk.ru/index.php?kp_query=${encodeURIComponent(cleanTitle)}`;
+      
+          modalLinks = `
+            <button class="modal-btn" onclick="window.open('${kinopoiskSearchUrl}', '_blank')">
+              <img src="/images/links/kinopoisk.png" alt="Kinopoisk" class="logo-btn">
+            </button>
+          `;
+        }
+      
+        // ✅ No buttons for games
+        modal.innerHTML = `
+          <div class="modal-content">
+            <h2 id="modalTitle">${item.title}</h2>
+            <iframe id="modalFrame" src="https://www.youtube.com/embed/${item.youtube_id}" frameborder="0" allowfullscreen></iframe>
+            <div class="modal-buttons">
+              ${modalLinks} <!-- ✅ Only relevant buttons appear -->
+            </div>
+          </div>
+        `;
       });
+      
+      
+      
+      
+      
     
       group.appendChild(card);
       requestAnimationFrame(() => card.classList.add("show"));

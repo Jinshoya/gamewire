@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head><title>DonationAlerts Auth</title></head>
+  <body>
+    <h2>Authorizing DonationAlerts...</h2>
+    <script>
+      const code = new URLSearchParams(window.location.search).get('code');
+      if (!code) {
+        document.body.innerHTML = '❌ No code provided in URL';
+        throw new Error('Missing code');
+      }
+
+      fetch(`/.netlify/functions/da-auth?code=${code}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.token || !data.token.access_token) {
+            console.error("Auth response:", data);
+            throw new Error("No access token returned");
+          }
+
+          localStorage.setItem('donationAlertsToken', data.token.access_token);
+          localStorage.setItem('donationAlertsUser', JSON.stringify(data.user));
+          localStorage.setItem('donationAlertsTokenInfo', JSON.stringify(data.token));
+
+          const back = localStorage.getItem('redirectAfterLogin') || '/';
+          window.location.replace(back);
+        })
+        .catch(err => {
+          console.error("Auth error:", err);
+          document.body.innerHTML = `<h1>Login failed</h1><p>${err.message}</p>`;
+        });
+    </script>
+  </body>
+</html>
