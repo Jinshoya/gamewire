@@ -166,9 +166,9 @@ function renderNextBatch() {
         // ✅ Clean movie title for better search accuracy
         const cleanTitle = item.title
         .replace(/\(\s*\d*\s?(season|сезон)\s*\)/gi, "") // ✅ Removes "(3 сезон)", "(Season 2)"
-        .replace(/\b(season|сезон|\d+\s?сезон|Season\s?\d+)\b/gi, "") // ✅ Removes season-related words
-        .replace(/(trailer|teaser trailer|русский трейлер|трейлер|—).*$/gi, "") // ✅ Removes trailer-related words
-        .replace(/\(\s*\)/g, "") // ✅ Removes any leftover empty brackets
+        .replace(/\b(season|сезон|\d+\s?сезон|Season\s?\d+)\b/gi, "") // Removes season-related words
+        .replace(/(trailer|teaser trailer|русский трейлер|трейлер|—).*$/gi, "") // Removes trailer-related words
+        .replace(/\(\s*\)/g, "") // Removes any leftover empty brackets
         .trim();
       
       

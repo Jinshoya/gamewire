@@ -47,8 +47,10 @@ const [donationConnected, setDonationConnected] = useState(false);
   
     localStorage.setItem('redirectAfterLogin', window.location.pathname + '#donationalerts');
   
-    window.location.href = `https://www.donationalerts.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirect)}&response_type=code&scope=${encodeURIComponent(scope)}`;
+    // Use response_type=token for the implicit grant flow
+    window.location.href = `https://www.donationalerts.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirect)}&response_type=token&scope=${encodeURIComponent(scope)}`;
   };
+  
   
   
   
