@@ -2,8 +2,8 @@
 title: Steam Next Fest
 date: 2025-06-09 20:00
 end: 2025-06-16 20:00
-image: https://www.eventsforgamers.com/wp-content/uploads/2022/10/Banner-Steam-Next-Fest-2023-all.jpg
-logo: https://www.eventsforgamers.com/wp-content/uploads/2022/10/Banner-Steam-Next-Fest-2023-all.jpg
+image: https://i.imgur.com/85g5XPj.png
+logo: https://i.imgur.com/8Y1MPWk.png
 borderColor: "#ff6600"
 type: steam_sale
 youtube:
