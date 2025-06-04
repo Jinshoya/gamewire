@@ -1,6 +1,6 @@
 ---
 title: Southeast Asian Games Showcase
-date: 2025-06-04 16:57
+date: 2025-06-07 22:00
 end: 2025-06-04 16:57
 image: https://i.imgur.com/fRDGXUM.png
 logo: https://i.imgur.com/qhD9aM4.png
