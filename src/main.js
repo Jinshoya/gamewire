@@ -208,9 +208,9 @@ let soonestEventTitle = '';
 let nowLiveTitle = '';
 
 document.querySelectorAll('.countdown').forEach(el => {
-  const start = new Date(el.getAttribute('data-start-event-date'));
+  const start = new Date(el.getAttribute('data-start-event-date') + 'Z');
   const endStr = el.getAttribute('data-end-event-date');
-  const end = endStr ? new Date(endStr) : null;
+  const end = endStr ? new Date(endStr + 'Z') : null;
   const diff = start - now;
   const elapsed = now - start;
   const parent = el.closest('.event_block');
