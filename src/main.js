@@ -201,149 +201,119 @@ btn.classList.toggle('reacted', emoji === selected); // ✅ compare with stored
 }
 
 function startCountdowns() {
-  setInterval(() => {
-    // Get current time in UTC
-    const now = new Date();
-    const nowUTC = Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()
-    );
+setInterval(() => {
+const now = new Date();
+let soonestTimeLeft = Infinity;
+let soonestEventTitle = '';
+let nowLiveTitle = '';
 
-    let soonestTimeLeft = Infinity;
-    let soonestEventTitle = '';
-    let nowLiveTitle = '';
+document.querySelectorAll('.countdown').forEach(el => {
+const start = new Date(el.getAttribute('data-start-event-date')); // no + 'Z'
 
-    document.querySelectorAll('.countdown').forEach(el => {
-      // Parse event times as UTC
-      const start = new Date(el.getAttribute('data-start-event-date'));
-      const startUTC = Date.UTC(
-        start.getUTCFullYear(),
-        start.getUTCMonth(),
-        start.getUTCDate(),
-        start.getUTCHours(),
-        start.getUTCMinutes(),
-        start.getUTCSeconds()
-      );
+  const endStr = el.getAttribute('data-end-event-date');
+  const end = endStr ? new Date(endStr + 'Z') : null;
+  const diff = start - now;
+  const elapsed = now - start;
+  const parent = el.closest('.event_block');
+  const isSteam = parent.closest('#steam-sale-event');
 
-      const endStr = el.getAttribute('data-end-event-date');
-      let endUTC = null;
-      if (endStr) {
-        const end = new Date(endStr);
-        endUTC = Date.UTC(
-          end.getUTCFullYear(),
-          end.getUTCMonth(),
-          end.getUTCDate(),
-          end.getUTCHours(),
-          end.getUTCMinutes(),
-          end.getUTCSeconds()
-        );
+  // Track soonest upcoming event
+  if (diff > 0 && diff < soonestTimeLeft) {
+    soonestTimeLeft = diff;
+    const block = el.closest('.event_block');
+    soonestEventTitle = block?.querySelector('.event_upc_title')?.textContent || 'Upcoming Event';
+  }
+
+  // Glow if less than 1 hour
+  if (diff > 0 && diff < 3600000) {
+    el.classList.add("glowing");
+  } else {
+    el.classList.remove("glowing");
+  }
+
+  // Steam sale removal if ended
+  if (isSteam && end && now >= end) {
+    return parent.remove();
+  }
+
+  // If already started
+  if (diff <= 0) {
+    if (elapsed >= 3600000) {
+      // Move to past
+      if (parent.parentElement.id !== 'past-events') {
+        document.getElementById('past-events').appendChild(parent);
       }
 
-      // Use UTC values for calculations
-      const diff = startUTC - nowUTC;
-      const elapsed = nowUTC - startUTC;
-      const parent = el.closest('.event_block');
-      const isSteam = parent.closest('#steam-sale-event');
+      parent.classList.add('event_past');
+      parent.classList.remove('now_live');
+      el.innerHTML = '';
 
-      // Track soonest upcoming event
-      if (diff > 0 && diff < soonestTimeLeft) {
-        soonestTimeLeft = diff;
-        const block = el.closest('.event_block');
-        soonestEventTitle = block?.querySelector('.event_upc_title')?.textContent || 'Upcoming Event';
-      }
-
-      // Glow if less than 1 hour
-      if (diff > 0 && diff < 3600000) {
-        el.classList.add("glowing");
-      } else {
-        el.classList.remove("glowing");
-      }
-
-      // Steam sale removal if ended
-      if (isSteam && endUTC && nowUTC >= endUTC) {
-        return parent.remove();
-      }
-
-      // If already started
-      if (diff <= 0) {
-        if (elapsed >= 3600000) {
-          // Move to past
-          if (parent.parentElement.id !== 'past-events') {
-            document.getElementById('past-events').appendChild(parent);
-          }
-
-          parent.classList.add('event_past');
-          parent.classList.remove('now_live');
-          el.innerHTML = '';
-
-          const reactionBar = parent.querySelector('.reaction-bar');
-          if (reactionBar) reactionBar.classList.add('reactions-disabled');
-        } else {
-          // It's LIVE
-          el.innerHTML = `
-            <div class="event_countdown live-tag">
-              <span class="live-dot"></span>
-              <span class="live-text">NOW LIVE</span>
-            </div>
-          `;
-
-          if (parent.parentElement.id !== 'live-events') {
-            document.getElementById('live-events').appendChild(parent);
-            setTimeout(() => hideEmptySections(), 10);
-          }
-
-          parent.classList.add('now_live');
-          parent.classList.remove('event_past');
-
-          const reactionBar = parent.querySelector('.reaction-bar');
-          if (reactionBar) reactionBar.classList.remove('reactions-disabled');
-
-          const block = el.closest('.event_block');
-          nowLiveTitle = block?.querySelector('.event_upc_title')?.textContent || 'Now Live';
-        }
-        return;
-      }
-
-      // Show countdown (using UTC-based diff)
-      const totalSeconds = Math.floor(diff / 1000);
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const mins = Math.floor((totalSeconds % 3600) / 60);
-      const secs = totalSeconds % 60;
-
-      el.innerHTML = `
-        <div class="event_countdown">
-          Starting in
-          <span class="number">${days}</span><span class="unit">d</span>
-          <span class="number">${hours}</span><span class="unit">h</span>
-          <span class="number">${mins}</span><span class="unit">m</span>
-          <span class="number">${secs}</span><span class="unit">s</span>
-        </div>
-      `;
-    });
-
-    // Update page title
-    if (nowLiveTitle) {
-      document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
-    } else if (soonestTimeLeft < Infinity) {
-      const totalSeconds = Math.floor(soonestTimeLeft / 1000);
-      if (totalSeconds < 3600) {
-        const mins = Math.floor(totalSeconds / 60);
-        const secs = totalSeconds % 60;
-        document.title = `⏳ ${mins}m ${secs}s – ${soonestEventTitle}`;
-      } else {
-        const days = Math.floor(totalSeconds / 86400);
-        const hours = Math.floor((totalSeconds % 86400) / 3600);
-        document.title = `⏳ ${days}d ${hours}h – ${soonestEventTitle}`;
-      }
+      const reactionBar = parent.querySelector('.reaction-bar');
+      if (reactionBar) reactionBar.classList.add('reactions-disabled');
     } else {
-      document.title = 'ggPause';
+      // It's LIVE
+      el.innerHTML = `
+<div class="event_countdown live-tag">
+<span class="live-dot"></span>
+<span class="live-text">NOW LIVE</span>
+</div>
+`;
+
+      if (parent.parentElement.id !== 'live-events') {
+        document.getElementById('live-events').appendChild(parent);
+        setTimeout(() => hideEmptySections(), 10);
+      }
+
+      parent.classList.add('now_live');
+      parent.classList.remove('event_past');
+
+      const reactionBar = parent.querySelector('.reaction-bar');
+      if (reactionBar) reactionBar.classList.remove('reactions-disabled');
+
+      const block = el.closest('.event_block');
+      nowLiveTitle = block?.querySelector('.event_upc_title')?.textContent || 'Now Live';
     }
-  }, 1000);
+    return;
+  }
+
+  // Show countdown
+  const totalSeconds = Math.floor(diff / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
+
+  el.innerHTML = `
+    <div class="event_countdown">
+      Starting in
+      <span class="number">${days}</span><span class="unit">d</span>
+      <span class="number">${hours}</span><span class="unit">h</span>
+      <span class="number">${mins}</span><span class="unit">m</span>
+      <span class="number">${secs}</span><span class="unit">s</span>
+    </div>
+  `;
+});
+
+// 🔁 Set page title
+if (nowLiveTitle) {
+document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
+} else if (soonestTimeLeft < Infinity) {
+const totalSeconds = Math.floor(soonestTimeLeft / 1000);
+
+if (totalSeconds < 3600) {
+const mins = Math.floor(totalSeconds / 60);
+const secs = totalSeconds % 60;
+document.title = `⏳ ${mins}m ${secs}s – ${soonestEventTitle}`;
+} else {
+const days = Math.floor(totalSeconds / 86400);
+const hours = Math.floor((totalSeconds % 86400) / 3600);
+document.title = `⏳ ${days}d ${hours}h – ${soonestEventTitle}`;
+}
+} else {
+document.title = 'ggPause';
+}
+
+}, 1000);
 }
 
 
@@ -360,155 +330,122 @@ btn.classList.toggle('reacted', emoji === userEmoji);
 }
 async function loadEvents() {
   const res = await fetch('/events/index.json');
-const files = await res.json();
-const now = new Date();
-const parsedEvents = [];
+  const files = await res.json();
+  const now = new Date();
+  const parsedEvents = [];
 
-for (const file of files) {
-const response = await fetch(`/events/${file}`);
-const raw = await response.text();
-const { attributes: data } = parseFrontmatter(raw);
-data._filename = file;
-parsedEvents.push(data);
-}
+  for (const file of files) {
+    const response = await fetch(`/events/${file}`);
+    const raw = await response.text();
+    const { attributes: data } = parseFrontmatter(raw);
+    data._filename = file;
 
-parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+    // Convert Riga time to UTC when loading
+    const rigaTime = new Date(data.date);
+    const utcTime = new Date(rigaTime.getTime() - (rigaTime.getTimezoneOffset() * 60000));
+    data.date = utcTime.toISOString();
 
-
-for (const data of parsedEvents) {
-  const date = new Date(data.date);
-  const isPast = date < now;
-  const isSteam = data.type === 'steam_sale';
-
-  const slug = data.slug || data._filename.replace('.md', '');
-  
-  const formatTimeShort = d => {
-    const dt = new Date(d);
-    const h = dt.getUTCHours();  // UTC hours
-    const m = dt.getUTCMinutes().toString().padStart(2, '0');  // UTC minutes
-    const ampm = h >= 12 ? 'pm' : 'am';
-    const hour = ((h + 11) % 12 + 1);
-    return `${hour}:${m} <span class="unit">${ampm}</span>`;
-  };
-
-  const formatDateShort = d => {
-    const dt = new Date(d);
-    const month = dt.toLocaleString('default', { month: 'short', timeZone: 'UTC' });
-    return `${month} ${dt.getUTCDate()}`;  // UTC date
-  };
-
-  const formatSingle = d => `${formatDateShort(d)} - ${formatTimeShort(d)}`;
-  const formatRange = (start, end) =>
-    `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
-  const formatTimeUTC = d => {
-const dt = new Date(d);
-const h = dt.getUTCHours();
-const m = dt.getUTCMinutes().toString().padStart(2, '0');
-const ampm = h >= 12 ? 'pm' : 'am';
-const hour = ((h + 11) % 12 + 1);
-return `${hour}:${m} <span class="unit">UTC</span>`;
-};
-
-
-const formatDateUTC = d => {
-const dt = new Date(d);
-const month = dt.toLocaleString('default', { month: 'short' });
-return `${month} ${dt.getUTCDate()}`;
-};
-
-const formatSingleUTC = d => `${formatDateUTC(d)} - ${formatTimeUTC(d)}`;
-
-const formatRangeUTC = (start, end) =>
-`${formatDateUTC(start)} - ${formatTimeUTC(start)} / ${formatDateUTC(end)} - ${formatTimeUTC(end)}`;
-
-  const localDateStr = isSteam
-? formatRange(data.date, data.end)
-: formatSingle(data.date);
-
-const utcDateStr = isSteam
-? formatRangeUTC(data.date, data.end)
-: formatSingleUTC(data.date);
-
-  const hasStarted = date <= now;
-const isLive = hasStarted && (!data.end || now < new Date(data.end));
-
-const html = `
-<div class="event_block ${isLive ? 'now_live event_headliner' : ''}">
-<div class="event_logo">
-<img src="${data.logo}" alt="logo" />
-</div>
-<div class="event_card" style="background-image: url('${data.image}')">
-<div class="event_card_overlay"></div>
-<div class="event_card_content">
-  <div class="event_card_main">
-    <div class="event_title_wrapper">
-<h2 class="event_title event_upc_title">${data.title}</h2>
-    </div>
-<p class="event_date">
-<span class="toggle-date toggle-local active">${localDateStr}</span>
-<span class="toggle-date toggle-utc">${utcDateStr}</span>
-</p>
-
-    <div class="countdown"
-         data-start-event-date="${data.date}"
-         ${data.end ? `data-end-event-date="${data.end}"` : ''}>
-    </div>
-  </div>
-  <div class="event_expectations_wrapper">
-    <div class="event_reacts">
-      <div class="label">Your expectations</div>
-      <div class="reaction-bar" data-event="${slug}">
-        ${[
-{ emoji: '🔥', icon: 'https://cdn.7tv.app/emote/01JDBDSNMQCZ7Z89PRZ712RM5N/4x.gif' },
-{ emoji: '😮', icon: 'https://cdn.7tv.app/emote/01G8TM6XNG000836WX1T1D503Y/3x.gif' },
-{ emoji: '😱', icon: 'https://cdn.7tv.app/emote/01GT61CD6R000DY5BPCJX9D3EB/3x.gif' },
-{ emoji: '😴', icon: 'https://cdn.7tv.app/emote/01FA5S9KGR0003RPW78DX3QB0Z/3x.png' },
-{ emoji: '🤡', icon: 'https://cdn.7tv.app/emote/01HMBMJPV0000D32KQCYBK4S1D/4x.png' },
-{ emoji: '🥶', icon: 'https://cdn.7tv.app/emote/01FZ6223S8000B4AWRZNMVN918/3x.gif' },
-{ emoji: '😂', icon: 'https://cdn.7tv.app/emote/01F9KXJ9AG00005C1KM5Y0PY1D/4x.gif' }
-].map(r => `
-<button onclick="react(this, '${r.emoji}')" data-emoji="${r.emoji}">
-<img src="${r.icon}" class="reaction-icon" alt="${r.emoji}" />
-<span>0</span>
-</button>
-`).join('')}
-      </div>
-    </div>
-    <div class="event_links_block">
-      <div class="label">Check it out</div>
-      ${renderLinks(data)}
-    </div>
-  </div>
-</div>
-</div>
-</div>
-`;
-
-const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 'live-events' : 'upcoming-events';
-const container = document.getElementById(target);
-if (container) container.insertAdjacentHTML("beforeend", html);
-
-setTimeout(() => {
-  const titles = container.querySelectorAll('.event_title');
-  titles.forEach(title => {
-    const wrapper = title.closest('.event_title_wrapper');
-    const overflow = title.scrollWidth - wrapper.clientWidth;
-    if (overflow > 10) {
-      title.classList.add('scrolling');
-      wrapper.classList.add('hover-scroll');
-      title.style.setProperty('--scroll-distance', `-${overflow}px`);
+    if (data.end) {
+      const rigaEnd = new Date(data.end);
+      const utcEnd = new Date(rigaEnd.getTime() - (rigaEnd.getTimezoneOffset() * 60000));
+      data.end = utcEnd.toISOString();
     }
-  });
-}, 100);
-}
 
-startCountdowns();
+    parsedEvents.push(data);
+  }
 
+  parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-document.querySelectorAll('.reaction-bar').forEach(wrapper => {
-const eventId = wrapper.getAttribute('data-event');
-loadReactionsForEvent(wrapper, eventId);
-});
+  for (const data of parsedEvents) {
+    const date = new Date(data.date);
+    const isPast = date < now;
+    const isSteam = data.type === 'steam_sale';
+
+    const slug = data.slug || data._filename.replace('.md', '');
+
+    // Date formatting functions (will show in user's local time)
+    const formatTimeShort = d => {
+      const dt = new Date(d);
+      const h = dt.getHours();
+      const m = dt.getMinutes().toString().padStart(2, '0');
+      const ampm = h >= 12 ? 'pm' : 'am';
+      const hour = ((h + 11) % 12 + 1);
+      return `${hour}:${m} <span class="unit">${ampm}</span>`;
+    };
+
+    const formatDateShort = d => {
+      const dt = new Date(d);
+      const month = dt.toLocaleString('default', { month: 'short' });
+      return `${month} ${dt.getDate()}`;
+    };
+
+    const formatSingle = d => `${formatDateShort(d)} - ${formatTimeShort(d)}`;
+    const formatRange = (start, end) =>
+      `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
+
+    const localDateStr = isSteam
+      ? formatRange(data.date, data.end)
+      : formatSingle(data.date);
+
+    const hasStarted = date <= now;
+    const isLive = hasStarted && (!data.end || now < new Date(data.end));
+
+    const html = `
+      <div class="event_block ${isLive ? 'now_live event_headliner' : ''}">
+        <div class="event_logo">
+          <img src="${data.logo}" alt="logo" />
+        </div>
+        <div class="event_card" style="background-image: url('${data.image}')">
+          <div class="event_card_overlay"></div>
+          <div class="event_card_content">
+            <div class="event_card_main">
+              <div class="event_title_wrapper">
+                <h2 class="event_title event_upc_title">${data.title}</h2>
+              </div>
+              <p class="event_date">
+                ${localDateStr}
+              </p>
+              <div class="countdown"
+                   data-start-event-date="${data.date}"
+                   ${data.end ? `data-end-event-date="${data.end}"` : ''}>
+              </div>
+            </div>
+            <div class="event_expectations_wrapper">
+              <div class="event_reacts">
+                <div class="label">Your expectations</div>
+                <div class="reaction-bar" data-event="${slug}">
+                  ${[
+                    { emoji: '🔥', icon: 'https://cdn.7tv.app/emote/01JDBDSNMQCZ7Z89PRZ712RM5N/4x.gif' },
+                    { emoji: '😮', icon: 'https://cdn.7tv.app/emote/01G8TM6XNG000836WX1T1D503Y/3x.gif' },
+                    { emoji: '😱', icon: 'https://cdn.7tv.app/emote/01GT61CD6R000DY5BPCJX9D3EB/3x.gif' },
+                    { emoji: '😴', icon: 'https://cdn.7tv.app/emote/01FA5S9KGR0003RPW78DX3QB0Z/3x.png' },
+                    { emoji: '🤡', icon: 'https://cdn.7tv.app/emote/01HMBMJPV0000D32KQCYBK4S1D/4x.png' },
+                    { emoji: '🥶', icon: 'https://cdn.7tv.app/emote/01FZ6223S8000B4AWRZNMVN918/3x.gif' },
+                    { emoji: '😂', icon: 'https://cdn.7tv.app/emote/01F9KXJ9AG00005C1KM5Y0PY1D/4x.gif' }
+                  ].map(r => `
+                    <button onclick="react(this, '${r.emoji}')" data-emoji="${r.emoji}">
+                      <img src="${r.icon}" class="reaction-icon" alt="${r.emoji}" />
+                      <span>0</span>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+              <div class="event_links_block">
+                <div class="label">Check it out</div>
+                ${renderLinks(data)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const target = isPast ? 'past-events' : isSteam ? 'steam-sale-event' : isLive ? 'live-events' : 'upcoming-events';
+    const container = document.getElementById(target);
+    if (container) container.insertAdjacentHTML("beforeend", html);
+  }
+
+  startCountdowns();
 }
 
 function updateNowPlayingBar() {
