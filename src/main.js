@@ -212,12 +212,12 @@ function startCountdowns() {
       const startDateTimeStr = el.getAttribute('data-start-event-date');
       const endDateTimeStr = el.getAttribute('data-end-event-date');
 
-      // IMPORTANT CHANGE: Append '+05:00' to the date string to explicitly specify UTC+5 offset
+      // IMPORTANT CHANGE: Append '+07:00' to the date string to explicitly specify UTC+5 offset
       // This forces Date.parse to interpret the string as UTC+5, regardless of user's local timezone.
-      const start = new Date(startDateTimeStr + ' +05:00');
+      const start = new Date(startDateTimeStr + ' +07:00');
       const startUtcTime = start.getTime(); // Get UTC milliseconds for consistent calculations
 
-      const end = endDateTimeStr ? new Date(endDateTimeStr + ' +05:00') : null;
+      const end = endDateTimeStr ? new Date(endDateTimeStr + ' +07:00') : null;
       const endUtcTime = end ? end.getTime() : null; // Get UTC milliseconds if end date exists
 
       const diff = startUtcTime - nowUtcTime;
@@ -351,8 +351,8 @@ parsedEvents.push(data);
 
 // Sort using UTC timestamps derived from the UTC+5 interpretation
 parsedEvents.sort((a, b) => {
-  const dateA = new Date(a.date + ' +05:00');
-  const dateB = new Date(b.date + ' +05:00');
+  const dateA = new Date(a.date + ' +07:00');
+  const dateB = new Date(b.date + ' +07:00');
   return dateA.getTime() - dateB.getTime();
 });
 
@@ -363,8 +363,8 @@ const nowLocal = new Date();
 for (const data of parsedEvents) {
 // IMPORTANT CHANGE: When creating the Date object, it will now correctly
 // interpret the string as UTC+5, regardless of the user's local timezone.
-const dateForLocalDisplay = new Date(data.date + ' +05:00');
-const endForLocalDisplay = data.end ? new Date(data.end + ' +05:00') : null;
+const dateForLocalDisplay = new Date(data.date + ' +07:00');
+const endForLocalDisplay = data.end ? new Date(data.end + ' +07:00') : null;
 
 
 // The isPast and isLive checks still use the locally interpreted Date objects for initial grouping.
@@ -421,12 +421,12 @@ const formatRangeUTC = (start, end) =>
   // For display, we pass the original string appended with the offset to the formatters,
   // so they can correctly interpret it as UTC+5 and then convert to local or UTC for display.
   const localDateStr = isSteam
-? formatRange(data.date + ' +05:00', data.end + ' +05:00')
-: formatSingle(data.date + ' +05:00');
+? formatRange(data.date + ' +07:00', data.end + ' +07:00')
+: formatSingle(data.date + ' +07:00');
 
 const utcDateStr = isSteam
-? formatRangeUTC(data.date + ' +05:00', data.end + ' +05:00')
-: formatSingleUTC(data.date + ' +05:00');
+? formatRangeUTC(data.date + ' +07:00', data.end + ' +07:00')
+: formatSingleUTC(data.date + ' +07:00');
 
 const hasStarted = dateForLocalDisplay <= nowLocal;
 const isLive = hasStarted && (!endForLocalDisplay || nowLocal < endForLocalDisplay);
