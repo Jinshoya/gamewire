@@ -193,33 +193,35 @@ const { data } = await supabase
 const selected = localStorage.getItem(`reaction_${eventId}`);
 
 wrapper.querySelectorAll('button').forEach(btn => {
-const emoji = btn.getAttribute('data-emoji'); // ✅ CORRECT way
+const emoji = btn.getAttribute('data-emoji');
 const found = data.find(r => r.emoji === emoji);
 btn.querySelector('span').textContent = found?.count ?? 0;
-btn.classList.toggle('reacted', emoji === selected); // ✅ compare with stored
+btn.classList.toggle('reacted', emoji === selected);
 });
 }
 
 function startCountdowns() {
   setInterval(() => {
-    const nowUtcTime = Date.now(); // Get current time in UTC milliseconds. This is consistent globally.
+    const nowUtcTime = Date.now(); // Get current time in milliseconds since epoch (UTC)
     let soonestTimeLeft = Infinity;
     let soonestEventTitle = '';
     let nowLiveTitle = '';
 
     document.querySelectorAll('.countdown').forEach(el => {
-      // IMPORTANT: Ensure 'data-start-event-date' and 'data-end-event-date'
-      // attributes contain ISO 8601 formatted UTC date strings (e.g., "2025-06-07T10:00:00Z").
-      // If they don't include a timezone (like "Z" for UTC), new Date() will parse them
-      // as local time, leading to inconsistent countdowns.
-      const start = new Date(el.getAttribute('data-start-event-date'));
-      const endStr = el.getAttribute('data-end-event-date');
-      const end = endStr ? new Date(endStr) : null;
+      // Get the date strings
+      const startDateTimeStr = el.getAttribute('data-start-event-date');
+      const endDateTimeStr = el.getAttribute('data-end-event-date');
 
-      // Calculate diff and elapsed using UTC timestamps from the Date objects.
-      // .getTime() returns milliseconds since epoch, which is UTC-based.
-      const diff = start.getTime() - nowUtcTime;
-      const elapsed = nowUtcTime - start.getTime();
+      // IMPORTANT CHANGE: Append '-07:00' to the date string to explicitly specify UTC-7 offset
+      // This forces Date.parse to interpret the string as UTC-7, regardless of user's local timezone.
+      const start = new Date(startDateTimeStr + ' -07:00');
+      const startUtcTime = start.getTime(); // Get UTC milliseconds for consistent calculations
+
+      const end = endDateTimeStr ? new Date(endDateTimeStr + ' -07:00') : null;
+      const endUtcTime = end ? end.getTime() : null; // Get UTC milliseconds if end date exists
+
+      const diff = startUtcTime - nowUtcTime;
+      const elapsed = nowUtcTime - startUtcTime;
       const parent = el.closest('.event_block');
       const isSteam = parent.closest('#steam-sale-event');
 
@@ -238,7 +240,7 @@ function startCountdowns() {
       }
 
       // Steam sale removal if ended
-      if (isSteam && end && nowUtcTime >= end.getTime()) {
+      if (isSteam && endUtcTime && nowUtcTime >= endUtcTime) {
         return parent.remove();
       }
 
@@ -300,26 +302,24 @@ function startCountdowns() {
   `;
     });
 
-// 🔁 Set page title
-// These calculations for the page title will now also be based on the globally unified 'soonestTimeLeft'
-// derived from UTC timestamps.
-if (nowLiveTitle) {
-document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
-} else if (soonestTimeLeft < Infinity) {
-const totalSeconds = Math.floor(soonestTimeLeft / 1000);
+    // 🔁 Set page title
+    if (nowLiveTitle) {
+      document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
+    } else if (soonestTimeLeft < Infinity) {
+      const totalSeconds = Math.floor(soonestTimeLeft / 1000);
 
-if (totalSeconds < 3600) {
-const mins = Math.floor(totalSeconds / 60);
-const secs = totalSeconds % 60;
-document.title = `⏳ ${mins}m ${secs}s – ${soonestEventTitle}`;
-} else {
-const days = Math.floor(totalSeconds / 86400);
-const hours = Math.floor((totalSeconds % 86400) / 3600);
-document.title = `⏳ ${days}d ${hours}h – ${soonestEventTitle}`;
-}
-} else {
-document.title = 'ggPause';
-}
+      if (totalSeconds < 3600) {
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        document.title = `⏳ ${mins}m ${secs}s – ${soonestEventTitle}`;
+      } else {
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        document.title = `⏳ ${days}d ${hours}h – ${soonestEventTitle}`;
+      }
+    } else {
+      document.title = 'ggPause';
+    }
 
   }, 1000);
 }
@@ -330,7 +330,7 @@ async function loadReactionsForEvent(wrapper, eventId) {
   const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
   const userEmoji = localStorage.getItem(`reaction_${eventId}`);
   wrapper.querySelectorAll('button').forEach(btn => {
-const emoji = btn.getAttribute('data-emoji'); // ✅ important
+const emoji = btn.getAttribute('data-emoji');
 const found = data.find(r => r.emoji === emoji);
 btn.querySelector('span').textContent = found?.count ?? 0;
 btn.classList.toggle('reacted', emoji === userEmoji);
@@ -339,8 +339,6 @@ btn.classList.toggle('reacted', emoji === userEmoji);
 async function loadEvents() {
   const res = await fetch('/events/index.json');
 const files = await res.json();
-const now = new Date(); // This 'now' is for initial sorting and 'isPast' check based on local time.
-// The actual countdown logic is unified by using UTC timestamps.
 const parsedEvents = [];
 
 for (const file of files) {
@@ -351,26 +349,36 @@ data._filename = file;
 parsedEvents.push(data);
 }
 
-parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+// Sort using UTC timestamps derived from the UTC-7 interpretation
+parsedEvents.sort((a, b) => {
+  const dateA = new Date(a.date + ' -07:00');
+  const dateB = new Date(b.date + ' -07:00');
+  return dateA.getTime() - dateB.getTime();
+});
 
+
+// Get the current local time for initial display grouping
+const nowLocal = new Date();
 
 for (const data of parsedEvents) {
-// VERY IMPORTANT:
-// For the countdown to be unified, the 'data.date' and 'data.end' values
-// in your markdown frontmatter (and ultimately in the 'data-start-event-date'
-// and 'data-end-event-date' attributes) MUST be in a format that
-// `new Date()` interprets as UTC. The best way is ISO 8601 with 'Z' suffix:
-// Example: date: "2025-06-07T10:00:00Z" (for 10 AM UTC)
-// If they are simply "YYYY-MM-DD HH:MM:SS", new Date() will parse them
-// in the user's local timezone, which will break the global consistency.
-const date = new Date(data.date);
-const isPast = date < now; // This 'isPast' is based on local time for initial placement
+// IMPORTANT CHANGE: When creating the Date object, it will now correctly
+// interpret the string as UTC-7, regardless of the user's local timezone.
+const dateForLocalDisplay = new Date(data.date + ' -07:00');
+const endForLocalDisplay = data.end ? new Date(data.end + ' -07:00') : null;
+
+
+// The isPast and isLive checks still use the locally interpreted Date objects for initial grouping.
+// However, the core countdown logic uses the UTC timestamps for global consistency.
+const isPast = dateForLocalDisplay < nowLocal;
 const isSteam = data.type === 'steam_sale';
 
 
 const slug = data.slug || data._filename.replace('.md', '');
+
+// These formatters will display the time in the user's local timezone,
+// based on the UTC-7 source time.
 const formatTimeShort = d => {
-  const dt = new Date(d); // This will display in local time for user convenience
+  const dt = new Date(d); // This will display in user's local time for user convenience
   const h = dt.getHours();
   const m = dt.getMinutes().toString().padStart(2, '0');
   const ampm = h >= 12 ? 'pm' : 'am';
@@ -379,7 +387,7 @@ const formatTimeShort = d => {
 };
 
 const formatDateShort = d => {
-  const dt = new Date(d); // This will display in local time for user convenience
+  const dt = new Date(d); // This will display in user's local time for user convenience
   const month = dt.toLocaleString('default', { month: 'short' });
   return `${month} ${dt.getDate()}`;
 };
@@ -387,37 +395,41 @@ const formatDateShort = d => {
 const formatSingle = d => `${formatDateShort(d)} - ${formatTimeShort(d)}`;
 const formatRange = (start, end) =>
   `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
-  const formatTimeUTC = d => {
-const dt = new Date(d); // This will convert the passed date (hopefully UTC) to its UTC parts
-const h = dt.getUTCHours();
-const m = dt.getUTCMinutes().toString().padStart(2, '0');
-const ampm = h >= 12 ? 'pm' : 'am';
-const hour = ((h + 11) % 12 + 1);
-return `${hour}:${m} <span class="unit">UTC</span>`;
+
+// These formatters will explicitly show the UTC equivalent time, based on the UTC-7 source.
+const formatTimeUTC = d => {
+  const dt = new Date(d); // This will create a Date object interpreted as UTC-7
+  const h = dt.getUTCHours(); // But then extract UTC hours
+  const m = dt.getUTCMinutes().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'pm' : 'am';
+  const hour = ((h + 11) % 12 + 1);
+  return `${hour}:${m} <span class="unit">UTC</span>`;
 };
 
-
 const formatDateUTC = d => {
-const dt = new Date(d); // This will convert the passed date (hopefully UTC) to its UTC parts
-const month = dt.toLocaleString('default', { month: 'short' }); // still uses locale for month name
-return `${month} ${dt.getUTCDate()}`;
+  const dt = new Date(d); // This will create a Date object interpreted as UTC-7
+  const month = dt.toLocaleString('default', { month: 'short' }); // still uses locale for month name for convenience
+  return `${month} ${dt.getUTCDate()}`; // But extract UTC day
 };
 
 const formatSingleUTC = d => `${formatDateUTC(d)} - ${formatTimeUTC(d)}`;
 
 const formatRangeUTC = (start, end) =>
-`${formatDateUTC(start)} - ${formatTimeUTC(start)} / ${formatDateUTC(end)} - ${formatTimeUTC(end)}`;
+  `${formatDateUTC(start)} - ${formatTimeUTC(start)} / ${formatDateUTC(end)} - ${formatTimeUTC(end)}`;
 
+
+  // For display, we pass the original string appended with the offset to the formatters,
+  // so they can correctly interpret it as UTC-7 and then convert to local or UTC for display.
   const localDateStr = isSteam
-? formatRange(data.date, data.end)
-: formatSingle(data.date);
+? formatRange(data.date + ' -07:00', data.end + ' -07:00')
+: formatSingle(data.date + ' -07:00');
 
 const utcDateStr = isSteam
-? formatRangeUTC(data.date, data.end)
-: formatSingleUTC(data.date);
+? formatRangeUTC(data.date + ' -07:00', data.end + ' -07:00')
+: formatSingleUTC(data.date + ' -07:00');
 
-  const hasStarted = date <= now;
-const isLive = hasStarted && (!data.end || now < new Date(data.end));
+const hasStarted = dateForLocalDisplay <= nowLocal;
+const isLive = hasStarted && (!endForLocalDisplay || nowLocal < endForLocalDisplay);
 
 const html = `
 <div class="event_block ${isLive ? 'now_live event_headliner' : ''}">
@@ -542,12 +554,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       loadReactionsForEvent(wrapper, eventId);
     });
 
-    // It's good to call startCountdowns only once after events are loaded
-    // as it sets up its own setInterval.
-    startCountdowns();
-    // Re-call updateNowPlayingBar to ensure it's up-to-date after countdowns start
-    // and live events potentially move.
     setInterval(updateNowPlayingBar, 3000);
+    startCountdowns();
   }
 });
 
@@ -591,8 +599,12 @@ if (steamHeader) steamHeader.style.display = 'none';
 }
 }
 
-// Removed duplicate setInterval(updateNowPlayingBar, 3000) here,
-// as it's already in the DOMContentLoaded block.
+
+
+
+
+
+setInterval(updateNowPlayingBar, 3000);
 window.addEventListener("load", () => {
 const loadingScreen = document.getElementById("loadingScreen");
 if (loadingScreen) {
