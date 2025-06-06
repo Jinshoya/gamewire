@@ -208,7 +208,8 @@ let soonestEventTitle = '';
 let nowLiveTitle = '';
 
 document.querySelectorAll('.countdown').forEach(el => {
-  const start = new Date(el.getAttribute('data-start-event-date') + 'Z');
+const start = new Date(el.getAttribute('data-start-event-date')); // no + 'Z'
+
   const endStr = el.getAttribute('data-end-event-date');
   const end = endStr ? new Date(endStr + 'Z') : null;
   const diff = start - now;
@@ -345,7 +346,23 @@ parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
 
 for (const data of parsedEvents) {
-const date = new Date(data.date);
+  // Convert `data.date` from Europe/Riga → UTC ISO string
+  const rigaDate = new Date(data.date);
+  const utcDate = new Date(
+    rigaDate.toLocaleString("en-US", { timeZone: "UTC" })
+  );
+  data.date = utcDate.toISOString(); // Store it as UTC
+
+  // Do the same for end date if it exists
+  if (data.end) {
+    const rigaEnd = new Date(data.end);
+    const utcEnd = new Date(
+      rigaEnd.toLocaleString("en-US", { timeZone: "UTC" })
+    );
+    data.end = utcEnd.toISOString();
+  }
+
+  const date = new Date(data.date); // ← This now uses UTC safely
 const isPast = date < now;
 const isSteam = data.type === 'steam_sale';
 
