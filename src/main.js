@@ -201,119 +201,149 @@ btn.classList.toggle('reacted', emoji === selected); // ✅ compare with stored
 }
 
 function startCountdowns() {
-setInterval(() => {
-const now = new Date();
-let soonestTimeLeft = Infinity;
-let soonestEventTitle = '';
-let nowLiveTitle = '';
+  setInterval(() => {
+    // Get current time in UTC
+    const now = new Date();
+    const nowUTC = Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()
+    );
 
-document.querySelectorAll('.countdown').forEach(el => {
-const start = new Date(el.getAttribute('data-start-event-date')); // no + 'Z'
+    let soonestTimeLeft = Infinity;
+    let soonestEventTitle = '';
+    let nowLiveTitle = '';
 
-  const endStr = el.getAttribute('data-end-event-date');
-  const end = endStr ? new Date(endStr + 'Z') : null;
-  const diff = start - now;
-  const elapsed = now - start;
-  const parent = el.closest('.event_block');
-  const isSteam = parent.closest('#steam-sale-event');
+    document.querySelectorAll('.countdown').forEach(el => {
+      // Parse event times as UTC
+      const start = new Date(el.getAttribute('data-start-event-date'));
+      const startUTC = Date.UTC(
+        start.getUTCFullYear(),
+        start.getUTCMonth(),
+        start.getUTCDate(),
+        start.getUTCHours(),
+        start.getUTCMinutes(),
+        start.getUTCSeconds()
+      );
 
-  // Track soonest upcoming event
-  if (diff > 0 && diff < soonestTimeLeft) {
-    soonestTimeLeft = diff;
-    const block = el.closest('.event_block');
-    soonestEventTitle = block?.querySelector('.event_upc_title')?.textContent || 'Upcoming Event';
-  }
-
-  // Glow if less than 1 hour
-  if (diff > 0 && diff < 3600000) {
-    el.classList.add("glowing");
-  } else {
-    el.classList.remove("glowing");
-  }
-
-  // Steam sale removal if ended
-  if (isSteam && end && now >= end) {
-    return parent.remove();
-  }
-
-  // If already started
-  if (diff <= 0) {
-    if (elapsed >= 3600000) {
-      // Move to past
-      if (parent.parentElement.id !== 'past-events') {
-        document.getElementById('past-events').appendChild(parent);
+      const endStr = el.getAttribute('data-end-event-date');
+      let endUTC = null;
+      if (endStr) {
+        const end = new Date(endStr);
+        endUTC = Date.UTC(
+          end.getUTCFullYear(),
+          end.getUTCMonth(),
+          end.getUTCDate(),
+          end.getUTCHours(),
+          end.getUTCMinutes(),
+          end.getUTCSeconds()
+        );
       }
 
-      parent.classList.add('event_past');
-      parent.classList.remove('now_live');
-      el.innerHTML = '';
+      // Use UTC values for calculations
+      const diff = startUTC - nowUTC;
+      const elapsed = nowUTC - startUTC;
+      const parent = el.closest('.event_block');
+      const isSteam = parent.closest('#steam-sale-event');
 
-      const reactionBar = parent.querySelector('.reaction-bar');
-      if (reactionBar) reactionBar.classList.add('reactions-disabled');
-    } else {
-      // It's LIVE
+      // Track soonest upcoming event
+      if (diff > 0 && diff < soonestTimeLeft) {
+        soonestTimeLeft = diff;
+        const block = el.closest('.event_block');
+        soonestEventTitle = block?.querySelector('.event_upc_title')?.textContent || 'Upcoming Event';
+      }
+
+      // Glow if less than 1 hour
+      if (diff > 0 && diff < 3600000) {
+        el.classList.add("glowing");
+      } else {
+        el.classList.remove("glowing");
+      }
+
+      // Steam sale removal if ended
+      if (isSteam && endUTC && nowUTC >= endUTC) {
+        return parent.remove();
+      }
+
+      // If already started
+      if (diff <= 0) {
+        if (elapsed >= 3600000) {
+          // Move to past
+          if (parent.parentElement.id !== 'past-events') {
+            document.getElementById('past-events').appendChild(parent);
+          }
+
+          parent.classList.add('event_past');
+          parent.classList.remove('now_live');
+          el.innerHTML = '';
+
+          const reactionBar = parent.querySelector('.reaction-bar');
+          if (reactionBar) reactionBar.classList.add('reactions-disabled');
+        } else {
+          // It's LIVE
+          el.innerHTML = `
+            <div class="event_countdown live-tag">
+              <span class="live-dot"></span>
+              <span class="live-text">NOW LIVE</span>
+            </div>
+          `;
+
+          if (parent.parentElement.id !== 'live-events') {
+            document.getElementById('live-events').appendChild(parent);
+            setTimeout(() => hideEmptySections(), 10);
+          }
+
+          parent.classList.add('now_live');
+          parent.classList.remove('event_past');
+
+          const reactionBar = parent.querySelector('.reaction-bar');
+          if (reactionBar) reactionBar.classList.remove('reactions-disabled');
+
+          const block = el.closest('.event_block');
+          nowLiveTitle = block?.querySelector('.event_upc_title')?.textContent || 'Now Live';
+        }
+        return;
+      }
+
+      // Show countdown (using UTC-based diff)
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
+
       el.innerHTML = `
-<div class="event_countdown live-tag">
-<span class="live-dot"></span>
-<span class="live-text">NOW LIVE</span>
-</div>
-`;
+        <div class="event_countdown">
+          Starting in
+          <span class="number">${days}</span><span class="unit">d</span>
+          <span class="number">${hours}</span><span class="unit">h</span>
+          <span class="number">${mins}</span><span class="unit">m</span>
+          <span class="number">${secs}</span><span class="unit">s</span>
+        </div>
+      `;
+    });
 
-      if (parent.parentElement.id !== 'live-events') {
-        document.getElementById('live-events').appendChild(parent);
-        setTimeout(() => hideEmptySections(), 10);
+    // Update page title
+    if (nowLiveTitle) {
+      document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
+    } else if (soonestTimeLeft < Infinity) {
+      const totalSeconds = Math.floor(soonestTimeLeft / 1000);
+      if (totalSeconds < 3600) {
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        document.title = `⏳ ${mins}m ${secs}s – ${soonestEventTitle}`;
+      } else {
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        document.title = `⏳ ${days}d ${hours}h – ${soonestEventTitle}`;
       }
-
-      parent.classList.add('now_live');
-      parent.classList.remove('event_past');
-
-      const reactionBar = parent.querySelector('.reaction-bar');
-      if (reactionBar) reactionBar.classList.remove('reactions-disabled');
-
-      const block = el.closest('.event_block');
-      nowLiveTitle = block?.querySelector('.event_upc_title')?.textContent || 'Now Live';
+    } else {
+      document.title = 'ggPause';
     }
-    return;
-  }
-
-  // Show countdown
-  const totalSeconds = Math.floor(diff / 1000);
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const mins = Math.floor((totalSeconds % 3600) / 60);
-  const secs = totalSeconds % 60;
-
-  el.innerHTML = `
-    <div class="event_countdown">
-      Starting in
-      <span class="number">${days}</span><span class="unit">d</span>
-      <span class="number">${hours}</span><span class="unit">h</span>
-      <span class="number">${mins}</span><span class="unit">m</span>
-      <span class="number">${secs}</span><span class="unit">s</span>
-    </div>
-  `;
-});
-
-// 🔁 Set page title
-if (nowLiveTitle) {
-document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
-} else if (soonestTimeLeft < Infinity) {
-const totalSeconds = Math.floor(soonestTimeLeft / 1000);
-
-if (totalSeconds < 3600) {
-const mins = Math.floor(totalSeconds / 60);
-const secs = totalSeconds % 60;
-document.title = `⏳ ${mins}m ${secs}s – ${soonestEventTitle}`;
-} else {
-const days = Math.floor(totalSeconds / 86400);
-const hours = Math.floor((totalSeconds % 86400) / 3600);
-document.title = `⏳ ${days}d ${hours}h – ${soonestEventTitle}`;
-}
-} else {
-document.title = 'ggPause';
-}
-
-}, 1000);
+  }, 1000);
 }
 
 
