@@ -346,46 +346,30 @@ parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
 
 for (const data of parsedEvents) {
-  // Convert `data.date` from Europe/Riga → UTC ISO string
-  const rigaDate = new Date(data.date);
-  const utcDate = new Date(
-    rigaDate.toLocaleString("en-US", { timeZone: "UTC" })
-  );
-  data.date = utcDate.toISOString(); // Store it as UTC
+  const date = new Date(data.date);
+  const isPast = date < now;
+  const isSteam = data.type === 'steam_sale';
 
-  // Do the same for end date if it exists
-  if (data.end) {
-    const rigaEnd = new Date(data.end);
-    const utcEnd = new Date(
-      rigaEnd.toLocaleString("en-US", { timeZone: "UTC" })
-    );
-    data.end = utcEnd.toISOString();
-  }
+  const slug = data.slug || data._filename.replace('.md', '');
+  
+  const formatTimeShort = d => {
+    const dt = new Date(d);
+    const h = dt.getUTCHours();  // UTC hours
+    const m = dt.getUTCMinutes().toString().padStart(2, '0');  // UTC minutes
+    const ampm = h >= 12 ? 'pm' : 'am';
+    const hour = ((h + 11) % 12 + 1);
+    return `${hour}:${m} <span class="unit">${ampm}</span>`;
+  };
 
-  const date = new Date(data.date); // ← This now uses UTC safely
-const isPast = date < now;
-const isSteam = data.type === 'steam_sale';
+  const formatDateShort = d => {
+    const dt = new Date(d);
+    const month = dt.toLocaleString('default', { month: 'short', timeZone: 'UTC' });
+    return `${month} ${dt.getUTCDate()}`;  // UTC date
+  };
 
-
-const slug = data.slug || data._filename.replace('.md', '');
-const formatTimeShort = d => {
-  const dt = new Date(d);
-  const h = dt.getHours();
-  const m = dt.getMinutes().toString().padStart(2, '0');
-  const ampm = h >= 12 ? 'pm' : 'am';
-  const hour = ((h + 11) % 12 + 1);
-  return `${hour}:${m} <span class="unit">${ampm}</span>`;
-};
-
-const formatDateShort = d => {
-  const dt = new Date(d);
-  const month = dt.toLocaleString('default', { month: 'short' });
-  return `${month} ${dt.getDate()}`;
-};
-
-const formatSingle = d => `${formatDateShort(d)} - ${formatTimeShort(d)}`;
-const formatRange = (start, end) =>
-  `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
+  const formatSingle = d => `${formatDateShort(d)} - ${formatTimeShort(d)}`;
+  const formatRange = (start, end) =>
+    `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
   const formatTimeUTC = d => {
 const dt = new Date(d);
 const h = dt.getUTCHours();
