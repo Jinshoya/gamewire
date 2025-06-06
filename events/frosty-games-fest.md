@@ -1,18 +1,18 @@
 ---
-title: Steam Next Fest
-date: 2025-06-09 20:00
-end: 2025-06-16 20:00
-image: https://i.imgur.com/85g5XPj.png
-logo: https://i.imgur.com/8Y1MPWk.png
+title: Frosty Games Fest
+date: 2025-06-08 02:00
+end: 2025-06-04 16:56
+image: https://i.imgur.com/irPVe1p.png
+logo: https://i.imgur.com/vyTwcj9.png
 borderColor: "#ff6600"
-type: steam_sale
+type: event
 youtube:
   icon: /images/links/youtube_link.png
+  url: https://www.youtube.com/watch?v=11JJtI7FRNk
 twitch:
   icon: /images/links/twitch_link.png
 website:
   icon: /images/links/web_link.png
 steam:
   icon: /images/links/steam_link.png
-  url: https://store.steampowered.com/
 ---
