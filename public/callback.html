@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html>
-  <head><title>DonationAlerts Auth</title></head>
+  <head><title>Authorization Handler</title></head>
   <body>
-    <h2>Authorizing DonationAlerts...</h2>
+    <h2>Processing login...</h2>
+    <div id="status">Checking for token...</div>
     <script>
-      const code = new URLSearchParams(window.location.search).get('code');
-      if (!code) {
-        document.body.innerHTML = '❌ No code provided in URL';
-        throw new Error('Missing code');
+      // Get token from hash (implicit flow)
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const accessToken = params.get('access_token');
+      
+      console.log('Hash:', window.location.hash);
+      console.log('Access Token:', accessToken);
+      
+      if (accessToken) {
+        document.getElementById('status').innerHTML = '✅ Token found! Storing and redirecting...';
+        
+        // Store the token
+        localStorage.setItem('twitchAccessToken', accessToken);
+        
+        // Get redirect path
+        const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+        localStorage.removeItem('redirectAfterLogin');
+        
+        // Redirect back
+        setTimeout(() => {
+          window.location.replace(redirectPath);
+        }, 1000);
+        
+      } else {
+        document.getElementById('status').innerHTML = '❌ No access token found in URL';
+        console.error('No token in hash:', window.location.hash);
       }
-
-      fetch(`/.netlify/functions/da-auth?code=${code}`)
-        .then(res => res.json())
-        .then(data => {
-          if (!data.token || !data.token.access_token) {
-            console.error("Auth response:", data);
-            throw new Error("No access token returned");
-          }
-
-          localStorage.setItem('donationAlertsToken', data.token.access_token);
-          localStorage.setItem('donationAlertsUser', JSON.stringify(data.user));
-          localStorage.setItem('donationAlertsTokenInfo', JSON.stringify(data.token));
-
-          const back = localStorage.getItem('redirectAfterLogin') || '/';
-          window.location.replace(back);
-        })
-        .catch(err => {
-          console.error("Auth error:", err);
-          document.body.innerHTML = `<h1>Login failed</h1><p>${err.message}</p>`;
-        });
     </script>
   </body>
 </html>
