@@ -193,10 +193,10 @@ const { data } = await supabase
 const selected = localStorage.getItem(`reaction_${eventId}`);
 
 wrapper.querySelectorAll('button').forEach(btn => {
-const emoji = btn.getAttribute('data-emoji');
+const emoji = btn.getAttribute('data-emoji'); // ✅ CORRECT way
 const found = data.find(r => r.emoji === emoji);
 btn.querySelector('span').textContent = found?.count ?? 0;
-btn.classList.toggle('reacted', emoji === selected);
+btn.classList.toggle('reacted', emoji === selected); // ✅ compare with stored
 });
 }
 
@@ -212,12 +212,12 @@ function startCountdowns() {
       const startDateTimeStr = el.getAttribute('data-start-event-date');
       const endDateTimeStr = el.getAttribute('data-end-event-date');
 
-      // IMPORTANT CHANGE: Append '-07:00' to the date string to explicitly specify UTC-7 offset
-      // This forces Date.parse to interpret the string as UTC-7, regardless of user's local timezone.
-      const start = new Date(startDateTimeStr + ' -07:00');
+      // IMPORTANT CHANGE: Append '+05:00' to the date string to explicitly specify UTC+5 offset
+      // This forces Date.parse to interpret the string as UTC+5, regardless of user's local timezone.
+      const start = new Date(startDateTimeStr + ' +05:00');
       const startUtcTime = start.getTime(); // Get UTC milliseconds for consistent calculations
 
-      const end = endDateTimeStr ? new Date(endDateTimeStr + ' -07:00') : null;
+      const end = endDateTimeStr ? new Date(endDateTimeStr + ' +05:00') : null;
       const endUtcTime = end ? end.getTime() : null; // Get UTC milliseconds if end date exists
 
       const diff = startUtcTime - nowUtcTime;
@@ -330,7 +330,7 @@ async function loadReactionsForEvent(wrapper, eventId) {
   const { data } = await supabase.from('reactions').select('emoji, count').eq('event_id', eventId);
   const userEmoji = localStorage.getItem(`reaction_${eventId}`);
   wrapper.querySelectorAll('button').forEach(btn => {
-const emoji = btn.getAttribute('data-emoji');
+const emoji = btn.getAttribute('data-emoji'); // ✅ important
 const found = data.find(r => r.emoji === emoji);
 btn.querySelector('span').textContent = found?.count ?? 0;
 btn.classList.toggle('reacted', emoji === userEmoji);
@@ -349,10 +349,10 @@ data._filename = file;
 parsedEvents.push(data);
 }
 
-// Sort using UTC timestamps derived from the UTC-7 interpretation
+// Sort using UTC timestamps derived from the UTC+5 interpretation
 parsedEvents.sort((a, b) => {
-  const dateA = new Date(a.date + ' -07:00');
-  const dateB = new Date(b.date + ' -07:00');
+  const dateA = new Date(a.date + ' +05:00');
+  const dateB = new Date(b.date + ' +05:00');
   return dateA.getTime() - dateB.getTime();
 });
 
@@ -362,9 +362,9 @@ const nowLocal = new Date();
 
 for (const data of parsedEvents) {
 // IMPORTANT CHANGE: When creating the Date object, it will now correctly
-// interpret the string as UTC-7, regardless of the user's local timezone.
-const dateForLocalDisplay = new Date(data.date + ' -07:00');
-const endForLocalDisplay = data.end ? new Date(data.end + ' -07:00') : null;
+// interpret the string as UTC+5, regardless of the user's local timezone.
+const dateForLocalDisplay = new Date(data.date + ' +05:00');
+const endForLocalDisplay = data.end ? new Date(data.end + ' +05:00') : null;
 
 
 // The isPast and isLive checks still use the locally interpreted Date objects for initial grouping.
@@ -376,7 +376,7 @@ const isSteam = data.type === 'steam_sale';
 const slug = data.slug || data._filename.replace('.md', '');
 
 // These formatters will display the time in the user's local timezone,
-// based on the UTC-7 source time.
+// based on the UTC+5 source time.
 const formatTimeShort = d => {
   const dt = new Date(d); // This will display in user's local time for user convenience
   const h = dt.getHours();
@@ -396,9 +396,9 @@ const formatSingle = d => `${formatDateShort(d)} - ${formatTimeShort(d)}`;
 const formatRange = (start, end) =>
   `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
 
-// These formatters will explicitly show the UTC equivalent time, based on the UTC-7 source.
+// These formatters will explicitly show the UTC equivalent time, based on the UTC+5 source.
 const formatTimeUTC = d => {
-  const dt = new Date(d); // This will create a Date object interpreted as UTC-7
+  const dt = new Date(d); // This will create a Date object interpreted as UTC+5
   const h = dt.getUTCHours(); // But then extract UTC hours
   const m = dt.getUTCMinutes().toString().padStart(2, '0');
   const ampm = h >= 12 ? 'pm' : 'am';
@@ -407,7 +407,7 @@ const formatTimeUTC = d => {
 };
 
 const formatDateUTC = d => {
-  const dt = new Date(d); // This will create a Date object interpreted as UTC-7
+  const dt = new Date(d); // This will create a Date object interpreted as UTC+5
   const month = dt.toLocaleString('default', { month: 'short' }); // still uses locale for month name for convenience
   return `${month} ${dt.getUTCDate()}`; // But extract UTC day
 };
@@ -419,14 +419,14 @@ const formatRangeUTC = (start, end) =>
 
 
   // For display, we pass the original string appended with the offset to the formatters,
-  // so they can correctly interpret it as UTC-7 and then convert to local or UTC for display.
+  // so they can correctly interpret it as UTC+5 and then convert to local or UTC for display.
   const localDateStr = isSteam
-? formatRange(data.date + ' -07:00', data.end + ' -07:00')
-: formatSingle(data.date + ' -07:00');
+? formatRange(data.date + ' +05:00', data.end + ' +05:00')
+: formatSingle(data.date + ' +05:00');
 
 const utcDateStr = isSteam
-? formatRangeUTC(data.date + ' -07:00', data.end + ' -07:00')
-: formatSingleUTC(data.date + ' -07:00');
+? formatRangeUTC(data.date + ' +05:00', data.end + ' +05:00')
+: formatSingleUTC(data.date + ' +05:00');
 
 const hasStarted = dateForLocalDisplay <= nowLocal;
 const isLive = hasStarted && (!endForLocalDisplay || nowLocal < endForLocalDisplay);
