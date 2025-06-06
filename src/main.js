@@ -201,88 +201,95 @@ btn.classList.toggle('reacted', emoji === selected); // ✅ compare with stored
 }
 
 function startCountdowns() {
-setInterval(() => {
-const now = new Date();
-let soonestTimeLeft = Infinity;
-let soonestEventTitle = '';
-let nowLiveTitle = '';
+  setInterval(() => {
+    const nowUtcTime = Date.now(); // Get current time in UTC milliseconds. This is consistent globally.
+    let soonestTimeLeft = Infinity;
+    let soonestEventTitle = '';
+    let nowLiveTitle = '';
 
-document.querySelectorAll('.countdown').forEach(el => {
-  const start = new Date(el.getAttribute('data-start-event-date'));
-  const endStr = el.getAttribute('data-end-event-date');
-  const end = endStr ? new Date(endStr) : null;
-  const diff = start - now;
-  const elapsed = now - start;
-  const parent = el.closest('.event_block');
-  const isSteam = parent.closest('#steam-sale-event');
+    document.querySelectorAll('.countdown').forEach(el => {
+      // IMPORTANT: Ensure 'data-start-event-date' and 'data-end-event-date'
+      // attributes contain ISO 8601 formatted UTC date strings (e.g., "2025-06-07T10:00:00Z").
+      // If they don't include a timezone (like "Z" for UTC), new Date() will parse them
+      // as local time, leading to inconsistent countdowns.
+      const start = new Date(el.getAttribute('data-start-event-date'));
+      const endStr = el.getAttribute('data-end-event-date');
+      const end = endStr ? new Date(endStr) : null;
 
-  // Track soonest upcoming event
-  if (diff > 0 && diff < soonestTimeLeft) {
-    soonestTimeLeft = diff;
-    const block = el.closest('.event_block');
-    soonestEventTitle = block?.querySelector('.event_upc_title')?.textContent || 'Upcoming Event';
-  }
+      // Calculate diff and elapsed using UTC timestamps from the Date objects.
+      // .getTime() returns milliseconds since epoch, which is UTC-based.
+      const diff = start.getTime() - nowUtcTime;
+      const elapsed = nowUtcTime - start.getTime();
+      const parent = el.closest('.event_block');
+      const isSteam = parent.closest('#steam-sale-event');
 
-  // Glow if less than 1 hour
-  if (diff > 0 && diff < 3600000) {
-    el.classList.add("glowing");
-  } else {
-    el.classList.remove("glowing");
-  }
-
-  // Steam sale removal if ended
-  if (isSteam && end && now >= end) {
-    return parent.remove();
-  }
-
-  // If already started
-  if (diff <= 0) {
-    if (elapsed >= 3600000) {
-      // Move to past
-      if (parent.parentElement.id !== 'past-events') {
-        document.getElementById('past-events').appendChild(parent);
+      // Track soonest upcoming event
+      if (diff > 0 && diff < soonestTimeLeft) {
+        soonestTimeLeft = diff;
+        const block = el.closest('.event_block');
+        soonestEventTitle = block?.querySelector('.event_upc_title')?.textContent || 'Upcoming Event';
       }
 
-      parent.classList.add('event_past');
-      parent.classList.remove('now_live');
-      el.innerHTML = '';
+      // Glow if less than 1 hour
+      if (diff > 0 && diff < 3600000) {
+        el.classList.add("glowing");
+      } else {
+        el.classList.remove("glowing");
+      }
 
-      const reactionBar = parent.querySelector('.reaction-bar');
-      if (reactionBar) reactionBar.classList.add('reactions-disabled');
-    } else {
-      // It's LIVE
-      el.innerHTML = `
+      // Steam sale removal if ended
+      if (isSteam && end && nowUtcTime >= end.getTime()) {
+        return parent.remove();
+      }
+
+      // If already started
+      if (diff <= 0) {
+        if (elapsed >= 3600000) {
+          // Move to past
+          if (parent.parentElement.id !== 'past-events') {
+            document.getElementById('past-events').appendChild(parent);
+          }
+
+          parent.classList.add('event_past');
+          parent.classList.remove('now_live');
+          el.innerHTML = '';
+
+          const reactionBar = parent.querySelector('.reaction-bar');
+          if (reactionBar) reactionBar.classList.add('reactions-disabled');
+        } else {
+          // It's LIVE
+          el.innerHTML = `
 <div class="event_countdown live-tag">
 <span class="live-dot"></span>
 <span class="live-text">NOW LIVE</span>
 </div>
 `;
 
-      if (parent.parentElement.id !== 'live-events') {
-        document.getElementById('live-events').appendChild(parent);
-        setTimeout(() => hideEmptySections(), 10);
+          if (parent.parentElement.id !== 'live-events') {
+            document.getElementById('live-events').appendChild(parent);
+            setTimeout(() => hideEmptySections(), 10);
+          }
+
+          parent.classList.add('now_live');
+          parent.classList.remove('event_past');
+
+          const reactionBar = parent.querySelector('.reaction-bar');
+          if (reactionBar) reactionBar.classList.remove('reactions-disabled');
+
+          const block = el.closest('.event_block');
+          nowLiveTitle = block?.querySelector('.event_upc_title')?.textContent || 'Now Live';
+        }
+        return;
       }
 
-      parent.classList.add('now_live');
-      parent.classList.remove('event_past');
+      // Show countdown
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
 
-      const reactionBar = parent.querySelector('.reaction-bar');
-      if (reactionBar) reactionBar.classList.remove('reactions-disabled');
-
-      const block = el.closest('.event_block');
-      nowLiveTitle = block?.querySelector('.event_upc_title')?.textContent || 'Now Live';
-    }
-    return;
-  }
-
-  // Show countdown
-  const totalSeconds = Math.floor(diff / 1000);
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const mins = Math.floor((totalSeconds % 3600) / 60);
-  const secs = totalSeconds % 60;
-
-  el.innerHTML = `
+      el.innerHTML = `
     <div class="event_countdown">
       Starting in
       <span class="number">${days}</span><span class="unit">d</span>
@@ -291,9 +298,11 @@ document.querySelectorAll('.countdown').forEach(el => {
       <span class="number">${secs}</span><span class="unit">s</span>
     </div>
   `;
-});
+    });
 
 // 🔁 Set page title
+// These calculations for the page title will now also be based on the globally unified 'soonestTimeLeft'
+// derived from UTC timestamps.
 if (nowLiveTitle) {
 document.title = `🔴 NOW LIVE – ${nowLiveTitle}`;
 } else if (soonestTimeLeft < Infinity) {
@@ -312,7 +321,7 @@ document.title = `⏳ ${days}d ${hours}h – ${soonestEventTitle}`;
 document.title = 'ggPause';
 }
 
-}, 1000);
+  }, 1000);
 }
 
 
@@ -330,7 +339,8 @@ btn.classList.toggle('reacted', emoji === userEmoji);
 async function loadEvents() {
   const res = await fetch('/events/index.json');
 const files = await res.json();
-const now = new Date();
+const now = new Date(); // This 'now' is for initial sorting and 'isPast' check based on local time.
+// The actual countdown logic is unified by using UTC timestamps.
 const parsedEvents = [];
 
 for (const file of files) {
@@ -345,14 +355,22 @@ parsedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
 
 for (const data of parsedEvents) {
+// VERY IMPORTANT:
+// For the countdown to be unified, the 'data.date' and 'data.end' values
+// in your markdown frontmatter (and ultimately in the 'data-start-event-date'
+// and 'data-end-event-date' attributes) MUST be in a format that
+// `new Date()` interprets as UTC. The best way is ISO 8601 with 'Z' suffix:
+// Example: date: "2025-06-07T10:00:00Z" (for 10 AM UTC)
+// If they are simply "YYYY-MM-DD HH:MM:SS", new Date() will parse them
+// in the user's local timezone, which will break the global consistency.
 const date = new Date(data.date);
-const isPast = date < now;
+const isPast = date < now; // This 'isPast' is based on local time for initial placement
 const isSteam = data.type === 'steam_sale';
 
 
 const slug = data.slug || data._filename.replace('.md', '');
 const formatTimeShort = d => {
-  const dt = new Date(d);
+  const dt = new Date(d); // This will display in local time for user convenience
   const h = dt.getHours();
   const m = dt.getMinutes().toString().padStart(2, '0');
   const ampm = h >= 12 ? 'pm' : 'am';
@@ -361,7 +379,7 @@ const formatTimeShort = d => {
 };
 
 const formatDateShort = d => {
-  const dt = new Date(d);
+  const dt = new Date(d); // This will display in local time for user convenience
   const month = dt.toLocaleString('default', { month: 'short' });
   return `${month} ${dt.getDate()}`;
 };
@@ -370,7 +388,7 @@ const formatSingle = d => `${formatDateShort(d)} - ${formatTimeShort(d)}`;
 const formatRange = (start, end) =>
   `${formatDateShort(start)} - ${formatTimeShort(start)} / ${formatDateShort(end)} - ${formatTimeShort(end)}`;
   const formatTimeUTC = d => {
-const dt = new Date(d);
+const dt = new Date(d); // This will convert the passed date (hopefully UTC) to its UTC parts
 const h = dt.getUTCHours();
 const m = dt.getUTCMinutes().toString().padStart(2, '0');
 const ampm = h >= 12 ? 'pm' : 'am';
@@ -380,8 +398,8 @@ return `${hour}:${m} <span class="unit">UTC</span>`;
 
 
 const formatDateUTC = d => {
-const dt = new Date(d);
-const month = dt.toLocaleString('default', { month: 'short' });
+const dt = new Date(d); // This will convert the passed date (hopefully UTC) to its UTC parts
+const month = dt.toLocaleString('default', { month: 'short' }); // still uses locale for month name
 return `${month} ${dt.getUTCDate()}`;
 };
 
@@ -524,8 +542,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       loadReactionsForEvent(wrapper, eventId);
     });
 
-    setInterval(updateNowPlayingBar, 3000);
+    // It's good to call startCountdowns only once after events are loaded
+    // as it sets up its own setInterval.
     startCountdowns();
+    // Re-call updateNowPlayingBar to ensure it's up-to-date after countdowns start
+    // and live events potentially move.
+    setInterval(updateNowPlayingBar, 3000);
   }
 });
 
@@ -569,12 +591,8 @@ if (steamHeader) steamHeader.style.display = 'none';
 }
 }
 
-
-
-
-
-
-setInterval(updateNowPlayingBar, 3000);
+// Removed duplicate setInterval(updateNowPlayingBar, 3000) here,
+// as it's already in the DOMContentLoaded block.
 window.addEventListener("load", () => {
 const loadingScreen = document.getElementById("loadingScreen");
 if (loadingScreen) {
